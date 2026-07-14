@@ -58,6 +58,12 @@ const linksList = [
     caption: 'Profile',
     icon: 'school',
     link: '/profile'
+  },
+  {
+    label: 'XLSX',
+    caption: 'XLSX',
+    icon: 'file_upload',
+    link: '/xlsx'
   }
 ]
 
