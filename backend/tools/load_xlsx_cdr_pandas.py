@@ -1,12 +1,13 @@
 import os
+import sys
 import django
 from django.core.exceptions import FieldError
 
+# Adiciona a raiz do projeto (backend/) ao sys.path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 # 1. Altere 'nome_do_seu_projeto' para o nome da pasta principal do seu projeto Django
-os.environ.setdefault(
-    'DJANGO_SETTINGS_MODULE',
-    'kernel.settings'
-)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE','kernel.settings')
 
 # 2. Inicializa o Django
 django.setup()
