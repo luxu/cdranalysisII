@@ -124,7 +124,9 @@ class Device(Base):
     iccid = models.CharField(
         'ICCID(ID do cartão SIM)',
         max_length=255,
-    )  # ThingName só os nros
+        blank=True,
+        null=True,
+    )
     imsi = models.CharField(
         "IMSI(Internacional Mobile Subscriber Identity)",
         max_length=255,
