@@ -65,6 +65,48 @@ const linksList = [
     link: '/device'
   },
   {
+    label: 'Organization',
+    caption: 'Organization',
+    icon: 'business',
+    link: '/organization'
+  },
+  {
+    label: 'Customer',
+    caption: 'Customer',
+    icon: 'people',
+    link: '/customer'
+  },
+  {
+    label: 'MNO',
+    caption: 'MNO',
+    icon: 'cell_tower',
+    link: '/mno'
+  },
+  {
+    label: 'NetworkProvider',
+    caption: 'NetworkProvider',
+    icon: 'router',
+    link: '/networkprovider'
+  },
+  {
+    label: 'PricePlan',
+    caption: 'PricePlan',
+    icon: 'sell',
+    link: '/priceplan'
+  },
+  {
+    label: 'Thing',
+    caption: 'Thing',
+    icon: 'memory',
+    link: '/thing'
+  },
+  {
+    label: 'Session',
+    caption: 'Session',
+    icon: 'sync_alt',
+    link: '/session'
+  },
+  {
     label: 'XLSX',
     caption: 'XLSX',
     icon: 'file_upload',
