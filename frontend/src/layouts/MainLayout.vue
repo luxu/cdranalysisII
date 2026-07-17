@@ -10,7 +10,6 @@
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
-
       </q-toolbar>
     </q-header>
 
@@ -18,10 +17,10 @@
       <q-list>
         <q-item-label header>Menu</q-item-label>
 
-        <q-item 
-          v-for="item in linksList" 
-          :key="item.label" 
-          clickable 
+        <q-item
+          v-for="item in linksList"
+          :key="item.label"
+          clickable
           :to="item.link"
           exact
         >
@@ -30,7 +29,7 @@
           </q-item-section>
 
           <q-item-section>
-            <q-item-label>{{ item.label }}</q-item-label>            
+            <q-item-label>{{ item.label }}</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
@@ -58,6 +57,12 @@ const linksList = [
     caption: 'Profile',
     icon: 'school',
     link: '/profile'
+  },
+  {
+    label: 'Device',
+    caption: 'Device',
+    icon: 'devices',
+    link: '/device'
   },
   {
     label: 'XLSX',

@@ -4,9 +4,31 @@ const routes = [
     component: () => import('@/layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('@/pages/IndexPage.vue') },
-      { path: 'profile', name: 'profile', component: () => import('@/pages/profile/ListPage.vue') },
-      { path: 'profile-form/:id?', name: 'form-profile', component: () => import('@/pages/profile/FormPage.vue') },
-      { path: 'xlsx', name: 'xlsx', component: () => import('@/pages/LoadPage.vue') }
+      {
+        path: 'profile',
+        name: 'profile',
+        component: () => import('@/pages/profile/ListPage.vue')
+      },
+      {
+        path: 'profile-form/:id?',
+        name: 'form-profile',
+        component: () => import('@/pages/profile/FormPage.vue')
+      },
+      {
+        path: 'device',
+        name: 'device',
+        component: () => import('@/pages/device/ListPage.vue')
+      },
+      {
+        path: 'device-form/:id?',
+        name: 'form-device',
+        component: () => import('@/pages/device/FormPage.vue')
+      },
+      {
+        path: 'xlsx',
+        name: 'xlsx',
+        component: () => import('@/pages/LoadPage.vue')
+      }
     ]
   },
 
