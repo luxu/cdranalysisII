@@ -29,6 +29,8 @@ MAPEAMENTO_COLUNAS = {
     'msisdn': 'MSISDN',
     'sessionid': 'SessionId',
     'sessioncreatetime': 'sessionCreationTime',
+    'realusage': 'RealUsage',
+    'uom': 'UOM',
 }
 
 COLUNAS_COMO_STR = [
@@ -88,6 +90,7 @@ def processar_linha(linha, caches):
     device = caches['device'][imsi]
 
     session_id = linha[m['sessionid']]
+    # Se a célula Session estiver em branco retorna
     if pd.isna(session_id):
         return
 
@@ -104,6 +107,8 @@ def processar_linha(linha, caches):
                 'sessioncreatetime': sessioncreatetime_,
                 'imsi': imsi,
                 'device': device,
+                'realusage': linha[m['realusage']] if not pd.isna(linha[m['realusage']]) else None,
+                'uom': linha[m['uom']] if not pd.isna(linha[m['uom']]) else None,
             },
         )
         caches['session'][session_id] = True
