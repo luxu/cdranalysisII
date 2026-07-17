@@ -20,13 +20,43 @@ from cdr.models import (
     Customer,
     NetworkProvider,
     PricePlan,
-    Thing
+    Thing,
+    Device,
+    Session
 )
-
+# Serve para passar o campo dinamicamente na linha 104
+MODELS_MAP = {
+    'organization': Organization,
+    'customer': Customer,
+    'mno': Mno,
+    'priceplan': PricePlan,
+    'networkprovider': NetworkProvider,
+    'thing': Thing,
+    'device': Device,
+    'session': Session,
+}
+# campo_bd: coluna do excel
+MAPEAMENTO_COLUNAS = {
+    'orgid': 'OrganizationId',
+    'orgname': 'OrganizationName',
+    'customerid': 'CustomerId',
+    'customername': 'CustomerName',
+    'priceplanid': 'PricePlanId',
+    'priceplanname': 'PricePlanName',
+    'mnoid': 'MNOId',
+    'mnoname': 'MnoName',
+    'networkproviderid': 'NetworkProviderId',
+    'networkprovidername': 'NetworkProviderName',
+    'thingsgroupid': 'ThingsGroupId',
+    'thingsgroupname': 'ThingsGroupName',
+    'imsi': 'imsi'.upper(),
+    'msisdn': 'msisdn'.upper(),
+    'sessionid': 'SessionId',
+    'sessioncreatetime': 'sessionCreationTime'
+}
 
 
 def load_file(filename):
-    # Carrega o arquivo Excel usando o Pandas
     return pd.read_excel(filename)
 
 def importar_sistema_dinamico(
@@ -34,22 +64,20 @@ def importar_sistema_dinamico(
         model_django,
         chave_id,
         chave_nome,
-        mapeamento,
         lista_fks=None
 ):
-    MODELS_MAP = {
-        'organization': Organization,
-        'customer': Customer,
-        'mno': Mno,
-        'priceplan': PricePlan,
-        'networkprovider': NetworkProvider,
-        'thing': Thing,
-    }
+    mapeamento = MAPEAMENTO_COLUNAS
     coluna_excel_id = mapeamento[chave_id]
     coluna_excel_nome = mapeamento[chave_nome]
+    if chave_id == 'sessionid':
+        print(chave_id)
+        # coluna_excel_id = coluna_excel_id.upper()
+        # coluna_excel_nome = coluna_excel_nome.upper()
     colunas_necessarias = [coluna_excel_id, coluna_excel_nome]
     for chave_fk, _ in lista_fks:
         colunas_necessarias.append(mapeamento[chave_fk])
+    contador = 0
+    # Percorre linha a linha da planilha
     for _, linha in df.iterrows():
         id_excel = linha[coluna_excel_id]
         nome_excel = linha[coluna_excel_nome]
@@ -76,6 +104,7 @@ def importar_sistema_dinamico(
             except FieldError as e:
                 print(e)
             try:
+                # Pega um FK para salvar no model atual
                 model_classe = MODELS_MAP[model_fk]
                 instancia_fk = model_classe.objects.get(**{chave_fk: id_fk})
             except Exception:
@@ -90,41 +119,28 @@ def importar_sistema_dinamico(
                 objetos_para_criar.append(model_django(**dados_campos))
                 model_django.objects.bulk_create(objetos_para_criar)
                 print(f'Perfeito! Model..:{model_django.__name__} salvo no BD!')
-            except TypeError as e:
+            except ValueError as e:
                 print(e)
+        contador += 1
+    print(f'Model:{model_django} \nPassou pelo Arquivo...{contador} vezes!')
     return
 
 
 
 if '__main__' == __name__:
-    MAPEAMENTO_COLUNAS = {
-        'orgid': 'OrganizationId',
-        'orgname': 'OrganizationName',
-        'customerid': 'CustomerId',
-        'customername': 'CustomerName',
-        'priceplanid': 'PricePlanId',
-        'priceplanname': 'PricePlanName',
-        'mnoid': 'MNOId',
-        'mnoname': 'MnoName',
-        'networkproviderid': 'NetworkProviderId',
-        'networkprovidername': 'NetworkProviderName',
-        'thingsgroupid': 'ThingsGroupId',
-        'thingsgroupname': 'ThingsGroupName'
-    }
     filename = os.path.join(os.path.dirname(__file__), '..', 'files', 'cdr.xlsx')
     df_excel = load_file(filename)
-
-    # --- CONFIGURAÇÃO DA FILA DE IMPORTAÇÃO ---
-    # Estrutura: (Model, 'campo_id', 'campo_nome', [('chave_fk_mapeamento', 'nome_campo_no_model')])
+    # uso (Model, primeiro_campo_do_bd, segundo_campo_do_bd, FK(campo, model)
     fila_importacao = [
-        # 1. Tabelas Independentes (Bases)
         (Organization, 'orgid', 'orgname', []),
-        # 2. Tabelas Dependentes de Nível 1
-        (Mno, 'mnoid', 'mnoname', [('orgid', 'organization')]),
         (Customer, 'customerid', 'customername', [('orgid', 'organization')]),
-        (PricePlan, 'priceplanid', 'priceplanname', [('customerid', 'customer')]),
-        (NetworkProvider, 'networkproviderid', 'networkprovidername', [('customerid', 'customer')]),
         (Thing, 'thingsgroupid', 'thingsgroupname', [('customerid', 'customer')]),
+        (Device, 'imsi', 'msisdn', [('thingsgroupid', 'thing')]),
+        (Session, 'sessionid', 'sessioncreatetime', [('imsi', 'device')]),
+        ### Dependem do ORGANIZATION só
+        # (Mno, 'mnoid', 'mnoname', [('orgid', 'organization')]),
+        # (PricePlan, 'priceplanid', 'priceplanname', [('customerid', 'customer')]),
+        # (NetworkProvider, 'networkproviderid', 'networkprovidername', [('customerid', 'customer')]),
     ]
     print("Iniciando carga de dados integrada...")
     for model, campo_id, campo_nome, fks in fila_importacao:
@@ -134,7 +150,6 @@ if '__main__' == __name__:
             model_django=model,
             chave_id=campo_id,
             chave_nome=campo_nome,
-            mapeamento=MAPEAMENTO_COLUNAS,
             lista_fks=fks
         )
     print("\nCarga finalizada com sucesso!")

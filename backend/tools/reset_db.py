@@ -2,6 +2,7 @@ import os
 import sys
 import shutil
 import subprocess
+from decouple import config
 from pathlib import Path
 
 # --- CONFIGURAÇÃO DE SEGURANÇA ---
@@ -79,9 +80,8 @@ def resetar_projeto():
         cwd=BASE_DIR,
         env={
             **os.environ,
-            "DJANGO_SUPERUSER_USERNAME": "contato@luxu.com.br",
-            "DJANGO_SUPERUSER_EMAIL": "contato@luxu.com.br",
-            "DJANGO_SUPERUSER_PASSWORD": "2",
+            "DJANGO_SUPERUSER_EMAIL": config("DJANGO_SUPERUSER_EMAIL"),
+            "DJANGO_SUPERUSER_PASSWORD": config("DJANGO_SUPERUSER_PASSWORD"),
         },
         check=True,
     )

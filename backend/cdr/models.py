@@ -15,6 +15,7 @@ class Organization(Base):
     def __str__(self):
         return f'Organization..: {self.orgname}'
 
+
 class Customer(Base):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     customerid = models.CharField(
@@ -30,6 +31,7 @@ class Customer(Base):
 
     def __str__(self):
         return f'Customer..: {self.customername}'
+
 
 class Mno(Base):
     # Operadora de rede móvel (ex: Vivo, Claro, Tim).
@@ -110,3 +112,56 @@ class Thing(Base):
     class Meta:
         verbose_name = 'Dispositivo(Thing)'
         verbose_name_plural = 'Dispositivos(Things)'
+
+
+class Device(Base):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    thing = models.ForeignKey(
+        Thing,
+        on_delete=models.CASCADE,
+        related_name='devices_things',
+    )
+    iccid = models.CharField(
+        'ICCID(ID do cartão SIM)',
+        max_length=255,
+    )  # ThingName só os nros
+    imsi = models.CharField(
+        "IMSI(Internacional Mobile Subscriber Identity)",
+        max_length=255,
+    )  # (FK)
+    msisdn = models.CharField(
+        "MSISDN(número da linha)",
+        max_length=255,
+    )
+    mei = models.CharField(
+        "MEI(ID do aparelho)",
+        max_length=255,
+    )
+
+
+class Session(Base):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    device = models.ForeignKey(
+        Device,
+        on_delete=models.CASCADE,
+        related_name='sessions_devices',
+    )
+    sessionid = models.CharField(
+        "SessionID",
+        max_length=255,
+    )
+    imsi = models.CharField(
+        "IMSI(Internacional Mobile Subscriber Identity)",
+        max_length=255,
+    )  # (FK)
+    sessioncreatetime = models.DateTimeField(
+        
+    )
+    realusage = models.CharField(
+        "RealUsage1(consumo real)",
+        max_length=255,
+    )
+    uom = models.CharField(
+        "UOM(Unidade de Medida, ex: MB, KB)",
+        max_length=255,
+    )
