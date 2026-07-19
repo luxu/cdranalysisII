@@ -5,14 +5,15 @@ requires-python = ">=3.13"
 dependencies = [
     "dj-database-url>=3.1.2",
     "django>=6.0.6",
+    "django-cors-headers>=4.9.0",
     "django-extensions>=4.1",
+    "djangorestframework>=3.17.0",
+    "djangorestframework-simplejwt>=5.5.1",
+    "gunicorn>=25.3.0",
     "ipython>=9.15.0",
-    "openpyxl>=3.1.5",
     "pandas>=3.0.3",
     "pillow>=12.3.0",
     "python-decouple>=3.8",
-    "rich>=15.0.0",
-    "tabulate>=0.10.0",
     "taskipy>=1.2.1",
 ]
 [tool.taskipy.tasks]
@@ -21,16 +22,10 @@ makemigrations = "uv run python manage.py makemigrations"
 migrate = "uv run python manage.py migrate"
 createsuperuser = "uv run python manage.py createsuperuser"
 runserver = "uv run python manage.py runserver"
-loadata_gasto = "uv run python manage.py loaddata fixtures/gasto_fixtures.json"
-loadata_events = "uv run python manage.py loaddata events/fixtures/01_events.json"
 loadfixtures = "uv run python manage.py migrate && uv run python manage.py loaddata gasto/fixtures/01_segmento.json gasto/fixtures/02_cardbank.json gasto/fixtures/03_regralimpezanome.json gasto/fixtures/04_gasto.json gasto/fixtures/05_parcelas.json events/fixtures/01_events.json"
 dumpfixtures = "uv run python manage.py dumpdata gasto.segmento --format=json --indent=2 > gasto/fixtures/01_segmento.json && uv run python manage.py dumpdata gasto.cardbank --format=json --indent=2 > gasto/fixtures/02_cardbank.json && uv run python manage.py dumpdata gasto.regralimpezanome --format=json --indent=2 > gasto/fixtures/03_regralimpezanome.json"
 setupdb = "uv run python manage.py makemigrations && uv run python manage.py migrate && task loadfixtures"
 pytest = "uv run pytest -vv"
-8004 = "uv run python manage.py runserver 8004"
 shell_plus = "uv run python manage.py shell_plus"
-showmigrations = "uv run python manage.py showmigrations"
-cdr = "uv run python tools/load_cdr.py"
-reset = "uv run python tools/reset_db.py"
 lint = "ruff check"
 lint_fix = "ruff check --fix"
