@@ -10,25 +10,40 @@
               label="Customer"
               v-model="form.customer"
               :options="customerOptions"
-              option-label="name"
+              option-label="customername"
               option-value="id"
               emit-value
               map-options
+              :error="hasError('customer')"
+              :error-message="fieldError('customer')"
             />
           </div>
           <div class="col-12 col-sm-6 col-md-3">
-            <q-input filled label="PricePlanId" v-model="form.priceplanid" />
+            <q-input
+              filled
+              label="PricePlanId"
+              v-model="form.priceplanid"
+              :error="hasError('priceplanid')"
+              :error-message="fieldError('priceplanid')"
+            />
           </div>
           <div class="col-12 col-sm-6 col-md-3">
             <q-input
               filled
               label="PricePlanName"
               v-model="form.priceplanname"
+              :error="hasError('priceplanname')"
+              :error-message="fieldError('priceplanname')"
             />
           </div>
         </div>
         <div class="col-12 col-sm-6 col-md-3">
-          <q-btn label="Submit" type="submit" color="primary" />
+          <q-btn
+            label="Submit"
+            type="submit"
+            color="primary"
+            :loading="loading"
+          />
         </div>
       </q-form>
     </div>
@@ -36,61 +51,34 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { defineComponent } from 'vue'
+import priceplanService from '@/services/priceplan'
+import customerService from '@/services/customer'
+import useCrudForm from '@/composables/useCrudForm'
+import useOptions from '@/composables/useOptions'
 
 export default defineComponent({
   setup() {
-    const form = ref({
-      customer: null,
-      priceplanid: '',
-      priceplanname: ''
-    })
-
-    const customerOptions = ref([
-      { id: 1, name: 'Customer 1' },
-      { id: 2, name: 'Customer 2' }
-    ])
-
-    const router = useRouter()
-    const route = useRoute()
-
-    const isUpdate = computed(() => route.params.id)
-
-    const handleGetPricePlan = async id => {
-      console.log('Fetching priceplan data for id:', id)
-      // Fetch the priceplan data by ID and populate the form fields
-      // Example:
-      // const response = await fetch(`/api/priceplans/${id}`);
-      // const data = await response.json();
-      // form.value = {
-      //     customer: data.customer,
-      //     priceplanid: data.priceplanid,
-      //     priceplanname: data.priceplanname,
-      // };
-    }
-
-    onMounted(() => {
-      if (isUpdate.value) {
-        handleGetPricePlan(isUpdate.value)
+    const { form, loading, hasError, fieldError, onSubmit } = useCrudForm(
+      priceplanService,
+      {
+        listRoute: 'priceplan',
+        initialForm: {
+          customer: null,
+          priceplanid: '',
+          priceplanname: ''
+        }
       }
-    })
+    )
 
-    const onSubmit = () => {
-      if (isUpdate.value) {
-        // Update the priceplan
-        console.log('Updating priceplan:', form.value)
-      } else {
-        // Create a new priceplan
-        console.log('Creating new priceplan:', form.value)
-      }
-      router.push({ name: 'priceplan' })
-    }
+    const customerOptions = useOptions(customerService)
 
     return {
       form,
+      loading,
       customerOptions,
-      handleGetPricePlan,
+      hasError,
+      fieldError,
       onSubmit
     }
   }

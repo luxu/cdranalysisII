@@ -7,7 +7,14 @@
       icon="add"
       :to="{ name: 'form-networkprovider' }"
     />
-    <q-table :rows="rows" :columns="columns" row-key="id">
+    <q-table
+      v-model:pagination="pagination"
+      :rows="rows"
+      :columns="columns"
+      row-key="id"
+      :loading="loading"
+      @request="onRequest"
+    >
       <template v-slot:body-cell-actions="props">
         <q-td :props="props" class="q-gutter-x-sm">
           <q-btn
@@ -35,32 +42,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
-import { columns } from './table'
+import { defineComponent } from 'vue'
 import { useRouter } from 'vue-router'
+import { columns } from './table'
+import networkproviderService from '@/services/networkprovider'
+import useCrudList from '@/composables/useCrudList'
 
 export default defineComponent({
   setup() {
     const router = useRouter()
 
-    const rows = ref([
-      {
-        id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-        networkproviderid:
-          'NetworkProviderId_57afa6a5-a642-4d01-92f8-87880964264c',
-        networkprovidername: 'CBRS 315010 Solis',
-        customer: 'SOLIS - OPERADORA AGRO',
-        customer_name: 'SOLIS - OPERADORA AGRO'
-      },
-      {
-        id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
-        networkproviderid:
-          'NetworkProviderId_8540c013-1501-41d4-9c9b-2feea91c1473',
-        networkprovidername: 'CBRS 72472 Veracruz',
-        customer: 'VERACRUZ',
-        customer_name: 'VERACRUZ'
-      }
-    ])
+    const { rows, loading, pagination, onRequest, confirmRemove } = useCrudList(
+      networkproviderService,
+      { entityLabel: 'NetworkProvider' }
+    )
 
     const handlerEdit = (item: any) => {
       router.push({
@@ -69,13 +64,15 @@ export default defineComponent({
       })
     }
 
-    const handlerRemove = (item: any) => {
-      console.log('Removing networkprovider:', item.id)
-    }
+    const handlerRemove = (item: any) =>
+      confirmRemove(item, item.networkprovidername)
 
     return {
       rows,
       columns,
+      loading,
+      pagination,
+      onRequest,
       handlerEdit,
       handlerRemove
     }

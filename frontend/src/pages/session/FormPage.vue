@@ -10,20 +10,30 @@
               label="Device"
               v-model="form.device"
               :options="deviceOptions"
-              option-label="name"
+              option-label="iccid"
               option-value="id"
               emit-value
               map-options
+              :error="hasError('device')"
+              :error-message="fieldError('device')"
             />
           </div>
           <div class="col-12 col-sm-6 col-md-3">
-            <q-input filled label="SessionId" v-model="form.sessionid" />
+            <q-input
+              filled
+              label="SessionId"
+              v-model="form.sessionid"
+              :error="hasError('sessionid')"
+              :error-message="fieldError('sessionid')"
+            />
           </div>
           <div class="col-12 col-sm-6 col-md-3">
             <q-input
               filled
               label="IMSI (Internacional Mobile Subscriber Identity)"
               v-model="form.imsi"
+              :error="hasError('imsi')"
+              :error-message="fieldError('imsi')"
             />
           </div>
           <div class="col-12 col-sm-6 col-md-3">
@@ -32,6 +42,8 @@
               label="SessionCreateTime"
               v-model="form.sessioncreatetime"
               type="datetime-local"
+              :error="hasError('sessioncreatetime')"
+              :error-message="fieldError('sessioncreatetime')"
             />
           </div>
           <div class="col-12 col-sm-6 col-md-3">
@@ -39,6 +51,8 @@
               filled
               label="RealUsage (consumo real)"
               v-model="form.realusage"
+              :error="hasError('realusage')"
+              :error-message="fieldError('realusage')"
             />
           </div>
           <div class="col-12 col-sm-6 col-md-3">
@@ -46,11 +60,18 @@
               filled
               label="UOM (Unidade de Medida, ex: MB, KB)"
               v-model="form.uom"
+              :error="hasError('uom')"
+              :error-message="fieldError('uom')"
             />
           </div>
         </div>
         <div class="col-12 col-sm-6 col-md-3">
-          <q-btn label="Submit" type="submit" color="primary" />
+          <q-btn
+            label="Submit"
+            type="submit"
+            color="primary"
+            :loading="loading"
+          />
         </div>
       </q-form>
     </div>
@@ -58,67 +79,43 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { defineComponent } from 'vue'
+import sessionService from '@/services/session'
+import deviceService from '@/services/device'
+import useCrudForm from '@/composables/useCrudForm'
+import useOptions from '@/composables/useOptions'
 
 export default defineComponent({
   setup() {
-    const form = ref({
-      device: null,
-      sessionid: '',
-      imsi: '',
-      sessioncreatetime: '',
-      realusage: '',
-      uom: ''
-    })
-
-    const deviceOptions = ref([
-      { id: 1, name: 'Device 1' },
-      { id: 2, name: 'Device 2' }
-    ])
-
-    const router = useRouter()
-    const route = useRoute()
-
-    const isUpdate = computed(() => route.params.id)
-
-    const handleGetSession = async id => {
-      console.log('Fetching session data for id:', id)
-      // Fetch the session data by ID and populate the form fields
-      // Example:
-      // const response = await fetch(`/api/sessions/${id}`);
-      // const data = await response.json();
-      // form.value = {
-      //     device: data.device,
-      //     sessionid: data.sessionid,
-      //     imsi: data.imsi,
-      //     sessioncreatetime: data.sessioncreatetime,
-      //     realusage: data.realusage,
-      //     uom: data.uom,
-      // };
-    }
-
-    onMounted(() => {
-      if (isUpdate.value) {
-        handleGetSession(isUpdate.value)
+    const { form, loading, hasError, fieldError, onSubmit } = useCrudForm(
+      sessionService,
+      {
+        listRoute: 'session',
+        initialForm: {
+          device: null,
+          sessionid: '',
+          imsi: '',
+          sessioncreatetime: '',
+          realusage: '',
+          uom: ''
+        },
+        // API retorna ISO 8601 (ex.: 2026-01-14T09:25:37-03:00);
+        // o input datetime-local aceita apenas YYYY-MM-DDTHH:mm
+        mapIn: (data: any) => ({
+          ...data,
+          sessioncreatetime: data.sessioncreatetime?.slice(0, 16) || ''
+        })
       }
-    })
+    )
 
-    const onSubmit = () => {
-      if (isUpdate.value) {
-        // Update the session
-        console.log('Updating session:', form.value)
-      } else {
-        // Create a new session
-        console.log('Creating new session:', form.value)
-      }
-      router.push({ name: 'session' })
-    }
+    const deviceOptions = useOptions(deviceService)
 
     return {
       form,
+      loading,
       deviceOptions,
-      handleGetSession,
+      hasError,
+      fieldError,
       onSubmit
     }
   }

@@ -10,10 +10,12 @@
               label="Customer"
               v-model="form.customer"
               :options="customerOptions"
-              option-label="name"
+              option-label="customername"
               option-value="id"
               emit-value
               map-options
+              :error="hasError('customer')"
+              :error-message="fieldError('customer')"
             />
           </div>
           <div class="col-12 col-sm-6 col-md-3">
@@ -21,6 +23,8 @@
               filled
               label="ThingsGroupId"
               v-model="form.thingsgroupid"
+              :error="hasError('thingsgroupid')"
+              :error-message="fieldError('thingsgroupid')"
             />
           </div>
           <div class="col-12 col-sm-6 col-md-3">
@@ -28,11 +32,18 @@
               filled
               label="ThingsGroupName"
               v-model="form.thingsgroupname"
+              :error="hasError('thingsgroupname')"
+              :error-message="fieldError('thingsgroupname')"
             />
           </div>
         </div>
         <div class="col-12 col-sm-6 col-md-3">
-          <q-btn label="Submit" type="submit" color="primary" />
+          <q-btn
+            label="Submit"
+            type="submit"
+            color="primary"
+            :loading="loading"
+          />
         </div>
       </q-form>
     </div>
@@ -40,61 +51,34 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { defineComponent } from 'vue'
+import thingService from '@/services/thing'
+import customerService from '@/services/customer'
+import useCrudForm from '@/composables/useCrudForm'
+import useOptions from '@/composables/useOptions'
 
 export default defineComponent({
   setup() {
-    const form = ref({
-      customer: null,
-      thingsgroupid: '',
-      thingsgroupname: ''
-    })
-
-    const customerOptions = ref([
-      { id: 1, name: 'Customer 1' },
-      { id: 2, name: 'Customer 2' }
-    ])
-
-    const router = useRouter()
-    const route = useRoute()
-
-    const isUpdate = computed(() => route.params.id)
-
-    const handleGetThing = async id => {
-      console.log('Fetching thing data for id:', id)
-      // Fetch the thing data by ID and populate the form fields
-      // Example:
-      // const response = await fetch(`/api/things/${id}`);
-      // const data = await response.json();
-      // form.value = {
-      //     customer: data.customer,
-      //     thingsgroupid: data.thingsgroupid,
-      //     thingsgroupname: data.thingsgroupname,
-      // };
-    }
-
-    onMounted(() => {
-      if (isUpdate.value) {
-        handleGetThing(isUpdate.value)
+    const { form, loading, hasError, fieldError, onSubmit } = useCrudForm(
+      thingService,
+      {
+        listRoute: 'thing',
+        initialForm: {
+          customer: null,
+          thingsgroupid: '',
+          thingsgroupname: ''
+        }
       }
-    })
+    )
 
-    const onSubmit = () => {
-      if (isUpdate.value) {
-        // Update the thing
-        console.log('Updating thing:', form.value)
-      } else {
-        // Create a new thing
-        console.log('Creating new thing:', form.value)
-      }
-      router.push({ name: 'thing' })
-    }
+    const customerOptions = useOptions(customerService)
 
     return {
       form,
+      loading,
       customerOptions,
-      handleGetThing,
+      hasError,
+      fieldError,
       onSubmit
     }
   }

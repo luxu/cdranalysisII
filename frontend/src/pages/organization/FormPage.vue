@@ -5,14 +5,31 @@
       <q-form class="q-gutter-md" @submit.prevent="onSubmit">
         <div class="row q-col-gutter-md">
           <div class="col-12 col-sm-6 col-md-3">
-            <q-input filled label="OrgId" v-model="form.orgid" />
+            <q-input
+              filled
+              label="OrgId"
+              v-model="form.orgid"
+              :error="hasError('orgid')"
+              :error-message="fieldError('orgid')"
+            />
           </div>
           <div class="col-12 col-sm-6 col-md-3">
-            <q-input filled label="OrgName" v-model="form.orgname" />
+            <q-input
+              filled
+              label="OrgName"
+              v-model="form.orgname"
+              :error="hasError('orgname')"
+              :error-message="fieldError('orgname')"
+            />
           </div>
         </div>
         <div class="col-12 col-sm-6 col-md-3">
-          <q-btn label="Submit" type="submit" color="primary" />
+          <q-btn
+            label="Submit"
+            type="submit"
+            color="primary"
+            :loading="loading"
+          />
         </div>
       </q-form>
     </div>
@@ -20,53 +37,28 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { defineComponent } from 'vue'
+import organizationService from '@/services/organization'
+import useCrudForm from '@/composables/useCrudForm'
 
 export default defineComponent({
   setup() {
-    const form = ref({
-      orgid: '',
-      orgname: ''
-    })
-
-    const router = useRouter()
-    const route = useRoute()
-
-    const isUpdate = computed(() => route.params.id)
-
-    const handleGetOrganization = async id => {
-      console.log('Fetching organization data for id:', id)
-      // Fetch the organization data by ID and populate the form fields
-      // Example:
-      // const response = await fetch(`/api/organizations/${id}`);
-      // const data = await response.json();
-      // form.value = {
-      //     orgid: data.orgid,
-      //     orgname: data.orgname,
-      // };
-    }
-
-    onMounted(() => {
-      if (isUpdate.value) {
-        handleGetOrganization(isUpdate.value)
+    const { form, loading, hasError, fieldError, onSubmit } = useCrudForm(
+      organizationService,
+      {
+        listRoute: 'organization',
+        initialForm: {
+          orgid: '',
+          orgname: ''
+        }
       }
-    })
-
-    const onSubmit = () => {
-      if (isUpdate.value) {
-        // Update the organization
-        console.log('Updating organization:', form.value)
-      } else {
-        // Create a new organization
-        console.log('Creating new organization:', form.value)
-      }
-      router.push({ name: 'organization' })
-    }
+    )
 
     return {
       form,
-      handleGetOrganization,
+      loading,
+      hasError,
+      fieldError,
       onSubmit
     }
   }

@@ -10,10 +10,12 @@
               label="Thing"
               v-model="form.thing"
               :options="thingOptions"
-              option-label="name"
+              option-label="thingsgroupname"
               option-value="id"
               emit-value
               map-options
+              :error="hasError('thing')"
+              :error-message="fieldError('thing')"
             />
           </div>
           <div class="col-12 col-sm-6 col-md-3">
@@ -21,6 +23,8 @@
               filled
               label="ICCID (ID do cartão SIM)"
               v-model="form.iccid"
+              :error="hasError('iccid')"
+              :error-message="fieldError('iccid')"
             />
           </div>
           <div class="col-12 col-sm-6 col-md-3">
@@ -28,6 +32,8 @@
               filled
               label="IMSI (Internacional Mobile Subscriber Identity)"
               v-model="form.imsi"
+              :error="hasError('imsi')"
+              :error-message="fieldError('imsi')"
             />
           </div>
           <div class="col-12 col-sm-6 col-md-3">
@@ -35,14 +41,27 @@
               filled
               label="MSISDN (número da linha)"
               v-model="form.msisdn"
+              :error="hasError('msisdn')"
+              :error-message="fieldError('msisdn')"
             />
           </div>
           <div class="col-12 col-sm-6 col-md-3">
-            <q-input filled label="MEI (ID do aparelho)" v-model="form.mei" />
+            <q-input
+              filled
+              label="MEI (ID do aparelho)"
+              v-model="form.mei"
+              :error="hasError('mei')"
+              :error-message="fieldError('mei')"
+            />
           </div>
         </div>
         <div class="col-12 col-sm-6 col-md-3">
-          <q-btn label="Submit" type="submit" color="primary" />
+          <q-btn
+            label="Submit"
+            type="submit"
+            color="primary"
+            :loading="loading"
+          />
         </div>
       </q-form>
     </div>
@@ -50,65 +69,36 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { defineComponent } from 'vue'
+import deviceService from '@/services/device'
+import thingService from '@/services/thing'
+import useCrudForm from '@/composables/useCrudForm'
+import useOptions from '@/composables/useOptions'
 
 export default defineComponent({
   setup() {
-    const form = ref({
-      thing: null,
-      iccid: '',
-      imsi: '',
-      msisdn: '',
-      mei: ''
-    })
-
-    const thingOptions = ref([
-      { id: 1, name: 'Thing 1' },
-      { id: 2, name: 'Thing 2' }
-    ])
-
-    const router = useRouter()
-    const route = useRoute()
-
-    const isUpdate = computed(() => route.params.id)
-
-    const handleGetDevice = async id => {
-      console.log('Fetching device data for id:', id)
-      // Fetch the device data by ID and populate the form fields
-      // Example:
-      // const response = await fetch(`/api/devices/${id}`);
-      // const data = await response.json();
-      // form.value = {
-      //     thing: data.thing,
-      //     iccid: data.iccid,
-      //     imsi: data.imsi,
-      //     msisdn: data.msisdn,
-      //     mei: data.mei,
-      // };
-    }
-
-    onMounted(() => {
-      if (isUpdate.value) {
-        handleGetDevice(isUpdate.value)
+    const { form, loading, hasError, fieldError, onSubmit } = useCrudForm(
+      deviceService,
+      {
+        listRoute: 'device',
+        initialForm: {
+          thing: null,
+          iccid: '',
+          imsi: '',
+          msisdn: '',
+          mei: ''
+        }
       }
-    })
+    )
 
-    const onSubmit = () => {
-      if (isUpdate.value) {
-        // Update the device
-        console.log('Updating device:', form.value)
-      } else {
-        // Create a new device
-        console.log('Creating new device:', form.value)
-      }
-      router.push({ name: 'device' })
-    }
+    const thingOptions = useOptions(thingService)
 
     return {
       form,
+      loading,
       thingOptions,
-      handleGetDevice,
+      hasError,
+      fieldError,
       onSubmit
     }
   }

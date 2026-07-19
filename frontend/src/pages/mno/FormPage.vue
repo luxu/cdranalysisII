@@ -10,21 +10,40 @@
               label="Organization"
               v-model="form.organization"
               :options="organizationOptions"
-              option-label="name"
+              option-label="orgname"
               option-value="id"
               emit-value
               map-options
+              :error="hasError('organization')"
+              :error-message="fieldError('organization')"
             />
           </div>
           <div class="col-12 col-sm-6 col-md-3">
-            <q-input filled label="MNOId" v-model="form.mnoid" />
+            <q-input
+              filled
+              label="MNOId"
+              v-model="form.mnoid"
+              :error="hasError('mnoid')"
+              :error-message="fieldError('mnoid')"
+            />
           </div>
           <div class="col-12 col-sm-6 col-md-3">
-            <q-input filled label="MnoName" v-model="form.mnoname" />
+            <q-input
+              filled
+              label="MnoName"
+              v-model="form.mnoname"
+              :error="hasError('mnoname')"
+              :error-message="fieldError('mnoname')"
+            />
           </div>
         </div>
         <div class="col-12 col-sm-6 col-md-3">
-          <q-btn label="Submit" type="submit" color="primary" />
+          <q-btn
+            label="Submit"
+            type="submit"
+            color="primary"
+            :loading="loading"
+          />
         </div>
       </q-form>
     </div>
@@ -32,61 +51,34 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { defineComponent } from 'vue'
+import mnoService from '@/services/mno'
+import organizationService from '@/services/organization'
+import useCrudForm from '@/composables/useCrudForm'
+import useOptions from '@/composables/useOptions'
 
 export default defineComponent({
   setup() {
-    const form = ref({
-      organization: null,
-      mnoid: '',
-      mnoname: ''
-    })
-
-    const organizationOptions = ref([
-      { id: 1, name: 'Organization 1' },
-      { id: 2, name: 'Organization 2' }
-    ])
-
-    const router = useRouter()
-    const route = useRoute()
-
-    const isUpdate = computed(() => route.params.id)
-
-    const handleGetMno = async id => {
-      console.log('Fetching mno data for id:', id)
-      // Fetch the mno data by ID and populate the form fields
-      // Example:
-      // const response = await fetch(`/api/mnos/${id}`);
-      // const data = await response.json();
-      // form.value = {
-      //     organization: data.organization,
-      //     mnoid: data.mnoid,
-      //     mnoname: data.mnoname,
-      // };
-    }
-
-    onMounted(() => {
-      if (isUpdate.value) {
-        handleGetMno(isUpdate.value)
+    const { form, loading, hasError, fieldError, onSubmit } = useCrudForm(
+      mnoService,
+      {
+        listRoute: 'mno',
+        initialForm: {
+          organization: null,
+          mnoid: '',
+          mnoname: ''
+        }
       }
-    })
+    )
 
-    const onSubmit = () => {
-      if (isUpdate.value) {
-        // Update the mno
-        console.log('Updating mno:', form.value)
-      } else {
-        // Create a new mno
-        console.log('Creating new mno:', form.value)
-      }
-      router.push({ name: 'mno' })
-    }
+    const organizationOptions = useOptions(organizationService)
 
     return {
       form,
+      loading,
       organizationOptions,
-      handleGetMno,
+      hasError,
+      fieldError,
       onSubmit
     }
   }

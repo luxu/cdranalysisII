@@ -7,7 +7,14 @@
       icon="add"
       :to="{ name: 'form-thing' }"
     />
-    <q-table :rows="rows" :columns="columns" row-key="id">
+    <q-table
+      v-model:pagination="pagination"
+      :rows="rows"
+      :columns="columns"
+      row-key="id"
+      :loading="loading"
+      @request="onRequest"
+    >
       <template v-slot:body-cell-actions="props">
         <q-td :props="props" class="q-gutter-x-sm">
           <q-btn
@@ -35,30 +42,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
-import { columns } from './table'
+import { defineComponent } from 'vue'
 import { useRouter } from 'vue-router'
+import { columns } from './table'
+import thingService from '@/services/thing'
+import useCrudList from '@/composables/useCrudList'
 
 export default defineComponent({
   setup() {
     const router = useRouter()
 
-    const rows = ref([
-      {
-        id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-        thingsgroupid: 'ThingsGroupId_cec3ed58-6b30-4899-8ee8-4dcdb00cbc77',
-        thingsgroupname: 'LAB SOLIS CWB',
-        customer: 'SOLIS - OPERADORA AGRO',
-        customer_name: 'SOLIS - OPERADORA AGRO'
-      },
-      {
-        id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
-        thingsgroupid: 'ThingsGroupId_8540c013-1501-41d4-9c9b-2feea91c1473',
-        thingsgroupname: 'VERACRUZ',
-        customer: 'VERACRUZ',
-        customer_name: 'VERACRUZ'
-      }
-    ])
+    const { rows, loading, pagination, onRequest, confirmRemove } = useCrudList(
+      thingService,
+      { entityLabel: 'Thing' }
+    )
 
     const handlerEdit = (item: any) => {
       router.push({
@@ -67,13 +64,15 @@ export default defineComponent({
       })
     }
 
-    const handlerRemove = (item: any) => {
-      console.log('Removing thing:', item.id)
-    }
+    const handlerRemove = (item: any) =>
+      confirmRemove(item, item.thingsgroupname)
 
     return {
       rows,
       columns,
+      loading,
+      pagination,
+      onRequest,
       handlerEdit,
       handlerRemove
     }

@@ -1,12 +1,11 @@
 <template>
   <q-page padding class="q-gutter-y-md">
     <div class="row q-col-gutter-md justify-center">
-      
       <div class="col-12 col-md-8">
         <q-card class="my-card q-pa-md">
           <q-card-section>
             <div class="text-h6 q-mb-md">Upload de Arquivo</div>
-            
+
             <q-file
               v-model="arquivo"
               label="Selecione ou arraste um arquivo Excel (.xlsx)"
@@ -46,8 +45,10 @@
       <div v-if="linhasTabela.length > 0" class="col-12 col-md-10">
         <q-card class="my-card q-pa-md">
           <q-card-section>
-            <div class="text-h6 q-mb-md">Dados Originais: {{ arquivo?.name }}</div>
-            
+            <div class="text-h6 q-mb-md"
+              >Dados Originais: {{ arquivo?.name }}</div
+            >
+
             <q-table
               flat
               bordered
@@ -59,7 +60,9 @@
           </q-card-section>
 
           <q-card-section class="bg-grey-2 q-mt-md rounded-borders">
-            <div class="text-subtitle1 q-mb-sm text-weight-bold">Filtrar Colunas</div>
+            <div class="text-subtitle1 q-mb-sm text-weight-bold"
+              >Filtrar Colunas</div
+            >
             <q-select
               v-model="colunasSelecionadas"
               multiple
@@ -83,7 +86,7 @@
               <q-icon name="filter_alt" class="q-mr-sm" />
               Dados Filtrados
             </div>
-            
+
             <q-table
               flat
               bordered
@@ -95,7 +98,6 @@
           </q-card-section>
         </q-card>
       </div>
-
     </div>
   </q-page>
 </template>
@@ -126,13 +128,15 @@ const opcoesColunas = computed(() => {
 // Computado que monta dinamicamente as colunas da SEGUNDA tabela
 const colunasFiltradas = computed(() => {
   const chavesSelecionadas = colunasSelecionadas.value.map(opt => opt.value)
-  return colunasTabela.value.filter(col => chavesSelecionadas.includes(col.name))
+  return colunasTabela.value.filter(col =>
+    chavesSelecionadas.includes(col.name)
+  )
 })
 
 // Computado que filtra os dados das linhas para a SEGUNDA tabela
 const linhasFiltradas = computed(() => {
   const chavesSelecionadas = colunasSelecionadas.value.map(opt => opt.value)
-  
+
   return linhasTabela.value.map(linha => {
     // Começa apenas com o ID para manter a reatividade da linha no q-table
     const novaLinha = { id: linha.id }
@@ -151,7 +155,7 @@ const lerEVisualizarArquivo = () => {
 
   const reader = new FileReader()
 
-  reader.onload = (e) => {
+  reader.onload = e => {
     try {
       const data = new Uint8Array(e.target.result)
       const workbook = XLSX.read(data, { type: 'array' })
@@ -161,7 +165,7 @@ const lerEVisualizarArquivo = () => {
 
       if (dadosJson.length > 0) {
         const cabecalhos = dadosJson[0]
-        
+
         // Monta colunas originais
         colunasTabela.value = cabecalhos.map((label, index) => ({
           name: `col_${index}`,
@@ -175,7 +179,8 @@ const lerEVisualizarArquivo = () => {
         linhasTabela.value = dadosJson.slice(1).map((linha, indexLinha) => {
           const objetoLinha = { id: indexLinha }
           cabecalhos.forEach((_, indexCol) => {
-            objetoLinha[`col_${indexCol}`] = linha[indexCol] !== undefined ? linha[indexCol] : ''
+            objetoLinha[`col_${indexCol}`] =
+              linha[indexCol] !== undefined ? linha[indexCol] : ''
           })
           return objetoLinha
         })
