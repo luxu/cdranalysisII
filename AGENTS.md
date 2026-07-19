@@ -13,11 +13,11 @@ Todas as tarefas usam `uv run` por baixo dos panos. Invocadas via taskipy:
 
 ```
 task runserver        # Servidor de desenvolvimento Django (porta 8000)
-task 8004             # Servidor de desenvolvimento na porta 8004
 task makemigrations   # Gerar migrações
 task migrate          # Aplicar migrações
-task reset            # Reset completo do DB: apaga migrações + db.sqlite3, re-migra, cria superusuário
-task cdr              # Carrega dados CDR de files/cdr.xlsx via tools/load_cdr.py
+task loadfixtures     # Migra + carrega fixtures
+task dumpfixtures     # Exporta fixtures dos models
+task setupdb          # makemigrations + migrate + loadfixtures
 task lint             # ruff check
 task lint_fix         # ruff check --fix
 task pytest           # uv run pytest -vv
@@ -36,9 +36,57 @@ pnpm lint:check       # oxfmt --check + oxlint  (apenas verificação, sem escri
 
 Configuração de lint: `.oxlintrc.json` (plugins: vue, import, eslint, promise, unicorn), `.oxfmtrc.json` (aspas simples, sem ponto e vírgula, 80 caracteres de largura).
 
+## REST API (DRF)
+
+A API REST está exposta em `/api/` via Django REST Framework com `DefaultRouter`.
+
+### Endpoints
+
+| Endpoint | Model | FK(s) |
+|----------|-------|-------|
+| `/api/organizations/` | Organization | — |
+| `/api/customers/` | Customer | organization |
+| `/api/mnos/` | Mno | organization |
+| `/api/networkproviders/` | NetworkProvider | customer |
+| `/api/priceplans/` | PricePlan | customer |
+| `/api/things/` | Thing | customer |
+| `/api/devices/` | Device | thing |
+| `/api/sessions/` | Session | device |
+| `/api/profiles/` | Profile | user |
+
+Cada endpoint suporta: GET (list), POST (create), GET/{id}/ (retrieve), PUT/PATCH (update), DELETE (destroy).
+
+### Configuração
+
+- **Autenticação:** Session + Token (`rest_framework.authentication`)
+- **Permissão:** `IsAuthenticated` (padrão global)
+- **Paginação:** 50 itens/página (`PageNumberPagination`)
+- **CORS:** `CORS_ALLOW_ALL_ORIGINS = True` (dev)
+- **Serializers:** `cdr/serializers.py`, `user/serializers.py` (ModelSerializer com UUID PKs)
+- **ViewSets:** `cdr/views.py`, `user/views.py` (ModelViewSet com select_related)
+
+### Frontend → Backend
+
+O proxy do devServer já está configurado no `quasar.config.js`:
+```js
+devServer: {
+  proxy: {
+    '/api': {
+      target: 'http://localhost:8000',
+      changeOrigin: true,
+    }
+  }
+}
+```
+
+Camada de API do frontend:
+
+- `src/boot/axios.js` — instância `api` do axios com `baseURL: '/api'` e interceptor que normaliza erros em `error.friendlyMessage`
+- `src/services/` — factory CRUD genérico (`crud.js`: `list/get/create/update/remove`) + um módulo por entidade; caminhos centralizados em `endpoints.js`
+- `src/composables/` — `useCrudList` (lista paginada DRF + delete com confirmação), `useCrudForm` (create/update + erros de validação DRF por campo), `useOptions` (popula selects de FK)
+
 ## Notas de arquitetura
 
-- **Não existe REST API ainda.** `kernel/urls.py` só expõe `/admin/`. DRF e CORS estão comentados nas configurações. As páginas do frontend usam dados mock hardcoded.
 - **Modelo de User customizado** — `user.User` usa autenticação por e-mail, não por nome de usuário. Definido via `AUTH_USER_MODEL = 'user.User'`.
 - **LoginRequiredMiddleware está ativo** — todas as views do Django requerem autenticação por padrão.
 - **Chaves primárias UUID** — todos os modelos CDR usam `UUIDField` como PKs via o modelo abstrato `core.Base`.
@@ -59,5 +107,4 @@ Nenhum arquivo de teste existe ainda. `task pytest` executa `uv run pytest -vv` 
 ## Cuidados
 
 - `pnpm lint` do frontend roda o formatador + linter juntos — não existe comando separado para formatação.
-- `task reset` é destrutivo — apaga `db.sqlite3` e todos os arquivos de migração antes de recriar do zero.
 - Requisito de engine Node no `package.json`: `>= 26 || ^24 || ^22.12`.
