@@ -10,6 +10,15 @@
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
+
+        <q-toolbar-title class="text-weight-bold">
+          CDR Analysis
+        </q-toolbar-title>
+
+        <div v-if="user" class="row items-center q-gutter-sm">
+          <span class="text-caption">{{ user.email }}</span>
+          <q-btn flat dense icon="logout" label="Sair" @click="handleLogout" />
+        </div>
       </q-toolbar>
     </q-header>
 
@@ -43,7 +52,12 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import EssentialLink from '@/components/EssentialLink.vue'
+import useAuth from '@/composables/useAuth'
+
+const router = useRouter()
+const { user, logout } = useAuth()
 
 const linksList = [
   {
@@ -118,5 +132,10 @@ const leftDrawerOpen = ref(false)
 
 function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value
+}
+
+function handleLogout() {
+  logout()
+  router.push('/login')
 }
 </script>
