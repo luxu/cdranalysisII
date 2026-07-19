@@ -138,9 +138,9 @@ if '__main__' == __name__:
         (Device, 'imsi', 'msisdn', [('thingsgroupid', 'thing')]),
         (Session, 'sessionid', 'sessioncreatetime', [('imsi', 'device')]),
         ### Dependem do ORGANIZATION só
-        # (Mno, 'mnoid', 'mnoname', [('orgid', 'organization')]),
-        # (PricePlan, 'priceplanid', 'priceplanname', [('customerid', 'customer')]),
-        # (NetworkProvider, 'networkproviderid', 'networkprovidername', [('customerid', 'customer')]),
+        (Mno, 'mnoid', 'mnoname', [('orgid', 'organization')]),
+        (PricePlan, 'priceplanid', 'priceplanname', [('customerid', 'customer')]),
+        (NetworkProvider, 'networkproviderid', 'networkprovidername', [('customerid', 'customer')]),
     ]
     print("Iniciando carga de dados integrada...")
     for model, campo_id, campo_nome, fks in fila_importacao:

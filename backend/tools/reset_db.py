@@ -59,6 +59,7 @@ def resetar_projeto():
             print("   -> Banco db.sqlite3 deletado com sucesso.")
         except Exception as e:
             print(f"❌ Erro ao deletar o banco: {e}")
+            exit(0)
     else:
         print("\nℹ️  Banco db.sqlite3 não encontrado localmente na raiz.")
 
