@@ -51,12 +51,13 @@ class Mno(Base):
         related_name='mno_organizations',
     )
 
+    # 'Mno(Mobile Network Operator)'
     class Meta:
-        verbose_name = 'Mno(Mobile Network Operator)'
-        verbose_name_plural = 'Mnos(Mobile Network Operator)'
+        verbose_name = 'Mno'
+        verbose_name_plural = 'Mnos'
 
     def __str__(self):
-        return f'MNO..: {self.mnoid}'
+        return self.mnoname
 
 
 class NetworkProvider(Base):
@@ -107,11 +108,11 @@ class Thing(Base):
     )
 
     def __str__(self):
-        return f'Thing..: {self.thingsgroupname}'
+        return f'{self.thingsgroupname}'
 
     class Meta:
-        verbose_name = 'Dispositivo(Thing)'
-        verbose_name_plural = 'Dispositivos(Things)'
+        verbose_name = 'Fazenda(Thing)'
+        verbose_name_plural = 'Fazendas(Things)'
 
 
 class Device(Base):
@@ -121,24 +122,29 @@ class Device(Base):
         on_delete=models.CASCADE,
         related_name='devices_things',
     )
+    # ICCID(ID do cartão SIM)
     iccid = models.CharField(
-        'ICCID(ID do cartão SIM)',
+        'ICCID',
         max_length=255,
         blank=True,
         null=True,
     )
+    # IMSI(Internacional Mobile Subscriber Identity)
     imsi = models.CharField(
-        "IMSI(Internacional Mobile Subscriber Identity)",
+        "IMSI",
         max_length=255,
     )  # (FK)
     msisdn = models.CharField(
         "MSISDN(número da linha)",
         max_length=255,
     )
-    mei = models.CharField(
+    imei = models.CharField(
         "MEI(ID do aparelho)",
         max_length=255,
     )
+
+    def __str__(self):
+        return self.imsi
 
 
 class Session(Base):
@@ -152,18 +158,16 @@ class Session(Base):
         "SessionID",
         max_length=255,
     )
-    imsi = models.CharField(
-        "IMSI(Internacional Mobile Subscriber Identity)",
-        max_length=255,
-    )  # (FK)
-    sessioncreatetime = models.DateTimeField(
-        
-    )
+    sessioncreatetime = models.DateTimeField()
     realusage = models.CharField(
-        "RealUsage1(consumo real)",
+        "RealUsage",
         max_length=255,
     )
+    # UOM(Unidade de Medida, ex: MB, KB)
     uom = models.CharField(
-        "UOM(Unidade de Medida, ex: MB, KB)",
+        "UOM",
         max_length=255,
     )
+
+    def __str__(self):
+        return f'{self.sessionid}'

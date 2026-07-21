@@ -37,8 +37,8 @@ const columns = [
     sortable: true
   },
   {
-    name: 'mei',
-    label: 'MEI',
+    name: 'imei',
+    label: 'IMEI',
     align: 'left',
     field: val => val.mei,
     sortable: true
