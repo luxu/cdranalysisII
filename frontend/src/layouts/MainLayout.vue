@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title class="text-weight-bold">
-          CDR Analysis
+          Solis
         </q-toolbar-title>
 
         <div v-if="user" class="row items-center q-gutter-sm">
