@@ -1,1 +1,22 @@
 // app global css
+
+body,
+#q-app {
+  display: flex !important;
+  min-height: 100vh;
+}
+
+.q-layout {
+  display: flex !important;
+  flex-direction: row !important;
+  flex: 1 !important;
+  min-height: 100vh !important;
+  background-color: transparent !important;
+}
+
+.q-page-container {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 !important;
+  padding: 0 !important;
+}

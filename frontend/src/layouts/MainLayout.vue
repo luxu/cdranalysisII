@@ -1,141 +1,21 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
-
-        <q-toolbar-title class="text-weight-bold">
-          Solis
-        </q-toolbar-title>
-
-        <div v-if="user" class="row items-center q-gutter-sm">
-          <span class="text-caption">{{ user.email }}</span>
-          <q-btn flat dense icon="logout" label="Sair" @click="handleLogout" />
-        </div>
-      </q-toolbar>
-    </q-header>
-
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item-label header>Menu</q-item-label>
-
-        <q-item
-          v-for="item in linksList"
-          :key="item.label"
-          clickable
-          :to="item.link"
-          exact
-        >
-          <q-item-section v-if="item.icon" avatar>
-            <q-icon :name="item.icon" />
-          </q-item-section>
-
-          <q-item-section>
-            <q-item-label>{{ item.label }}</q-item-label>
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </q-drawer>
+    <AppSidebar :alert-count="3" />
 
     <q-page-container>
       <router-view />
+      <footer
+        class="flex justify-end pt-2 pb-4 pr-8 text-[10px] text-slate-600 font-medium"
+      >
+        <span
+          >Made by
+          <strong class="text-slate-400 font-semibold">Atoms</strong></span
+        >
+      </footer>
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import EssentialLink from '@/components/EssentialLink.vue'
-import useAuth from '@/composables/useAuth'
-
-const router = useRouter()
-const { user, logout } = useAuth()
-
-const linksList = [
-  {
-    label: 'Home',
-    caption: 'Home',
-    icon: 'home',
-    link: '/'
-  },
-  {
-    label: 'Profile',
-    caption: 'Profile',
-    icon: 'school',
-    link: '/profile'
-  },
-  {
-    label: 'Device',
-    caption: 'Device',
-    icon: 'devices',
-    link: '/device'
-  },
-  {
-    label: 'Organization',
-    caption: 'Organization',
-    icon: 'business',
-    link: '/organization'
-  },
-  {
-    label: 'Customer',
-    caption: 'Customer',
-    icon: 'people',
-    link: '/customer'
-  },
-  {
-    label: 'MNO',
-    caption: 'MNO',
-    icon: 'cell_tower',
-    link: '/mno'
-  },
-  {
-    label: 'NetworkProvider',
-    caption: 'NetworkProvider',
-    icon: 'router',
-    link: '/networkprovider'
-  },
-  {
-    label: 'PricePlan',
-    caption: 'PricePlan',
-    icon: 'sell',
-    link: '/priceplan'
-  },
-  {
-    label: 'Thing',
-    caption: 'Thing',
-    icon: 'memory',
-    link: '/thing'
-  },
-  {
-    label: 'Session',
-    caption: 'Session',
-    icon: 'sync_alt',
-    link: '/session'
-  },
-  {
-    label: 'XLSX',
-    caption: 'XLSX',
-    icon: 'file_upload',
-    link: '/xlsx'
-  }
-]
-
-const leftDrawerOpen = ref(false)
-
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value
-}
-
-function handleLogout() {
-  logout()
-  router.push('/login')
-}
+import AppSidebar from '@/components/AppSidebar.vue'
 </script>

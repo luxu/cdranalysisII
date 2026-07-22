@@ -4,7 +4,12 @@
       <q-page class="flex flex-center bg-grey-3">
         <q-card class="q-pa-lg" style="width: 400px">
           <q-card-section class="text-center q-mb-md">
-            <img src="@/assets/logo_solis.jfif" alt="Logo" class="q-mb-md" style="width: 100px" />
+            <img
+              src="@/assets/logo_solis.jfif"
+              alt="Logo"
+              class="q-mb-md"
+              style="width: 100px"
+            />
             <div class="text-subtitle2 text-grey-6">Entrar no sistema</div>
           </q-card-section>
 
