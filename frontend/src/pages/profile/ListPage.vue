@@ -1,12 +1,7 @@
 <template>
   <q-page padding>
     <h1 class="text-h2 text-center">Profile List</h1>
-    <q-btn
-      color="primary"
-      label="Add Profile"
-      icon="add"
-      :to="{ name: 'form-profile' }"
-    />
+    <q-btn color="primary" label="Add Profile" icon="add" :to="formRoute()" />
     <q-table :rows="rows" :columns="columns" row-key="id">
       <template v-slot:body-cell-actions="props">
         <q-td :props="props" class="q-gutter-x-sm">
@@ -37,12 +32,13 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { columns } from './table'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 export default defineComponent({
   setup() {
-    // const rows = ref([])
     const router = useRouter()
+    const route = useRoute()
+
     const gasto = ref({
       id: null,
       name: '',
@@ -71,17 +67,31 @@ export default defineComponent({
       }
     ])
 
+    const isAdmin = () => route.path.startsWith('/admin')
+
+    const formRoute = (id?: string) => {
+      if (isAdmin()) {
+        return id ? `/admin/profile-form/${id}` : '/admin/profile-form'
+      }
+      return id
+        ? { name: 'form-profile', params: { id } }
+        : { name: 'form-profile' }
+    }
+
     const handlerEdit = (item: any) => {
-      router.push({
-        name: 'form-profile',
-        params: { id: item.id } // Pass the name as a parameter to the form page
-      })
+      router.push(formRoute(item.id))
+    }
+
+    const handlerRemove = (item: any) => {
+      // remove logic
     }
 
     return {
       rows,
       columns,
-      handlerEdit
+      formRoute,
+      handlerEdit,
+      handlerRemove
     }
   }
 })

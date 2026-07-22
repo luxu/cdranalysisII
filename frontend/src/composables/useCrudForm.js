@@ -2,10 +2,6 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 
-// Composable para formulários: carrega o registro na edição (rota com :id),
-// salva create/update e expõe erros de validação do DRF (HTTP 400) por campo.
-// mapIn (opcional): transforma o objeto da API antes de popular o form
-// (ex.: ajustar datetime ISO para o formato do input datetime-local).
 export default function useCrudForm(
   service,
   { listRoute, initialForm, mapIn = null }
@@ -20,6 +16,11 @@ export default function useCrudForm(
 
   const isUpdate = computed(() => !!route.params.id)
 
+  const resolvedListRoute = computed(() => {
+    const meta = route.meta?.listRoute
+    return meta || listRoute
+  })
+
   const hasError = field => !!errors.value[field]
 
   const fieldError = field => {
@@ -33,7 +34,6 @@ export default function useCrudForm(
     try {
       const data = await service.get(route.params.id)
       const source = mapIn ? mapIn(data) : data
-      // Popula apenas as chaves do formulário
       for (const key of Object.keys(initialForm)) {
         form.value[key] = source[key] ?? initialForm[key]
       }
@@ -53,7 +53,12 @@ export default function useCrudForm(
       } else {
         await service.create(form.value)
       }
-      router.push({ name: listRoute })
+      const target = resolvedListRoute.value
+      router.push(
+        typeof target === 'string' && target.startsWith('/')
+          ? target
+          : { name: target }
+      )
     } catch (error) {
       if (error.response?.status === 400) {
         errors.value = error.response.data

@@ -1,12 +1,7 @@
 <template>
   <q-page padding>
     <h1 class="text-h2 text-center">Thing List</h1>
-    <q-btn
-      color="primary"
-      label="Add Thing"
-      icon="add"
-      :to="{ name: 'form-thing' }"
-    />
+    <q-btn color="primary" label="Add Thing" icon="add" :to="formRoute()" />
     <q-table
       v-model:pagination="pagination"
       :rows="rows"
@@ -43,7 +38,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { columns } from './table'
 import thingService from '@/services/thing'
 import useCrudList from '@/composables/useCrudList'
@@ -51,17 +46,26 @@ import useCrudList from '@/composables/useCrudList'
 export default defineComponent({
   setup() {
     const router = useRouter()
+    const route = useRoute()
 
     const { rows, loading, pagination, onRequest, confirmRemove } = useCrudList(
       thingService,
       { entityLabel: 'Thing' }
     )
 
+    const isAdmin = () => route.path.startsWith('/admin')
+
+    const formRoute = (id?: string) => {
+      if (isAdmin()) {
+        return id ? `/admin/thing-form/${id}` : '/admin/thing-form'
+      }
+      return id
+        ? { name: 'form-thing', params: { id } }
+        : { name: 'form-thing' }
+    }
+
     const handlerEdit = (item: any) => {
-      router.push({
-        name: 'form-thing',
-        params: { id: item.id }
-      })
+      router.push(formRoute(item.id))
     }
 
     const handlerRemove = (item: any) =>
@@ -73,6 +77,7 @@ export default defineComponent({
       loading,
       pagination,
       onRequest,
+      formRoute,
       handlerEdit,
       handlerRemove
     }
