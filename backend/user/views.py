@@ -1,8 +1,12 @@
 from rest_framework import status, viewsets
 from rest_framework.authtoken.models import Token
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from cdr.models import Session
+from cdr.serializers import SessionSerializer
 
 from .models import Profile
 from .serializers import LoginSerializer, ProfileSerializer
@@ -29,3 +33,29 @@ class LoginView(APIView):
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.select_related('user').all()
     serializer_class = ProfileSerializer
+
+    @action(detail=True, methods=['get'])
+    def session_count(self, request, pk=None):
+        profile = self.get_object()
+        month = request.query_params.get('month')
+        if not month:
+            return Response(
+                {'error': 'Parâmetro "month" é obrigatório'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        count = Session.objects.filter(
+            device__thing=profile.thing,
+            sessioncreatetime__month=month,
+        ).count()
+        return Response({
+            'profile_id': str(profile.id),
+            'month': int(month),
+            'session_count': count,
+        })
+
+    @action(detail=True, methods=['get'])
+    def sessions(self, request, pk=None):
+        profile = self.get_object()
+        sessions = Session.objects.filter(device__thing=profile.thing)
+        serializer = SessionSerializer(sessions, many=True)
+        return Response(serializer.data)

@@ -28,7 +28,6 @@ class SessionAdmin(admin.ModelAdmin):
     )
     search_fields = (
         'sessionid',
-
     )
 
 @admin.register(Thing)

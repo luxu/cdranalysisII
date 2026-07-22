@@ -16,8 +16,6 @@ class LoginSerializer(serializers.Serializer):
         )
         if not user:
             raise serializers.ValidationError('Credenciais inválidas')
-        if not user.is_active:
-            raise serializers.ValidationError('Usuário inativo')
         attrs['user'] = user
         return attrs
 

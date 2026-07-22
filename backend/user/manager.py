@@ -15,7 +15,6 @@ class MinUserManager(BaseUserManager):
         email = self.normalize_email(email).lower()
         user = self.model(email=email, **extra_fields)
         user.password = make_password(password)
-        # user.read_filename(using=self._db)
         user.save(using=self._db)
         return user
 

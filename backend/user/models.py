@@ -4,6 +4,7 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 
+from cdr.models import Thing
 from core.models import Base
 from .manager import MinUserManager
 
@@ -25,6 +26,12 @@ class Profile(Base):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     name = models.CharField(max_length=255)
     celular = models.CharField(max_length=20, null=True, blank=True)
+    thing = models.ForeignKey(
+        Thing,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='things_profiles'
+    )
 
     def __str__(self):
         return f"Profile: {self.name}"
