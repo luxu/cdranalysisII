@@ -440,8 +440,8 @@ async function fetchCharts() {
   try {
     const chartParams = buildSessionParams(thingId.value)
     const [usageRes, topRes] = await Promise.all([
-      api.get('/api/sessions/usage_by_month/', { params: chartParams }),
-      api.get('/api/sessions/top_devices/', { params: chartParams })
+      api.get('/sessions/usage_by_month/', { params: chartParams }),
+      api.get('/sessions/top_devices/', { params: chartParams })
     ])
 
     usageData.value = usageRes.data.filter(d => d.month).slice(-12)
