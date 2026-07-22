@@ -8,11 +8,15 @@ const routes = [
     path: '/',
     component: () => import('@/layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('@/pages/IndexPage.vue') },
+      { path: '', component: () => import('@/pages/PanelPage.vue') },
       {
         path: 'profile',
         name: 'profile',
         component: () => import('@/pages/profile/ListPage.vue')
+      },
+      {
+        path: 'equipamentos',
+        component: () => import('@/pages/EquipamentosPage.vue')
       },
       {
         path: 'profile-form/:id?',
@@ -107,8 +111,35 @@ const routes = [
     ]
   },
 
-  // Always leave this as last one,
-  // but you can also remove it
+  {
+    path: '/admin',
+    component: () => import('@/layouts/AdminLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'admin',
+        component: () => import('@/pages/AdminPage.vue')
+      },
+      {
+        path: 'thing',
+        name: 'admin-thing',
+        component: () => import('@/pages/thing/ListPage.vue')
+      },
+      {
+        path: 'thing-form/:id?',
+        name: 'admin-form-thing',
+        component: () => import('@/pages/thing/FormPage.vue'),
+        meta: { listRoute: '/admin/thing' }
+      },
+      {
+        path: 'profile-form/:id?',
+        name: 'admin-form-profile',
+        component: () => import('@/pages/profile/FormPage.vue'),
+        meta: { listRoute: '/admin/profile' }
+      }
+    ]
+  },
+
   {
     path: '/:catchAll(.*)*',
     component: () => import('@/pages/ErrorNotFound.vue')
