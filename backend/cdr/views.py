@@ -1,6 +1,9 @@
-from django.db.models import Q
+from django.db.models import Q, Sum
+from django.db.models.functions import TruncMonth
 
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from .models import (
     Customer,
@@ -88,3 +91,43 @@ class SessionViewSet(viewsets.ModelViewSet):
         if device__thing:
             qs = qs.filter(device__thing_id=device__thing)
         return qs
+
+    @action(detail=False, methods=['get'])
+    def usage_by_month(self, request):
+        qs = self.filter_queryset(self.get_queryset())
+        months = (
+            qs
+            .annotate(month=TruncMonth('sessioncreatetime'))
+            .values('month')
+            .annotate(total=Sum('realusage'))
+            .order_by('month')
+        )
+        data = [
+            {
+                'month': m['month'].strftime('%Y-%m') if m['month'] else None,
+                'total': float(m['total']) if m['total'] else 0,
+            }
+            for m in months
+        ]
+        return Response(data)
+
+    @action(detail=False, methods=['get'])
+    def top_devices(self, request):
+        qs = self.filter_queryset(self.get_queryset())
+        top = (
+            qs
+            .values('device', 'device__iccid', 'device__imsi', 'device__msisdn')
+            .annotate(total=Sum('realusage'))
+            .order_by('-total')[:10]
+        )
+        data = [
+            {
+                'device_id': str(t['device']),
+                'iccid': t['device__iccid'],
+                'imsi': t['device__imsi'],
+                'msisdn': t['device__msisdn'],
+                'total_bytes': float(t['total']) if t['total'] else 0,
+            }
+            for t in top
+        ]
+        return Response(data)
