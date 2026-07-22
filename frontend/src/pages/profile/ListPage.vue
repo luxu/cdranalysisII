@@ -1,8 +1,24 @@
 <template>
   <q-page padding>
-    <h1 class="text-h2 text-center">Profile List</h1>
-    <q-btn color="primary" label="Add Profile" icon="add" :to="formRoute()" />
-    <q-table :rows="rows" :columns="columns" row-key="id">
+    <div class="flex items-center justify-between q-mb-md">
+      <h1 class="text-h2 text-center">Perfis</h1>
+      <q-btn color="primary" label="Adicionar" icon="add" :to="formRoute()" />
+    </div>
+    <q-table
+      v-model:pagination="pagination"
+      :rows="rows"
+      :columns="columns"
+      row-key="id"
+      :loading="loading"
+      @request="onRequest"
+    >
+      <template v-slot:body-cell-status="props">
+        <q-td :props="props">
+          <q-badge :color="props.value ? 'positive' : 'negative'">
+            {{ props.value ? 'Sim' : 'Não' }}
+          </q-badge>
+        </q-td>
+      </template>
       <template v-slot:body-cell-actions="props">
         <q-td :props="props" class="q-gutter-x-sm">
           <q-btn
@@ -12,7 +28,7 @@
             size="sm"
             @click="handlerEdit(props.row)"
           >
-            <q-tooltip> Edit </q-tooltip>
+            <q-tooltip> Editar </q-tooltip>
           </q-btn>
           <q-btn
             icon="mdi-delete-outline"
@@ -21,7 +37,7 @@
             size="sm"
             @click="handlerRemove(props.row)"
           >
-            <q-tooltip> Delete </q-tooltip>
+            <q-tooltip> Excluir </q-tooltip>
           </q-btn>
         </q-td>
       </template>
@@ -29,47 +45,26 @@
   </q-page>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue'
-import { columns } from './table'
+<script>
+import { defineComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { columns } from './table'
+import profileService from '@/services/profile'
+import useCrudList from '@/composables/useCrudList'
 
 export default defineComponent({
   setup() {
     const router = useRouter()
     const route = useRoute()
 
-    const gasto = ref({
-      id: null,
-      name: '',
-      photo: '',
-      city: '',
-      celular: '',
-      telephone: ''
-    })
-
-    const rows = ref([
-      {
-        id: 1,
-        name: 'John Doe',
-        photo: 'photo1.jpg',
-        city: 'New York',
-        celular: '1234567890',
-        telephone: '123-456-7890'
-      },
-      {
-        id: 2,
-        name: 'Jane Smith',
-        photo: 'photo2.jpg',
-        city: 'Los Angeles',
-        celular: '0987654321',
-        telephone: '098-765-4321'
-      }
-    ])
+    const { rows, loading, pagination, onRequest, confirmRemove } = useCrudList(
+      profileService,
+      { entityLabel: 'Perfil' }
+    )
 
     const isAdmin = () => route.path.startsWith('/admin')
 
-    const formRoute = (id?: string) => {
+    const formRoute = id => {
       if (isAdmin()) {
         return id ? `/admin/profile-form/${id}` : '/admin/profile-form'
       }
@@ -78,17 +73,18 @@ export default defineComponent({
         : { name: 'form-profile' }
     }
 
-    const handlerEdit = (item: any) => {
+    const handlerEdit = item => {
       router.push(formRoute(item.id))
     }
 
-    const handlerRemove = (item: any) => {
-      // remove logic
-    }
+    const handlerRemove = item => confirmRemove(item, item.name)
 
     return {
       rows,
       columns,
+      loading,
+      pagination,
+      onRequest,
       formRoute,
       handlerEdit,
       handlerRemove

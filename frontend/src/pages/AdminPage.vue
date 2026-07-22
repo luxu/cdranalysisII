@@ -11,7 +11,7 @@
         <div class="flex items-center justify-between">
           <span
             class="text-xs font-semibold text-slate-400 uppercase tracking-wider"
-            >Grupos User</span
+            >Fazendas</span
           >
           <div
             class="bg-[#10B981]/10 text-[#10B981] p-2 rounded-xl border border-[#10B981]/20"
@@ -41,9 +41,7 @@
           }}</span>
           <span class="text-xs text-slate-500 ml-2">fazendas</span>
         </div>
-        <p class="text-[11px] text-slate-500"
-          >Total de grupos de usuários cadastrados</p
-        >
+        <p class="text-[11px] text-slate-500">Total de fazendas cadastradas</p>
       </div>
 
       <div

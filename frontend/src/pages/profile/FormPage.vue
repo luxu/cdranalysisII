@@ -1,83 +1,126 @@
 <template>
   <q-page padding>
-    <h1 class="text-h2 text-center">{{ isUpdate ? 'Edit' : 'New' }} Profile</h1>
+    <h1 class="text-h2 text-center"
+      >{{ isUpdate ? 'Editar' : 'Novo' }} Perfil</h1
+    >
     <div class="q-pa-md" style="max-width: 900px; margin: auto">
       <q-form class="q-gutter-md" @submit.prevent="onSubmit">
         <div class="row q-col-gutter-md">
-          <div class="col-12 col-sm-6 col-md-3">
-            <q-input filled label="Name" v-model="form.name" />
+          <template v-if="!isUpdate">
+            <div class="col-12 col-sm-6 col-md-4">
+              <q-input
+                filled
+                label="Email"
+                type="email"
+                v-model="form.email"
+                :error="hasError('email')"
+                :error-message="fieldError('email')"
+              />
+            </div>
+            <div class="col-12 col-sm-6 col-md-4">
+              <q-input
+                filled
+                label="Senha"
+                type="password"
+                v-model="form.password"
+                :error="hasError('password')"
+                :error-message="fieldError('password')"
+              />
+            </div>
+          </template>
+          <div class="col-12 col-sm-6 col-md-4">
+            <q-input
+              filled
+              label="Nome"
+              v-model="form.name"
+              :error="hasError('name')"
+              :error-message="fieldError('name')"
+            />
           </div>
-          <div class="col-12 col-sm-6 col-md-3">
-            <q-input filled label="Email" v-model="form.email" type="email" />
+          <div class="col-12 col-sm-6 col-md-4">
+            <q-input
+              filled
+              label="Celular"
+              v-model="form.celular"
+              :error="hasError('celular')"
+              :error-message="fieldError('celular')"
+            />
           </div>
-          <div class="col-12 col-sm-6 col-md-3">
-            <q-input filled label="Photo" v-model="form.photo" />
+          <div class="col-12 col-sm-6 col-md-4">
+            <q-select
+              filled
+              label="Thing"
+              v-model="form.thing"
+              :options="thingOptions"
+              option-label="thingsgroupname"
+              option-value="id"
+              emit-value
+              map-options
+              clearable
+              :error="hasError('thing')"
+              :error-message="fieldError('thing')"
+            />
           </div>
-          <div class="col-12 col-sm-6 col-md-3">
-            <q-input filled label="City" v-model="form.city" />
-          </div>
-          <div class="col-12 col-sm-6 col-md-3">
-            <q-input filled label="Celular" v-model="form.celular" />
-          </div>
-          <div class="col-12 col-sm-6 col-md-3">
-            <q-input filled label="Telephone" v-model="form.telephone" />
+          <div class="col-12 col-sm-6 col-md-4 flex items-center q-pt-lg">
+            <q-toggle label="Ativo" v-model="form.status" color="primary" />
           </div>
         </div>
-        <div class="col-12 col-sm-6 col-md-3">
-          <q-btn label="Submit" type="submit" color="primary" />
+        <div>
+          <q-btn
+            label="Salvar"
+            type="submit"
+            color="primary"
+            :loading="loading"
+          />
         </div>
       </q-form>
     </div>
   </q-page>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+<script>
+import { defineComponent } from 'vue'
+import { useQuasar } from 'quasar'
+import profileService from '@/services/profile'
+import thingService from '@/services/thing'
+import useCrudForm from '@/composables/useCrudForm'
+import useOptions from '@/composables/useOptions'
 
 export default defineComponent({
   setup() {
-    const form = ref({
-      name: '',
-      email: '',
-      photo: '',
-      city: '',
-      celular: '',
-      telephone: ''
-    })
+    const $q = useQuasar()
 
-    const router = useRouter()
-    const route = useRoute()
+    const { form, loading, isUpdate, hasError, fieldError, onSubmit } =
+      useCrudForm(profileService, {
+        listRoute: 'profile',
+        initialForm: {
+          name: '',
+          celular: '',
+          thing: null,
+          status: true,
+          email: '',
+          password: '123mudar'
+        },
+        onSuccess: isUpdate => {
+          if (!isUpdate) {
+            $q.notify({
+              type: 'positive',
+              message:
+                'Perfil criado. Senha padrão: 123mudar. Envio de e-mail para troca de senha será implementado.'
+            })
+          }
+        }
+      })
 
-    const isUpdate = computed(() => !!route.params.id)
-
-    const handleGetGasto = async id => {
-      console.log('Fetching gasto data for name:', id)
-    }
-
-    onMounted(() => {
-      if (isUpdate.value) {
-        handleGetGasto(isUpdate.value)
-      }
-    })
-
-    const listRoute = computed(() => {
-      return route.meta?.listRoute || { name: 'profile' }
-    })
-
-    const onSubmit = () => {
-      if (isUpdate.value) {
-        console.log('Updating gasto:', form.value)
-      } else {
-        console.log('Creating new gasto:', form.value)
-      }
-      router.push(listRoute.value)
-    }
+    const thingOptions = useOptions(thingService)
 
     return {
       form,
+      loading,
       isUpdate,
-      handleGetGasto,
+      thingOptions,
+      hasError,
+      fieldError,
       onSubmit
     }
   }

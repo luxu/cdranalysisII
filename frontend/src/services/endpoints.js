@@ -8,7 +8,9 @@ const endpoints = {
   priceplan: '/priceplans/',
   thing: '/things/',
   device: '/devices/',
-  session: '/sessions/'
+  session: '/sessions/',
+  profile: '/profiles/',
+  user: '/users/'
 }
 
 export default endpoints

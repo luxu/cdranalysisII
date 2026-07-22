@@ -1,60 +1,47 @@
-import { ref } from 'vue'
-
 const columns = [
   {
-    name: 'id',
-    label: 'ID',
-    align: 'left',
-    field: val => val.id,
-    sortable: true
-  },
-  {
     name: 'name',
-    label: 'Name',
+    label: 'Nome',
     align: 'left',
     field: val => val.name,
     sortable: true
   },
   {
-    name: 'photo',
-    label: 'Photo',
+    name: 'user_email',
+    label: 'Email',
     align: 'left',
-    field: val => val.photo,
-    sortable: true
-  },
-  {
-    name: 'city',
-    label: 'City',
-    align: 'left',
-    field: val => val.city,
+    field: val => val.user_email,
     sortable: true
   },
   {
     name: 'celular',
     label: 'Celular',
     align: 'left',
-    field: val => val.celular,
+    field: val => val.celular || '-',
     sortable: true
   },
   {
-    name: 'telephone',
-    label: 'Telefone',
+    name: 'thing_name',
+    label: 'Thing',
     align: 'left',
-    field: val => val.telephone || '-',
+    field: val => val.thing_name || '-',
+    sortable: true
+  },
+  {
+    name: 'status',
+    label: 'Ativo',
+    align: 'center',
+    field: val => val.status,
+    format: val => (val ? 'Sim' : 'Não'),
     sortable: true
   },
   {
     name: 'actions',
     align: 'right',
-    label: 'Actions',
+    label: 'Ações',
     field: 'actions',
     sortable: false
   }
 ]
 
-const initialPagination = ref({
-  page: 1,
-  rowsPerPage: 8
-})
-
-export { columns, initialPagination }
+export { columns }

@@ -4,7 +4,7 @@ import { useQuasar } from 'quasar'
 
 export default function useCrudForm(
   service,
-  { listRoute, initialForm, mapIn = null }
+  { listRoute, initialForm, mapIn = null, onSuccess = null }
 ) {
   const $q = useQuasar()
   const router = useRouter()
@@ -53,6 +53,7 @@ export default function useCrudForm(
       } else {
         await service.create(form.value)
       }
+      if (onSuccess) onSuccess(isUpdate.value)
       const target = resolvedListRoute.value
       router.push(
         typeof target === 'string' && target.startsWith('/')
