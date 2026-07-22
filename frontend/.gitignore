@@ -1,6 +1,7 @@
 .DS_Store
 .thumbs.db
 node_modules
+frontend/node_modules
 
 # .env files
 .env*
@@ -9,6 +10,9 @@ node_modules
 .quasar
 /dist
 /quasar.config.*.temporary.compiled*
+
+.vscode
+frontend/.vscode
 
 # Cordova related directories and files
 /src-cordova/node_modules
