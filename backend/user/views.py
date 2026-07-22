@@ -1,3 +1,5 @@
+from django.contrib.auth import get_user_model
+
 from rest_framework import status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
@@ -9,7 +11,9 @@ from cdr.models import Session
 from cdr.serializers import SessionSerializer
 
 from .models import Profile
-from .serializers import LoginSerializer, ProfileSerializer
+from .serializers import LoginSerializer, ProfileSerializer, UserSerializer
+
+User = get_user_model()
 
 
 class LoginView(APIView):
@@ -26,12 +30,18 @@ class LoginView(APIView):
                 'id': str(user.id),
                 'email': user.email,
                 'is_staff': user.is_staff,
+                'groups': list(user.groups.values_list('name', flat=True)),
             },
         })
 
 
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
 class ProfileViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.select_related('user').all()
+    queryset = Profile.objects.select_related('user', 'thing').all()
     serializer_class = ProfileSerializer
 
     @action(detail=True, methods=['get'])

@@ -74,8 +74,17 @@ async function handleLogin() {
   errors.value = {}
   loading.value = true
   try {
-    await login(email.value, password.value)
-    router.push('/')
+    const data = await login(email.value, password.value)
+    const groups = data.user.groups || []
+    if (
+      data.user.is_staff ||
+      groups.includes('Administrador') ||
+      groups.includes('Manager')
+    ) {
+      router.push('/admin')
+    } else {
+      router.push('/')
+    }
   } catch (error) {
     if (error.response?.status === 400) {
       errors.value = error.response.data

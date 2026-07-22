@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils.timezone import make_aware
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 
 from cdr.models import Organization, Customer, Thing, Device, Session
 from user.models import Profile
@@ -74,6 +75,19 @@ class TestLoginAPI:
         })
         assert resp.status_code == 200
         assert 'token' in resp.data
+        assert resp.data['user']['groups'] == []
+
+    def test_login_with_groups(self, client):
+        user = User.objects.create_user(
+            email='grupo@example.com', password='secret123',
+        )
+        group = Group.objects.create(name='Analistas')
+        user.groups.add(group)
+        resp = client.post('/api/auth/login/', {
+            'email': 'grupo@example.com', 'password': 'secret123',
+        })
+        assert resp.status_code == 200
+        assert resp.data['user']['groups'] == ['Analistas']
 
     def test_login_invalid_credentials(self, client):
         resp = client.post('/api/auth/login/', {

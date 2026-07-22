@@ -17,6 +17,18 @@ if (token.value) {
 
 const isAuthenticated = computed(() => !!token.value)
 
+const role = computed(() => {
+  if (user.value?.is_staff) return 'admin'
+  if (!user.value?.groups?.length) return null
+  if (user.value.groups.includes('Administrador')) return 'admin'
+  if (user.value.groups.includes('Manager')) return 'manager'
+  return 'user'
+})
+
+const canAccessAdmin = computed(
+  () => role.value === 'admin' || role.value === 'manager'
+)
+
 async function login(email, password) {
   const data = await authService.login(email, password)
   token.value = data.token
@@ -34,5 +46,5 @@ function logout() {
 }
 
 export default function useAuth() {
-  return { user, token, isAuthenticated, login, logout }
+  return { user, token, role, isAuthenticated, canAccessAdmin, login, logout }
 }

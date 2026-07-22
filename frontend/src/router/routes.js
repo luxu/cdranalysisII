@@ -113,6 +113,7 @@ const routes = [
 
   {
     path: '/admin',
+    meta: { requiresStaff: true },
     component: () => import('@/layouts/AdminLayout.vue'),
     children: [
       {
@@ -130,6 +131,11 @@ const routes = [
         name: 'admin-form-thing',
         component: () => import('@/pages/thing/FormPage.vue'),
         meta: { listRoute: '/admin/thing' }
+      },
+      {
+        path: 'profile',
+        name: 'admin-profile',
+        component: () => import('@/pages/profile/ListPage.vue')
       },
       {
         path: 'profile-form/:id?',

@@ -12,7 +12,7 @@ from cdr.views import (
     SessionViewSet,
     ThingViewSet,
 )
-from user.views import LoginView, ProfileViewSet
+from user.views import LoginView, ProfileViewSet, UserViewSet
 
 router = DefaultRouter()
 router.register('organizations', OrganizationViewSet)
@@ -23,6 +23,7 @@ router.register('priceplans', PricePlanViewSet)
 router.register('things', ThingViewSet)
 router.register('devices', DeviceViewSet)
 router.register('sessions', SessionViewSet)
+router.register('users', UserViewSet)
 router.register('profiles', ProfileViewSet)
 
 urlpatterns = [
