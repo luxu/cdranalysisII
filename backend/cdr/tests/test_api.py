@@ -4,7 +4,7 @@ from datetime import datetime
 from django.urls import reverse
 from django.utils.timezone import make_aware
 
-from cdr.models import Device, Session
+from cdr.models import Session
 
 
 pytestmark = pytest.mark.django_db
