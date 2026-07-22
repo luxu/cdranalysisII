@@ -2,8 +2,7 @@
   <aside
     class="w-64 bg-[#0D1321] border-r border-[#1E293B]/40 flex flex-col justify-between p-5 shrink-0"
   >
-    <div class="space-y-8">
-      <!-- Logo / Nome do Sistema -->
+    <div class="space-y-6">
       <div class="flex items-center space-x-3 px-2">
         <div
           class="bg-[#10B981]/10 text-[#10B981] p-2 rounded-xl border border-[#10B981]/20"
@@ -23,14 +22,13 @@
           </svg>
         </div>
         <div>
-          <h2 class="text-sm font-bold text-white tracking-wide">AgroIoT</h2>
+          <h2 class="text-sm font-bold text-white tracking-wide">SOLIS</h2>
           <p class="text-[10px] text-slate-500 font-medium"
             >Monitoramento Inteligente</p
           >
         </div>
       </div>
 
-      <!-- Links de Navegação Principal -->
       <nav class="space-y-1">
         <RouterLink
           v-for="item in mainLinks"
@@ -60,17 +58,11 @@
           <span>{{ item.label }}</span>
         </RouterLink>
       </nav>
-    </div>
 
-    <!-- Links Configurações / Alertas -->
-    <div class="space-y-1">
-      <RouterLink
-        to="/alertas"
-        class="flex items-center justify-between px-4 py-2.5 rounded-xl text-slate-400 hover:bg-[#1E293B]/20 hover:text-slate-200 font-medium text-xs transition"
-      >
-        <div class="flex items-center space-x-3">
+      <div class="border-t border-[#1E293B]/40 pt-4 space-y-3">
+        <div class="flex items-center space-x-2 px-2">
           <svg
-            class="w-4 h-4"
+            class="w-3.5 h-3.5 text-slate-500 shrink-0"
             fill="none"
             stroke="currentColor"
             stroke-width="2"
@@ -79,19 +71,59 @@
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.641C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
             />
           </svg>
-          <span>Alertas</span>
+          <span
+            class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider"
+            >Filtros</span
+          >
         </div>
-        <span
-          v-if="alertCount > 0"
-          class="bg-rose-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md"
-        >
-          {{ alertCount }}
-        </span>
-      </RouterLink>
 
+        <div class="relative">
+          <svg
+            class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          <input
+            v-model="state.search"
+            type="text"
+            placeholder="Buscar dispositivo..."
+            class="w-full bg-[#090D16] border border-[#1E293B]/40 text-xs text-slate-300 placeholder-slate-600 rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:border-[#10B981]/50 transition"
+          />
+        </div>
+
+        <div class="flex items-center space-x-3 px-1">
+          <label class="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              v-model="state.statusAtivo"
+              class="w-3.5 h-3.5 rounded border-slate-600 bg-[#090D16] text-[#10B981] focus:ring-[#10B981]/30 focus:ring-offset-0 cursor-pointer"
+            />
+            <span class="text-[11px] text-slate-400">Ativo</span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              v-model="state.statusInativo"
+              class="w-3.5 h-3.5 rounded border-slate-600 bg-[#090D16] text-rose-500 focus:ring-rose-500/30 focus:ring-offset-0 cursor-pointer"
+            />
+            <span class="text-[11px] text-slate-400">Inativo</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-1">
       <RouterLink
         v-if="canAccessAdmin"
         to="/admin"
@@ -144,17 +176,19 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
 import useAuth from '@/composables/useAuth'
+import { useDashboardFilter } from '@/composables/useDashboardFilter'
 
 defineProps({
   alertCount: {
     type: Number,
-    default: 3
+    default: 0
   }
 })
 
 const route = useRoute()
 const router = useRouter()
 const { logout, canAccessAdmin } = useAuth()
+const { state } = useDashboardFilter()
 
 function handleLogout() {
   logout()
@@ -166,31 +200,6 @@ const mainLinks = [
     label: 'Painel',
     to: '/',
     icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z'
-  },
-  {
-    label: 'Temperatura',
-    to: '/temperatura',
-    icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2'
-  },
-  {
-    label: 'Umidade',
-    to: '/umidade',
-    icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z'
-  },
-  {
-    label: 'Pluviometria',
-    to: '/pluviometria',
-    icon: 'M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z'
-  },
-  {
-    label: 'Reservatórios',
-    to: '/reservatorios',
-    icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z'
-  },
-  {
-    label: 'Equipamentos',
-    to: '/equipamentos',
-    icon: 'M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 5h10a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2z'
   }
 ]
 

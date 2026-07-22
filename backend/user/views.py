@@ -44,6 +44,12 @@ class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.select_related('user', 'thing').all()
     serializer_class = ProfileSerializer
 
+    @action(detail=False, methods=['get'])
+    def me(self, request):
+        profile = self.get_queryset().get(user=request.user)
+        serializer = self.get_serializer(profile)
+        return Response(serializer.data)
+
     @action(detail=True, methods=['get'])
     def session_count(self, request, pk=None):
         profile = self.get_object()
