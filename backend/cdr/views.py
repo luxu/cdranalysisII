@@ -90,6 +90,12 @@ class SessionViewSet(viewsets.ModelViewSet):
         device__thing = self.request.query_params.get('device__thing')
         if device__thing:
             qs = qs.filter(device__thing_id=device__thing)
+        start_date = self.request.query_params.get('start_date')
+        if start_date:
+            qs = qs.filter(sessioncreatetime__date__gte=start_date)
+        end_date = self.request.query_params.get('end_date')
+        if end_date:
+            qs = qs.filter(sessioncreatetime__date__lte=end_date)
         return qs
 
     @action(detail=False, methods=['get'])

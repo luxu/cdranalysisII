@@ -293,7 +293,7 @@ import deviceService from '@/services/device'
 import sessionService from '@/services/session'
 import profileService from '@/services/profile'
 
-const { state, buildDeviceParams } = useDashboardFilter()
+const { state, buildDeviceParams, buildSessionParams } = useDashboardFilter()
 
 const loading = ref(true)
 const chartLoading = ref(true)
@@ -400,10 +400,8 @@ async function fetchFilteredDevices() {
 
 async function fetchSessionStats() {
   if (!thingId.value) return
-  const firstPage = await sessionService.list({
-    device__thing: thingId.value,
-    page: 1
-  })
+  const sessionParams = { ...buildSessionParams(thingId.value), page: 1 }
+  const firstPage = await sessionService.list(sessionParams)
   const deviceSet = new Set()
   let totalBytes = 0
 
@@ -421,7 +419,7 @@ async function fetchSessionStats() {
 
   for (let p = 2; p <= pagesToFetch; p++) {
     const res = await sessionService.list({
-      device__thing: thingId.value,
+      ...buildSessionParams(thingId.value),
       page: p
     })
     process(res.results)
@@ -440,13 +438,10 @@ async function fetchCharts() {
   if (!thingId.value) return
   chartLoading.value = true
   try {
+    const chartParams = buildSessionParams(thingId.value)
     const [usageRes, topRes] = await Promise.all([
-      api.get('/api/sessions/usage_by_month/', {
-        params: { device__thing: thingId.value }
-      }),
-      api.get('/api/sessions/top_devices/', {
-        params: { device__thing: thingId.value }
-      })
+      api.get('/api/sessions/usage_by_month/', { params: chartParams }),
+      api.get('/api/sessions/top_devices/', { params: chartParams })
     ])
 
     usageData.value = usageRes.data.filter(d => d.month).slice(-12)
@@ -486,6 +481,15 @@ watch(
     fetchFilteredDevices()
   },
   { deep: true }
+)
+
+watch(
+  () => [state.startDate, state.endDate],
+  () => {
+    fetchSessionStats()
+    fetchCharts()
+  },
+  { deep: true, debounce: 300 }
 )
 
 onMounted(async () => {

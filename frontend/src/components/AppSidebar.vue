@@ -120,6 +120,37 @@
             <span class="text-[11px] text-slate-400">Inativo</span>
           </label>
         </div>
+
+        <div class="space-y-2">
+          <div>
+            <label
+              class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-1 px-1"
+              >De</label
+            >
+            <input
+              type="date"
+              v-model="state.startDate"
+              class="w-full bg-[#090D16] border border-[#1E293B]/40 text-xs text-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:border-[#10B981]/50 transition [color-scheme:dark]"
+            />
+          </div>
+          <div>
+            <label
+              class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-1 px-1"
+              >Até</label
+            >
+            <input
+              type="date"
+              v-model="state.endDate"
+              class="w-full bg-[#090D16] border border-[#1E293B]/40 text-xs text-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:border-[#10B981]/50 transition [color-scheme:dark]"
+            />
+          </div>
+          <button
+            v-if="state.startDate || state.endDate"
+            class="text-[10px] text-slate-500 hover:text-slate-300 transition px-1"
+            @click="clearDates"
+            >Limpar datas</button
+          >
+        </div>
       </div>
     </div>
 
@@ -188,7 +219,7 @@ defineProps({
 const route = useRoute()
 const router = useRouter()
 const { logout, canAccessAdmin } = useAuth()
-const { state } = useDashboardFilter()
+const { state, clearDates } = useDashboardFilter()
 
 function handleLogout() {
   logout()
