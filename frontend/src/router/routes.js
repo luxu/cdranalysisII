@@ -18,15 +18,9 @@ const routes = [
         path: 'device-form/:id?',
         name: 'form-device',
         component: () => import('@/pages/device/FormPage.vue')
-      },
-      {
-        path: 'xlsx',
-        name: 'xlsx',
-        component: () => import('@/pages/LoadPage.vue')
       }
     ]
   },
-
   {
     path: '/admin',
     meta: { requiresStaff: true },
@@ -58,6 +52,16 @@ const routes = [
         name: 'admin-form-profile',
         component: () => import('@/pages/profile/FormPage.vue'),
         meta: { listRoute: '/admin/profile' }
+      },
+      {
+        path: 'xlsx',
+        name: 'admin-xlsx',
+        component: () => import('@/pages/LoadPage.vue')
+      },
+      {
+        path: 'session',
+        name: 'admin-session',
+        component: () => import('@/pages/session/ListPage.vue')
       }
     ]
   },

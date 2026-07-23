@@ -146,6 +146,9 @@ class Device(Base):
     def __str__(self):
         return self.imsi
 
+    class Meta:
+        ordering = ['imsi']
+
 
 class Session(Base):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

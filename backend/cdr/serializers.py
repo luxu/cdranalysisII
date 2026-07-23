@@ -126,3 +126,25 @@ class SessionSerializer(serializers.ModelSerializer):
             'status',
         ]
         read_only_fields = ['id', 'created_at', 'modified_at']
+
+
+class SessionListSerializer(serializers.ModelSerializer):
+    imsi = serializers.CharField(source='device.imsi', read_only=True)
+    msisdn = serializers.CharField(source='device.msisdn', read_only=True)
+    thing_name = serializers.CharField(
+        source='device.thing.thingsgroupname', read_only=True
+    )
+
+    class Meta:
+        model = Session
+        fields = [
+            'id',
+            'sessionid',
+            'sessioncreatetime',
+            'realusage',
+            'uom',
+            'imsi',
+            'msisdn',
+            'thing_name',
+            'status',
+        ]
