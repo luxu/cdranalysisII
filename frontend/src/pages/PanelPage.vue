@@ -2,14 +2,14 @@
   <main class="flex-1 p-8 space-y-6 overflow-y-auto">
     <div v-if="loading" class="space-y-6">
       <div class="h-8 w-48 bg-slate-800 rounded animate-pulse" />
-      <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section class="flex flex-row gap-2">
         <div
           v-for="i in 3"
           :key="i"
-          class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-6 space-y-3"
+          class="flex-1 bg-[#0D1321] border border-[#1E293B]/40 rounded-xl p-2.5 space-y-1.5 min-w-0"
         >
-          <div class="h-4 w-24 bg-slate-800 rounded animate-pulse" />
-          <div class="h-8 w-16 bg-slate-800 rounded animate-pulse" />
+          <div class="h-2.5 w-16 bg-slate-800 rounded animate-pulse" />
+          <div class="h-5 w-10 bg-slate-800 rounded animate-pulse" />
         </div>
       </section>
     </div>
@@ -45,20 +45,20 @@
         </div>
       </div>
 
-      <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section class="flex flex-row gap-4">
         <div
-          class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-6 shadow-sm space-y-3"
+          class="flex-1 bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-4 shadow-sm min-w-0"
         >
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between mb-2">
             <span
-              class="text-xs font-semibold text-slate-400 uppercase tracking-wider"
+              class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate"
               >Total Devices</span
             >
             <div
-              class="bg-[#10B981]/10 text-[#10B981] p-2 rounded-xl border border-[#10B981]/20"
+              class="bg-[#10B981]/10 text-[#10B981] p-1.5 rounded-lg border border-[#10B981]/20 shrink-0 ml-2"
             >
               <svg
-                class="w-5 h-5"
+                class="w-3.5 h-3.5"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
@@ -73,29 +73,26 @@
             </div>
           </div>
           <div>
-            <span class="text-3xl font-bold text-white">{{
+            <span class="text-xl font-bold text-white">{{
               stats.totalDevices
             }}</span>
-            <span class="text-xs text-slate-500 ml-2">dispositivos</span>
+            <span class="text-[10px] text-slate-500 ml-1.5">dispositivos</span>
           </div>
-          <p class="text-[11px] text-slate-500"
-            >Total de dispositivos da fazenda</p
-          >
         </div>
 
         <div
-          class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-6 shadow-sm space-y-3"
+          class="flex-1 bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-4 shadow-sm min-w-0"
         >
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between mb-2">
             <span
-              class="text-xs font-semibold text-slate-400 uppercase tracking-wider"
-              >Devices com Sessions</span
+              class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate"
+              >Devices c/ Sessions</span
             >
             <div
-              class="bg-[#3B82F6]/10 text-[#3B82F6] p-2 rounded-xl border border-[#3B82F6]/20"
+              class="bg-[#3B82F6]/10 text-[#3B82F6] p-1.5 rounded-lg border border-[#3B82F6]/20 shrink-0 ml-2"
             >
               <svg
-                class="w-5 h-5"
+                class="w-3.5 h-3.5"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
@@ -110,29 +107,26 @@
             </div>
           </div>
           <div>
-            <span class="text-3xl font-bold text-white">{{
+            <span class="text-xl font-bold text-white">{{
               stats.devicesWithSessions
             }}</span>
-            <span class="text-xs text-slate-500 ml-2">dispositivos</span>
+            <span class="text-[10px] text-slate-500 ml-1.5">dispositivos</span>
           </div>
-          <p class="text-[11px] text-slate-500"
-            >Dispositivos que criaram ao menos uma sessão</p
-          >
         </div>
 
         <div
-          class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-6 shadow-sm space-y-3"
+          class="flex-1 bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-4 shadow-sm min-w-0"
         >
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between mb-2">
             <span
-              class="text-xs font-semibold text-slate-400 uppercase tracking-wider"
+              class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate"
               >Total Real Usage</span
             >
             <div
-              class="bg-[#F59E0B]/10 text-[#F59E0B] p-2 rounded-xl border border-[#F59E0B]/20"
+              class="bg-[#F59E0B]/10 text-[#F59E0B] p-1.5 rounded-lg border border-[#F59E0B]/20 shrink-0 ml-2"
             >
               <svg
-                class="w-5 h-5"
+                class="w-3.5 h-3.5"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
@@ -147,91 +141,17 @@
             </div>
           </div>
           <div>
-            <span class="text-3xl font-bold text-white">{{
+            <span class="text-xl font-bold text-white">{{
               stats.totalRealUsage
             }}</span>
-            <span class="text-xs text-slate-500 ml-2">{{ stats.uom }}</span>
+            <span class="text-[10px] text-slate-500 ml-1.5">{{
+              stats.uom
+            }}</span>
           </div>
-          <p class="text-[11px] text-slate-500"
-            >Soma total de uso de todas as sessões</p
-          >
         </div>
       </section>
 
-      <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div
-          class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-5 shadow-sm space-y-4"
-        >
-          <div class="flex items-center justify-between">
-            <h3
-              class="text-xs font-semibold text-white uppercase tracking-wider"
-              >Uso Mensal</h3
-            >
-            <span class="text-[10px] text-slate-500">bytes</span>
-          </div>
-
-          <div
-            v-if="chartLoading"
-            class="h-52 flex items-center justify-center"
-          >
-            <div
-              class="w-6 h-6 border-2 border-[#10B981] border-t-transparent rounded-full animate-spin"
-            />
-          </div>
-
-          <svg
-            v-else-if="usageData.length"
-            class="w-full"
-            viewBox="0 0 400 180"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <defs>
-              <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#10B981" stop-opacity="0.35" />
-                <stop offset="100%" stop-color="#10B981" stop-opacity="0.02" />
-              </linearGradient>
-            </defs>
-
-            <polyline
-              :points="linePoints"
-              fill="none"
-              stroke="#10B981"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-
-            <polygon :points="areaPoints" fill="url(#areaGrad)" />
-
-            <circle
-              v-for="(p, i) in usageData"
-              :key="i"
-              :cx="xPos(i)"
-              cy="yVal(p.total)"
-              r="2.5"
-              fill="#10B981"
-              stroke="#0D1321"
-              stroke-width="1.5"
-            />
-
-            <text
-              v-for="(p, i) in usageLabels"
-              :key="'l' + i"
-              :x="xPos(i * step)"
-              y="175"
-              text-anchor="middle"
-              class="text-[8px] fill-slate-500"
-              font-size="7"
-            >
-              {{ p }}
-            </text>
-          </svg>
-
-          <div v-else class="h-52 flex items-center justify-center">
-            <p class="text-xs text-slate-600">Nenhum dado de uso mensal</p>
-          </div>
-        </div>
-
+      <section class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div
           class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-5 shadow-sm space-y-3"
         >
@@ -278,6 +198,92 @@
 
           <div v-else class="h-52 flex items-center justify-center">
             <p class="text-xs text-slate-600">Nenhum dado de consumo</p>
+          </div>
+        </div>
+
+        <div
+          class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-5 shadow-sm space-y-4"
+        >
+          <div class="flex items-center justify-between">
+            <h3
+              class="text-xs font-semibold text-white uppercase tracking-wider"
+              >Uso Mensal</h3
+            >
+            <span class="text-[10px] text-slate-500">bytes</span>
+          </div>
+
+          <div
+            v-if="chartLoading"
+            class="h-52 flex items-center justify-center"
+          >
+            <div
+              class="w-6 h-6 border-2 border-[#10B981] border-t-transparent rounded-full animate-spin"
+            />
+          </div>
+
+          <svg
+            v-else-if="usageData.length"
+            class="w-full"
+            viewBox="0 0 400 180"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <defs>
+              <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#10B981" stop-opacity="0.35" />
+                <stop offset="100%" stop-color="#10B981" stop-opacity="0.02" />
+              </linearGradient>
+            </defs>
+
+            <line
+              v-if="usageData.length === 1"
+              :x1="padding.left"
+              :y1="yVal(usageData[0].total)"
+              :x2="padding.left + innerW"
+              :y2="yVal(usageData[0].total)"
+              stroke="#10B981"
+              stroke-width="1.5"
+              stroke-dasharray="4,3"
+              opacity="0.5"
+            />
+
+            <polygon :points="areaPoints" fill="url(#areaGrad)" />
+
+            <polyline
+              v-if="usageData.length > 1"
+              :points="linePoints"
+              fill="none"
+              stroke="#10B981"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+
+            <circle
+              v-for="(p, i) in usageData"
+              :key="i"
+              :cx="xPos(i)"
+              :cy="yVal(p.total)"
+              :r="usageData.length === 1 ? 5 : 2.5"
+              fill="#10B981"
+              stroke="#0D1321"
+              stroke-width="1.5"
+            />
+
+            <text
+              v-for="(p, i) in usageLabels"
+              :key="'l' + i"
+              :x="xPos(i * step)"
+              y="175"
+              text-anchor="middle"
+              class="text-[8px] fill-slate-500"
+              font-size="7"
+            >
+              {{ p }}
+            </text>
+          </svg>
+
+          <div v-else class="h-52 flex items-center justify-center">
+            <p class="text-xs text-slate-600">Nenhum dado de uso mensal</p>
           </div>
         </div>
       </section>
@@ -367,6 +373,10 @@ const linePoints = computed(() =>
 
 const areaPoints = computed(() => {
   if (!usageData.value.length) return ''
+  if (usageData.value.length === 1) {
+    const y = yVal(usageData.value[0].total)
+    return `${padding.left},${y} ${padding.left + innerW},${y} ${padding.left + innerW},${padding.top + innerH} ${padding.left},${padding.top + innerH}`
+  }
   const pts = usageData.value.map((d, i) => `${xPos(i)},${yVal(d.total)}`)
   const last = usageData.value.length - 1
   return `${pts.join(' ')} ${xPos(last)},${padding.top + innerH} ${xPos(0)},${padding.top + innerH}`
@@ -446,7 +456,7 @@ async function fetchCharts() {
 
     usageData.value = usageRes.data.filter(d => d.month).slice(-12)
 
-    topDevices.value = topRes.data.slice(0, 10).map(d => {
+    topDevices.value = topRes.data.slice(0, 5).map(d => {
       const label = d.iccid || d.imsi || d.msisdn || d.device_id.slice(0, 8)
       return {
         ...d,
