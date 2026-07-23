@@ -1,7 +1,7 @@
 <template>
   <q-page padding>
     <div class="flex items-center justify-between q-mb-md">
-      <h1 class="text-h2 text-center">Perfis</h1>
+      <h1 class="text-h2 text-center">Profiles List</h1>
       <q-btn color="primary" label="Adicionar" icon="add" :to="formRoute()" />
     </div>
     <q-table
