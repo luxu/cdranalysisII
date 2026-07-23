@@ -45,25 +45,25 @@ export default defineBoot(({ router }) => {
     return '/'
   }
 
-  router.beforeEach((to, from, next) => {
+  router.beforeEach(to => {
     const user = getAuth()
 
     if (to.path === '/login') {
       if (user) {
-        return next(getHome(user))
+        return getHome(user)
       }
-      return next()
+      return true
     }
 
     if (!user) {
-      return next('/login')
+      return '/login'
     }
 
     if (
       to.matched.some(r => r.meta?.requiresAdmin) &&
       !user.groups?.includes('Administrador')
     ) {
-      return next('/')
+      return '/'
     }
     if (to.matched.some(r => r.meta?.requiresStaff)) {
       const groups = user.groups || []
@@ -72,10 +72,10 @@ export default defineBoot(({ router }) => {
         !groups.includes('Administrador') &&
         !groups.includes('Manager')
       ) {
-        return next('/')
+        return '/'
       }
     }
 
-    next()
+    return true
   })
 })
