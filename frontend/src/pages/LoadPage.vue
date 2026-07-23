@@ -8,12 +8,12 @@
 
             <q-file
               v-model="arquivo"
-              label="Selecione ou arraste um arquivo Excel (.xlsx)"
+              label="Selecione ou arraste um arquivo Excel (.xlsx) ou CSV (.csv)"
               outlined
               append
               counter
               :max-files="1"
-              accept=".xlsx, .xls"
+              accept=".xlsx, .xls, .csv"
               @rejected="onRejected"
             >
               <template v-slot:prepend>
@@ -33,6 +33,14 @@
 
           <q-card-actions align="right">
             <q-btn
+              v-if="canAccessAdmin"
+              label="Importar para o Banco"
+              color="secondary"
+              :disable="!arquivo"
+              :loading="importando"
+              @click="importarParaBanco"
+            />
+            <q-btn
               label="Visualizar Dados"
               color="primary"
               :disable="!arquivo"
@@ -42,21 +50,110 @@
         </q-card>
       </div>
 
-      <div v-if="linhasTabela.length > 0" class="col-12 col-md-10">
+      <div v-if="canAccessAdmin && resultadoImportacao" class="col-12 col-md-8">
         <q-card class="my-card q-pa-md">
+          <q-card-section>
+            <div class="text-h6 q-mb-md flex items-center">
+              <q-icon name="check_circle" color="positive" class="q-mr-sm" />
+              Resultado da Importação
+            </div>
+
+            <div class="row q-col-gutter-sm">
+              <div class="col-6 col-sm-3">
+                <div class="text-caption text-grey-5">Linhas</div>
+                <div class="text-subtitle1 text-weight-bold">
+                  {{ resultadoImportacao.total_lines }}
+                </div>
+              </div>
+              <div class="col-6 col-sm-3">
+                <div class="text-caption text-grey-5">Organizations</div>
+                <div class="text-subtitle1 text-weight-bold">
+                  {{ resultadoImportacao.organizations }}
+                </div>
+              </div>
+              <div class="col-6 col-sm-3">
+                <div class="text-caption text-grey-5">Customers</div>
+                <div class="text-subtitle1 text-weight-bold">
+                  {{ resultadoImportacao.customers }}
+                </div>
+              </div>
+              <div class="col-6 col-sm-3">
+                <div class="text-caption text-grey-5">Things</div>
+                <div class="text-subtitle1 text-weight-bold">
+                  {{ resultadoImportacao.things }}
+                </div>
+              </div>
+              <div class="col-6 col-sm-3">
+                <div class="text-caption text-grey-5">Devices</div>
+                <div class="text-subtitle1 text-weight-bold">
+                  {{ resultadoImportacao.devices }}
+                </div>
+              </div>
+              <div class="col-6 col-sm-3">
+                <div class="text-caption text-grey-5">Sessions</div>
+                <div class="text-subtitle1 text-weight-bold">
+                  {{ resultadoImportacao.sessions }}
+                </div>
+              </div>
+              <div class="col-6 col-sm-3">
+                <div class="text-caption text-grey-5">MNOs</div>
+                <div class="text-subtitle1 text-weight-bold">
+                  {{ resultadoImportacao.mnos }}
+                </div>
+              </div>
+              <div class="col-6 col-sm-3">
+                <div class="text-caption text-grey-5">Price Plans</div>
+                <div class="text-subtitle1 text-weight-bold">
+                  {{ resultadoImportacao.priceplans }}
+                </div>
+              </div>
+            </div>
+
+            <div
+              v-if="resultadoImportacao.errors.length > 0"
+              class="q-mt-md q-pa-sm bg-red-1 rounded-borders"
+            >
+              <div class="text-caption text-negative text-weight-bold">
+                Erros ({{ resultadoImportacao.errors.length }}):
+              </div>
+              <div
+                v-for="err in resultadoImportacao.errors.slice(0, 5)"
+                :key="err.line"
+                class="text-caption text-grey-7"
+              >
+                Linha {{ err.line }}: {{ err.error }}
+              </div>
+              <div
+                v-if="resultadoImportacao.errors.length > 5"
+                class="text-caption text-grey-5"
+              >
+                ... e mais {{ resultadoImportacao.errors.length - 5 }} erros
+              </div>
+            </div>
+          </q-card-section>
+        </q-card>
+      </div>
+
+      <div v-if="linhasTabela.length > 0" class="col-12">
+        <q-card class="my-card q-pa-md overflow-hidden">
           <q-card-section>
             <div class="text-h6 q-mb-md"
               >Dados Originais: {{ arquivo?.name }}</div
             >
 
-            <q-table
-              flat
-              bordered
-              :rows="linhasTabela"
-              :columns="colunasTabela"
-              row-key="id"
-              :pagination="{ rowsPerPage: 5 }"
-            />
+            <div style="max-height: 60vh; overflow: auto">
+              <q-table
+                flat
+                bordered
+                :rows="linhasTabela"
+                :columns="colunasTabela"
+                row-key="id"
+                :pagination="{ rowsPerPage: 0 }"
+                :rows-per-page-options="[0]"
+                class="full-width"
+                virtual-scroll
+              />
+            </div>
           </q-card-section>
 
           <q-card-section class="bg-grey-2 q-mt-md rounded-borders">
@@ -79,22 +176,27 @@
         </q-card>
       </div>
 
-      <div v-if="colunasSelecionadas.length > 0" class="col-12 col-md-10">
-        <q-card class="my-card q-pa-md border-filtered">
+      <div v-if="colunasSelecionadas.length > 0" class="col-12">
+        <q-card class="my-card q-pa-md border-filtered overflow-hidden">
           <q-card-section>
             <div class="text-h6 text-secondary q-mb-md flex items-center">
               <q-icon name="filter_alt" class="q-mr-sm" />
               Dados Filtrados
             </div>
 
-            <q-table
-              flat
-              bordered
-              :rows="linhasFiltradas"
-              :columns="colunasFiltradas"
-              row-key="id"
-              :pagination="{ rowsPerPage: 5 }"
-            />
+            <div style="max-height: 60vh; overflow: auto">
+              <q-table
+                flat
+                bordered
+                :rows="linhasFiltradas"
+                :columns="colunasFiltradas"
+                row-key="id"
+                :pagination="{ rowsPerPage: 0 }"
+                :rows-per-page-options="[0]"
+                class="full-width"
+                virtual-scroll
+              />
+            </div>
           </q-card-section>
         </q-card>
       </div>
@@ -106,9 +208,15 @@
 import { ref, computed } from 'vue'
 import { useQuasar } from 'quasar'
 import * as XLSX from 'xlsx'
+import useAuth from '@/composables/useAuth'
+import cdrImportService from '@/services/cdrImport'
+
+const { canAccessAdmin } = useAuth()
 
 const $q = useQuasar()
 const arquivo = ref(null)
+const importando = ref(false)
+const resultadoImportacao = ref(null)
 
 // Estados da Tabela Principal
 const linhasTabela = ref([])
@@ -205,6 +313,36 @@ const limparDados = () => {
   linhasTabela.value = []
   colunasTabela.value = []
   colunasSelecionadas.value = []
+  resultadoImportacao.value = null
+}
+
+const importarParaBanco = async () => {
+  if (!arquivo.value) return
+
+  importando.value = true
+  resultadoImportacao.value = null
+
+  try {
+    const resultado = await cdrImportService.upload(arquivo.value)
+    resultadoImportacao.value = resultado
+
+    if (resultado.errors.length > 0) {
+      $q.notify({
+        type: 'warning',
+        message: `Importado com ${resultado.errors.length} erro(s)`
+      })
+    } else {
+      $q.notify({
+        type: 'positive',
+        message: `${resultado.sessions} sessões importadas com sucesso!`
+      })
+    }
+  } catch (e) {
+    const msg = e.friendlyMessage || 'Erro ao importar arquivo'
+    $q.notify({ type: 'negative', message: msg })
+  } finally {
+    importando.value = false
+  }
 }
 
 const onRejected = () => {

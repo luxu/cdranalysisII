@@ -1,8 +1,12 @@
+import os
+import tempfile
+
 from django.db.models import Q, Sum
 from django.db.models.functions import TruncMonth
 
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
 from .models import (
@@ -22,6 +26,7 @@ from .serializers import (
     NetworkProviderSerializer,
     OrganizationSerializer,
     PricePlanSerializer,
+    SessionListSerializer,
     SessionSerializer,
     ThingSerializer,
 )
@@ -65,7 +70,6 @@ class DeviceViewSet(viewsets.ModelViewSet):
         qs = super().get_queryset()
         thing = self.request.query_params.get('thing')
         search = self.request.query_params.get('search')
-        status = self.request.query_params.get('status')
         if thing:
             qs = qs.filter(thing_id=thing)
         if search:
@@ -75,9 +79,6 @@ class DeviceViewSet(viewsets.ModelViewSet):
                 | Q(msisdn__icontains=search)
                 | Q(imei__icontains=search)
             )
-        if status is not None:
-            status_bool = status.lower() in ('true', '1', 'ativo')
-            qs = qs.filter(status=status_bool)
         return qs
 
 
@@ -86,7 +87,7 @@ class SessionViewSet(viewsets.ModelViewSet):
     serializer_class = SessionSerializer
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        qs = Session.objects.select_related('device__thing').all()
         device__thing = self.request.query_params.get('device__thing')
         if device__thing:
             qs = qs.filter(device__thing_id=device__thing)
@@ -97,6 +98,11 @@ class SessionViewSet(viewsets.ModelViewSet):
         if end_date:
             qs = qs.filter(sessioncreatetime__date__lte=end_date)
         return qs
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return SessionListSerializer
+        return SessionSerializer
 
     @action(detail=False, methods=['get'])
     def usage_by_month(self, request):
@@ -137,3 +143,46 @@ class SessionViewSet(viewsets.ModelViewSet):
             for t in top
         ]
         return Response(data)
+
+    @action(
+        detail=False,
+        methods=['post'],
+        url_path='import-cdr',
+        permission_classes=[IsAdminUser],
+    )
+    def import_cdr(self, request):
+        file = request.FILES.get('file')
+        if not file:
+            return Response(
+                {'error': 'Nenhum arquivo enviado'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not file.name.endswith(('.xlsx', '.xls', '.csv')):
+            return Response(
+                {'error': 'Formato inválido. Use .xlsx, .xls ou .csv'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        tmp_path = None
+        try:
+            ext = os.path.splitext(file.name)[1]
+            with tempfile.NamedTemporaryFile(
+                suffix=ext, delete=False
+            ) as tmp:
+                for chunk in file.chunks():
+                    tmp.write(chunk)
+                tmp_path = tmp.name
+
+            from cdr.services import import_cdr_from_file
+
+            stats = import_cdr_from_file(tmp_path)
+            return Response(stats)
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+        finally:
+            if tmp_path and os.path.exists(tmp_path):
+                os.unlink(tmp_path)
