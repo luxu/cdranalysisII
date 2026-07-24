@@ -136,6 +136,15 @@
     </div>
 
     <div class="space-y-1">
+      <div class="px-4 py-2">
+        <p class="text-[10px] text-slate-500 uppercase tracking-wider"
+          >Logado como</p
+        >
+        <p class="text-xs text-white font-medium truncate">{{
+          user?.name || user?.email
+        }}</p>
+      </div>
+
       <RouterLink
         v-if="canAccessAdmin"
         to="/admin"
@@ -199,7 +208,7 @@ defineProps({
 
 const route = useRoute()
 const router = useRouter()
-const { logout, canAccessAdmin } = useAuth()
+const { logout, canAccessAdmin, user } = useAuth()
 const { state, clearDates } = useDashboardFilter()
 
 function handleLogout() {

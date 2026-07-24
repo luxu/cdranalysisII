@@ -113,6 +113,16 @@
           </svg>
           <span>{{ item.label }}</span>
         </RouterLink>
+
+        <div class="px-4 py-2">
+          <p class="text-[10px] text-slate-500 uppercase tracking-wider"
+            >Logado como</p
+          >
+          <p class="text-xs text-white font-medium truncate">{{
+            user?.name || user?.email
+          }}</p>
+        </div>
+
         <button
           class="flex items-center space-x-3 w-full px-4 py-2.5 rounded-xl font-medium text-xs transition text-slate-400 hover:bg-[#1E293B]/20 hover:text-slate-200"
           @click="handleLogout"
@@ -143,7 +153,7 @@ import useAuth from '@/composables/useAuth'
 
 const route = useRoute()
 const router = useRouter()
-const { logout } = useAuth()
+const { logout, user } = useAuth()
 
 function handleLogout() {
   logout()
