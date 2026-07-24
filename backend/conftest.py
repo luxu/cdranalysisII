@@ -36,7 +36,7 @@ def user_data():
 
 @pytest.fixture
 def user(django_user_model, user_data):
-    return django_user_model.objects.create_user(**user_data)
+    return django_user_model.objects.create_user(**user_data, is_staff=True)
 
 
 @pytest.fixture

@@ -32,6 +32,32 @@ from .serializers import (
 )
 
 
+class OwnerFilteredMixin:
+    """Filtra queryset pelo thing do usuário logado. Admin vê tudo."""
+
+    owner_filter_field = 'thing_id'
+
+    def _is_admin(self, user):
+        if user.is_staff:
+            return True
+        return user.groups.filter(name__in=['Administrador', 'Manager']).exists()
+
+    def _user_thing_id(self, user):
+        try:
+            return user.profile.thing_id
+        except Exception:
+            return None
+
+    def _apply_owner_filter(self, qs):
+        if not self._is_admin(self.request.user):
+            thing_id = self._user_thing_id(self.request.user)
+            if thing_id:
+                qs = qs.filter(**{self.owner_filter_field: thing_id})
+            else:
+                qs = qs.none()
+        return qs
+
+
 class OrganizationViewSet(viewsets.ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
@@ -62,12 +88,12 @@ class ThingViewSet(viewsets.ModelViewSet):
     serializer_class = ThingSerializer
 
 
-class DeviceViewSet(viewsets.ModelViewSet):
+class DeviceViewSet(OwnerFilteredMixin, viewsets.ModelViewSet):
     queryset = Device.objects.select_related('thing').all()
     serializer_class = DeviceSerializer
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        qs = self._apply_owner_filter(super().get_queryset())
         thing = self.request.query_params.get('thing')
         search = self.request.query_params.get('search')
         if thing:
@@ -81,15 +107,14 @@ class DeviceViewSet(viewsets.ModelViewSet):
         return qs
 
 
-class SessionViewSet(viewsets.ModelViewSet):
+class SessionViewSet(OwnerFilteredMixin, viewsets.ModelViewSet):
     queryset = Session.objects.select_related('device').all()
     serializer_class = SessionSerializer
+    owner_filter_field = 'device__thing_id'
 
     def get_queryset(self):
         qs = Session.objects.select_related('device__thing').all()
-        device__thing = self.request.query_params.get('device__thing')
-        if device__thing:
-            qs = qs.filter(device__thing_id=device__thing)
+        qs = self._apply_owner_filter(qs)
         search = self.request.query_params.get('search')
         if search:
             qs = qs.filter(
