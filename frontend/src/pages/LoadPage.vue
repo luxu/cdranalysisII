@@ -90,7 +90,7 @@
                 </div>
               </div>
               <div class="col-6 col-sm-3">
-                <div class="text-caption text-grey-5">Sessions</div>
+                <div class="text-caption text-grey-5">Sessões</div>
                 <div class="text-subtitle1 text-weight-bold">
                   {{ resultadoImportacao.sessions }}
                 </div>

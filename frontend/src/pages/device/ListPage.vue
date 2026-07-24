@@ -1,9 +1,9 @@
 <template>
   <q-page padding>
-    <h1 class="text-h2 text-center">Device List</h1>
+    <h1 class="text-h2 text-center">Lista de Dispositivos</h1>
     <q-btn
       color="primary"
-      label="Add Device"
+      label="Adicionar Dispositivo"
       icon="add"
       :to="{ name: 'form-device' }"
     />

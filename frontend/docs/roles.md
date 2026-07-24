@@ -55,4 +55,4 @@ Adicionado `v-if="canAccessAdmin"` ao `RouterLink` do Admin em `AppSidebar.vue`.
 
 **Corrigido em:** `feat(profile): add profile CRUD with auto-create user`
 
-Card renomeado de "Grupos User" para "Fazendas" com descrição atualizada em `AdminPage.vue`.
+Card renomeado de "Grupos User" para "Clientes" com descrição atualizada em `AdminPage.vue`.

@@ -1,7 +1,12 @@
 <template>
   <q-page padding>
-    <h1 class="text-h2 text-center">Thing List</h1>
-    <q-btn color="primary" label="Add Thing" icon="add" :to="formRoute()" />
+    <h1 class="text-h2 text-center">Lista de Clientes</h1>
+    <q-btn
+      color="primary"
+      label="Adicionar Cliente"
+      icon="add"
+      :to="formRoute()"
+    />
     <q-table
       v-model:pagination="pagination"
       :rows="rows"

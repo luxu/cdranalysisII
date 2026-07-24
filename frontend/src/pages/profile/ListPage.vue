@@ -1,9 +1,12 @@
 <template>
   <q-page padding>
-    <div class="flex items-center justify-between q-mb-md">
-      <h1 class="text-h2 text-center">Profiles List</h1>
-      <q-btn color="primary" label="Adicionar" icon="add" :to="formRoute()" />
-    </div>
+    <h1 class="text-h2 text-center">Lista de Usuários</h1>
+    <q-btn
+      color="primary"
+      label="Adicionar Usuário"
+      icon="add"
+      :to="formRoute()"
+    />
     <q-table
       v-model:pagination="pagination"
       :rows="rows"

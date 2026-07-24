@@ -1,10 +1,34 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { defineConfig } from '#q-app'
 import tailwindcss from '@tailwindcss/vite'
 
-export default defineConfig((/* ctx */) => {
+function loadDotEnv() {
+  const envPath = resolve(process.cwd(), '.env')
+  try {
+    const content = readFileSync(envPath, 'utf-8')
+    const vars = {}
+    for (const line of content.split('\n')) {
+      const trimmed = line.trim()
+      if (!trimmed || trimmed.startsWith('#')) continue
+      const idx = trimmed.indexOf('=')
+      if (idx === -1) continue
+      const key = trimmed.slice(0, idx).trim()
+      const value = trimmed.slice(idx + 1).trim()
+      vars[key] = value
+    }
+    return vars
+  } catch {
+    return {}
+  }
+}
+
+const dotEnv = loadDotEnv()
+
+export default defineConfig(() => {
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
@@ -72,7 +96,7 @@ export default defineConfig((/* ctx */) => {
       open: false, // opens browser window automatically
       proxy: {
         '/api': {
-          target: 'http://localhost:8001',
+          target: dotEnv.VITE_API_URL || 'http://localhost:8001',
           changeOrigin: true
         }
       }

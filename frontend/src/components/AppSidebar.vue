@@ -102,25 +102,6 @@
           />
         </div>
 
-        <div class="flex items-center space-x-3 px-1">
-          <label class="flex items-center space-x-2 cursor-pointer">
-            <input
-              type="checkbox"
-              v-model="state.statusAtivo"
-              class="w-3.5 h-3.5 rounded border-slate-600 bg-[#090D16] text-[#10B981] focus:ring-[#10B981]/30 focus:ring-offset-0 cursor-pointer"
-            />
-            <span class="text-[11px] text-slate-400">Ativo</span>
-          </label>
-          <label class="flex items-center space-x-2 cursor-pointer">
-            <input
-              type="checkbox"
-              v-model="state.statusInativo"
-              class="w-3.5 h-3.5 rounded border-slate-600 bg-[#090D16] text-rose-500 focus:ring-rose-500/30 focus:ring-offset-0 cursor-pointer"
-            />
-            <span class="text-[11px] text-slate-400">Inativo</span>
-          </label>
-        </div>
-
         <div class="space-y-2">
           <div>
             <label
