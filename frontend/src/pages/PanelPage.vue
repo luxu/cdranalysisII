@@ -2,7 +2,7 @@
   <main class="flex-1 p-8 space-y-6 overflow-y-auto">
     <div v-if="loading" class="space-y-6">
       <div class="h-8 w-48 bg-slate-800 rounded animate-pulse" />
-      <section class="flex flex-row gap-2">
+      <section class="flex flex-row gap-4">
         <div
           v-for="i in 3"
           :key="i"
@@ -38,12 +38,42 @@
     <template v-else>
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-white tracking-tight">{{
-            farmName
-          }}</h1>
-          <p class="text-xs text-slate-500 mt-1">Painel da fazenda</p>
+          <h1 class="text-2xl font-bold text-white tracking-tight"
+            >Dashboard</h1
+          >
+          <p class="text-xs text-slate-500 mt-1"
+            >Visão geral das organizações</p
+          >
         </div>
       </div>
+
+      <section class="space-y-2">
+        <div
+          v-for="org in organizations"
+          :key="org.thing_id"
+          class="bg-[#0D1321] border border-[#1E293B]/40 rounded-xl px-5 py-3 shadow-sm flex items-center justify-between"
+        >
+          <span
+            class="text-sm font-bold text-white uppercase tracking-wider truncate"
+            :title="org.thing_name"
+            >{{ org.thing_name }}</span
+          >
+          <div class="flex items-center gap-6 shrink-0 ml-4">
+            <span class="text-xs text-slate-400 tabular-nums"
+              ><strong class="text-white font-bold">{{
+                org.device_count
+              }}</strong>
+              {{ org.device_count === 1 ? 'DEVICE' : 'DEVICES' }}</span
+            >
+            <span class="text-xs text-slate-400"
+              >CONSUMO
+              <strong class="text-[#10B981] font-bold ml-1">{{
+                formatUsage(org.total_usage)
+              }}</strong></span
+            >
+          </div>
+        </div>
+      </section>
 
       <section class="flex flex-row gap-4">
         <div
@@ -86,7 +116,7 @@
           <div class="flex items-center justify-between mb-2">
             <span
               class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate"
-              >Devices c/ Sessions</span
+              >Devices c/ Sessões</span
             >
             <div
               class="bg-[#3B82F6]/10 text-[#3B82F6] p-1.5 rounded-lg border border-[#3B82F6]/20 shrink-0 ml-2"
@@ -307,6 +337,8 @@ const error = ref(null)
 const farmName = ref('')
 const thingId = ref(null)
 
+const organizations = ref([])
+
 const stats = reactive({
   totalDevices: 0,
   devicesWithSessions: 0,
@@ -331,6 +363,10 @@ function formatBytesShort(bytes) {
   if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + ' MB'
   if (bytes >= 1024) return (bytes / 1024).toFixed(1) + ' KB'
   return bytes.toFixed(0) + ' B'
+}
+
+function formatUsage(bytes) {
+  return formatBytesShort(bytes)
 }
 
 const barColors = [
@@ -393,14 +429,22 @@ const usageLabels = computed(() => {
   return labels
 })
 
+async function fetchOrganizations() {
+  const res = await sessionService.summaryByThing()
+  organizations.value = res
+}
+
 async function fetchProfile() {
   const data = await profileService.get('me')
   thingId.value = data.thing
-  farmName.value = data.thing_name || 'Fazenda'
+  farmName.value = data.thing_name || (data.is_staff ? 'Admin' : 'Fazenda')
 }
 
 async function fetchFilteredDevices() {
-  if (!thingId.value) return
+  if (!thingId.value) {
+    stats.totalDevices = 0
+    return
+  }
   const params = buildDeviceParams(thingId.value)
   params.page = 1
   params.page_size = 1
@@ -409,7 +453,11 @@ async function fetchFilteredDevices() {
 }
 
 async function fetchSessionStats() {
-  if (!thingId.value) return
+  if (!thingId.value) {
+    stats.devicesWithSessions = 0
+    stats.totalRealUsage = '0'
+    return
+  }
   const sessionParams = { ...buildSessionParams(thingId.value), page: 1 }
   const firstPage = await sessionService.list(sessionParams)
   const deviceSet = new Set()
@@ -445,7 +493,11 @@ async function fetchSessionStats() {
 }
 
 async function fetchCharts() {
-  if (!thingId.value) return
+  if (!thingId.value) {
+    usageData.value = []
+    topDevices.value = []
+    return
+  }
   chartLoading.value = true
   try {
     const chartParams = buildSessionParams(thingId.value)
@@ -504,7 +556,7 @@ watch(
 
 onMounted(async () => {
   try {
-    await fetchProfile()
+    await Promise.all([fetchProfile(), fetchOrganizations()])
     await Promise.all([
       fetchFilteredDevices(),
       fetchSessionStats(),

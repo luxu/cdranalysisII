@@ -46,9 +46,18 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def me(self, request):
-        profile = self.get_queryset().get(user=request.user)
-        serializer = self.get_serializer(profile)
-        return Response(serializer.data)
+        try:
+            profile = self.get_queryset().get(user=request.user)
+            serializer = self.get_serializer(profile)
+            return Response(serializer.data)
+        except Profile.DoesNotExist:
+            return Response({
+                'user': str(request.user.id),
+                'thing': None,
+                'thing_name': None,
+                'name': request.user.email,
+                'is_staff': request.user.is_staff,
+            })
 
     @action(detail=True, methods=['get'])
     def session_count(self, request, pk=None):

@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Count, Min, Max
 from django.db.models.functions import TruncMonth
 
 from rest_framework import status, viewsets
@@ -91,6 +91,14 @@ class SessionViewSet(viewsets.ModelViewSet):
         device__thing = self.request.query_params.get('device__thing')
         if device__thing:
             qs = qs.filter(device__thing_id=device__thing)
+        search = self.request.query_params.get('search')
+        if search:
+            qs = qs.filter(
+                Q(sessionid__icontains=search)
+                | Q(device__imsi__icontains=search)
+                | Q(device__msisdn__icontains=search)
+                | Q(device__thing__thingsgroupname__icontains=search)
+            )
         start_date = self.request.query_params.get('start_date')
         if start_date:
             qs = qs.filter(sessioncreatetime__date__gte=start_date)
@@ -103,6 +111,49 @@ class SessionViewSet(viewsets.ModelViewSet):
         if self.action == 'list':
             return SessionListSerializer
         return SessionSerializer
+
+    @action(detail=False, methods=['get'])
+    def date_range(self, request):
+        result = Session.objects.aggregate(
+            min_date=Min('sessioncreatetime__date'),
+            max_date=Max('sessioncreatetime__date'),
+        )
+        return Response({
+            'min_date': result['min_date'].isoformat() if result['min_date'] else None,
+            'max_date': result['max_date'].isoformat() if result['max_date'] else None,
+        })
+
+    @action(detail=False, methods=['get'])
+    def summary_by_thing(self, request):
+        qs = Session.objects.select_related('device__thing')
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+        if start_date:
+            qs = qs.filter(sessioncreatetime__date__gte=start_date)
+        if end_date:
+            qs = qs.filter(sessioncreatetime__date__lte=end_date)
+        data = (
+            qs
+            .values(
+                'device__thing__id',
+                'device__thing__thingsgroupname',
+            )
+            .annotate(
+                device_count=Count('device', distinct=True),
+                total_usage=Sum('realusage'),
+            )
+            .order_by('device__thing__thingsgroupname')
+        )
+        result = [
+            {
+                'thing_id': str(d['device__thing__id']),
+                'thing_name': d['device__thing__thingsgroupname'],
+                'device_count': d['device_count'],
+                'total_usage': float(d['total_usage']) if d['total_usage'] else 0,
+            }
+            for d in data
+        ]
+        return Response(result)
 
     @action(detail=False, methods=['get'])
     def usage_by_month(self, request):
