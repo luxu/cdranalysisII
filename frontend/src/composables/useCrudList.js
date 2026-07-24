@@ -7,21 +7,26 @@ import { useQuasar } from 'quasar'
 //        useCrudList(organizationService, { entityLabel: 'Organization' })
 export default function useCrudList(
   service,
-  { entityLabel = 'registro' } = {}
+  { entityLabel = 'registro', rowsPerPage: initialRowsPerPage } = {}
 ) {
   const $q = useQuasar()
   const rows = ref([])
   const loading = ref(false)
   const pagination = ref({
     page: 1,
-    rowsPerPage: 50, // mesmo PAGE_SIZE do DRF no backend
+    rowsPerPage: initialRowsPerPage || 50,
     rowsNumber: 0
   })
 
-  const fetchRows = async (page = pagination.value.page) => {
+  const fetchRows = async (page = pagination.value.page, extraParams = {}) => {
     loading.value = true
     try {
-      const data = await service.list({ page })
+      const params = {
+        page,
+        page_size: pagination.value.rowsPerPage,
+        ...extraParams
+      }
+      const data = await service.list(params)
       rows.value = data.results
       pagination.value.page = page
       pagination.value.rowsNumber = data.count
