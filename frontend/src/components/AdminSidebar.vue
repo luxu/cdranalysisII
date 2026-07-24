@@ -29,6 +29,34 @@
 
       <nav class="space-y-1">
         <RouterLink
+          to="/admin"
+          class="flex items-center space-x-3 px-4 py-2.5 rounded-xl font-medium text-xs transition"
+          :class="
+            isActive('/admin')
+              ? 'bg-[#1E293B]/50 text-white'
+              : 'text-slate-400 hover:bg-[#1E293B]/20 hover:text-slate-200'
+          "
+        >
+          <svg
+            class="w-4 h-4"
+            :class="isActive('/admin') ? 'text-[#10B981]' : ''"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+            />
+          </svg>
+          <span>Dashboard</span>
+        </RouterLink>
+
+        <div class="border-t border-[#1E293B]/40 my-2" />
+
+        <RouterLink
           v-for="item in menuItems"
           :key="item.to"
           :to="item.to"
@@ -55,48 +83,56 @@
           </svg>
           <span>{{ item.label }}</span>
         </RouterLink>
-      </nav>
-    </div>
 
-    <div class="space-y-1">
-      <RouterLink
-        to="/admin"
-        class="flex items-center space-x-3 px-4 py-2.5 rounded-xl text-slate-400 hover:bg-[#1E293B]/20 hover:text-slate-200 font-medium text-xs transition"
-      >
-        <svg
-          class="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
+        <div class="border-t border-[#1E293B]/40 my-2" />
+
+        <RouterLink
+          v-for="item in toolItems"
+          :key="item.to"
+          :to="item.to"
+          class="flex items-center space-x-3 px-4 py-2.5 rounded-xl font-medium text-xs transition"
+          :class="
+            isActive(item.to)
+              ? 'bg-[#1E293B]/50 text-white'
+              : 'text-slate-400 hover:bg-[#1E293B]/20 hover:text-slate-200'
+          "
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-          />
-        </svg>
-        <span>Dashboard Admin</span>
-      </RouterLink>
-      <button
-        class="flex items-center space-x-3 w-full px-4 py-2.5 rounded-xl text-slate-400 hover:bg-[#1E293B]/20 hover:text-slate-200 font-medium text-xs transition"
-        @click="handleLogout"
-      >
-        <svg
-          class="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
+          <svg
+            class="w-4 h-4"
+            :class="isActive(item.to) ? 'text-[#10B981]' : ''"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              :d="item.icon"
+            />
+          </svg>
+          <span>{{ item.label }}</span>
+        </RouterLink>
+        <button
+          class="flex items-center space-x-3 w-full px-4 py-2.5 rounded-xl font-medium text-xs transition text-slate-400 hover:bg-[#1E293B]/20 hover:text-slate-200"
+          @click="handleLogout"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-          />
-        </svg>
-        <span>Sair</span>
-      </button>
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+            />
+          </svg>
+          <span>Sair</span>
+        </button>
+      </nav>
     </div>
   </aside>
 </template>
@@ -116,24 +152,27 @@ function handleLogout() {
 
 const menuItems = [
   {
-    label: 'Things(Clientes)',
+    label: 'Clientes',
     to: '/admin/thing',
     icon: 'M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z'
   },
   {
-    label: 'Profiles',
+    label: 'Usuários',
     to: '/admin/profile',
     icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z'
   },
   {
+    label: 'Sessões',
+    to: '/admin/session',
+    icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
+  }
+]
+
+const toolItems = [
+  {
     label: 'Importar CDR',
     to: '/admin/xlsx',
     icon: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12'
-  },
-  {
-    label: 'Sessions',
-    to: '/admin/session',
-    icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
   }
 ]
 
