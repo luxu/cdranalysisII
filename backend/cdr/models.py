@@ -134,10 +134,6 @@ class Device(Base):
         "IMSI",
         max_length=255,
     )  # (FK)
-    msisdn = models.CharField(
-        "MSISDN(número da linha)",
-        max_length=255,
-    )
     imei = models.CharField(
         "MEI(ID do aparelho)",
         max_length=255,

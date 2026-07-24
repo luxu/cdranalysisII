@@ -102,7 +102,6 @@ class DeviceSerializer(serializers.ModelSerializer):
             'thing',
             'iccid',
             'imsi',
-            'msisdn',
             'imei',
             'created_at',
             'modified_at',
@@ -130,7 +129,7 @@ class SessionSerializer(serializers.ModelSerializer):
 
 class SessionListSerializer(serializers.ModelSerializer):
     imsi = serializers.CharField(source='device.imsi', read_only=True)
-    msisdn = serializers.CharField(source='device.msisdn', read_only=True)
+    iccid = serializers.CharField(source='device.iccid', read_only=True)
     thing_name = serializers.CharField(
         source='device.thing.thingsgroupname', read_only=True
     )
@@ -144,7 +143,7 @@ class SessionListSerializer(serializers.ModelSerializer):
             'realusage',
             'uom',
             'imsi',
-            'msisdn',
+            'iccid',
             'thing_name',
             'status',
         ]

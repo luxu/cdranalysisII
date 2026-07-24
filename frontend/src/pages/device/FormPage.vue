@@ -39,15 +39,6 @@
           <div class="col-12 col-sm-6 col-md-3">
             <q-input
               filled
-              label="MSISDN (número da linha)"
-              v-model="form.msisdn"
-              :error="hasError('msisdn')"
-              :error-message="fieldError('msisdn')"
-            />
-          </div>
-          <div class="col-12 col-sm-6 col-md-3">
-            <q-input
-              filled
               label="MEI (ID do aparelho)"
               v-model="form.mei"
               :error="hasError('mei')"
@@ -85,7 +76,6 @@ export default defineComponent({
           thing: null,
           iccid: '',
           imsi: '',
-          msisdn: '',
           mei: ''
         }
       }

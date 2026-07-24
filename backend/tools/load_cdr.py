@@ -50,7 +50,6 @@ MAPEAMENTO_COLUNAS = {
     'thingsgroupid': 'ThingsGroupId',
     'thingsgroupname': 'ThingsGroupName',
     'imsi': 'imsi'.upper(),
-    'msisdn': 'msisdn'.upper(),
     'sessionid': 'SessionId',
     'sessioncreatetime': 'sessionCreationTime'
 }
@@ -135,7 +134,7 @@ if '__main__' == __name__:
         (Organization, 'orgid', 'orgname', []),
         (Customer, 'customerid', 'customername', [('orgid', 'organization')]),
         (Thing, 'thingsgroupid', 'thingsgroupname', [('customerid', 'customer')]),
-        (Device, 'imsi', 'msisdn', [('thingsgroupid', 'thing')]),
+        (Device, 'imsi', 'imei', [('thingsgroupid', 'thing')]),
         (Session, 'sessionid', 'sessioncreatetime', [('imsi', 'device')]),
         ### Dependem do ORGANIZATION só
         (Mno, 'mnoid', 'mnoname', [('orgid', 'organization')]),

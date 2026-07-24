@@ -22,7 +22,6 @@ MAPEAMENTO_COLUNAS = {
     'thingsgroupid': 'ThingsGroupId',
     'thingsgroupname': 'ThingsGroupName',
     'imsi': 'IMSI',
-    'msisdn': 'MSISDN',
     'imei': 'IMEI',
     'sessionid': 'SessionId',
     'sessioncreatetime': 'sessionCreationTime',
@@ -38,7 +37,7 @@ MAPEAMENTO_COLUNAS = {
 
 COLUNAS_COMO_STR = [
     'OrganizationId', 'CustomerId', 'ThingsGroupId',
-    'IMSI', 'MSISDN', 'SessionId', 'NetworkProviderId',
+    'IMSI', 'SessionId', 'NetworkProviderId',
     'PricePlanId', 'MNOId'
 ]
 
@@ -148,12 +147,10 @@ def _processar_linha(linha, caches, mapping, is_csv):
         return
 
     if imsi not in caches['device']:
-        msisdn = _get(linha, 'msisdn', mapping) or ''
         imei = _get(linha, 'imei', mapping) or ''
         device, _ = Device.objects.get_or_create(
             imsi=imsi,
             defaults={
-                'msisdn': msisdn,
                 'imei': imei,
                 'thing': thing,
             },
@@ -234,7 +231,6 @@ def _detect_mapping(columns, is_csv):
             'thingsgroupid': 'ThingsGroupId' if 'ThingsGroupId' in columns else None,
             'thingsgroupname': 'ThingsGroupName' if 'ThingsGroupName' in columns else None,
             'imsi': 'IMSI',
-            'msisdn': 'MSISDN',
             'imei': 'IMEI',
             'sessionid': 'SessionId',
             'sessioncreatetime': 'sessionCreationTime',

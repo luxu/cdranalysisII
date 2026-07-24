@@ -106,7 +106,6 @@ class DeviceSerializer(serializers.ModelSerializer):
             'thing',
             'iccid',
             'imsi',
-            'msisdn',
             'imei',
             'created_at',
             'modified_at',

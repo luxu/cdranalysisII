@@ -14,10 +14,10 @@ const columns = [
     sortable: true
   },
   {
-    name: 'msisdn',
-    label: 'MSISDN',
+    name: 'iccid',
+    label: 'ICCID',
     align: 'left',
-    field: val => val.msisdn,
+    field: val => val.iccid,
     sortable: true
   },
   {

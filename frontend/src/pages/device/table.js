@@ -30,13 +30,6 @@ const columns = [
     sortable: true
   },
   {
-    name: 'msisdn',
-    label: 'MSISDN',
-    align: 'left',
-    field: val => val.msisdn,
-    sortable: true
-  },
-  {
     name: 'imei',
     label: 'IMEI',
     align: 'left',

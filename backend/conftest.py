@@ -25,7 +25,7 @@ def thing(customer):
 @pytest.fixture
 def device(thing):
     return Device.objects.create(
-        thing=thing, imsi='IMSI-001', msisdn='999999999', imei='IMEI-001'
+        thing=thing, imsi='IMSI-001', imei='IMEI-001'
     )
 
 

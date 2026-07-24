@@ -509,7 +509,7 @@ async function fetchCharts() {
     usageData.value = usageRes.data.filter(d => d.month).slice(-12)
 
     topDevices.value = topRes.data.slice(0, 5).map(d => {
-      const label = d.iccid || d.imsi || d.msisdn || d.device_id.slice(0, 8)
+      const label = d.iccid || d.imsi || d.device_id.slice(0, 8)
       return {
         ...d,
         label: label.length > 22 ? label.slice(0, 20) + '…' : label,

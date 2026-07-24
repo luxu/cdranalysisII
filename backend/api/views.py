@@ -101,7 +101,6 @@ class DeviceViewSet(viewsets.ModelViewSet):
             qs = qs.filter(
                 Q(iccid__icontains=search)
                 | Q(imsi__icontains=search)
-                | Q(msisdn__icontains=search)
                 | Q(imei__icontains=search)
             )
         if status is not None:

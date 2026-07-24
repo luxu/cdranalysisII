@@ -46,7 +46,6 @@ class DeviceAdmin(admin.ModelAdmin):
         '__str__',
         'iccid',
         'imsi',
-        'msisdn',
         'imei',
     )
     list_filter = (

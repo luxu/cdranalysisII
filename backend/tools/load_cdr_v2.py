@@ -30,7 +30,6 @@ MAPEAMENTO_COLUNAS = {
     'thingsgroupid': 'ThingsGroupId',
     'thingsgroupname': 'ThingsGroupName',
     'imsi': 'IMSI',
-    'msisdn': 'MSISDN',
     'imei': 'IMEI',
     'sessionid': 'SessionId',
     'sessioncreatetime': 'sessionCreationTime',
@@ -46,7 +45,7 @@ MAPEAMENTO_COLUNAS = {
 
 COLUNAS_COMO_STR = [
     'OrganizationId', 'CustomerId', 'ThingsGroupId',
-    'IMSI', 'MSISDN', 'SessionId', 'NetworkProviderId',
+    'IMSI', 'SessionId', 'NetworkProviderId',
     'PricePlanId', 'MNOId'
 ]
 
@@ -124,12 +123,10 @@ def processar_linha(linha, caches):
     # ******************************************************************** DEVICE *****************
     imsi = linha[MAPEAMENTO_COLUNAS['imsi']]
     if imsi not in caches['device']:
-        msisdn = linha[MAPEAMENTO_COLUNAS['msisdn']]
         imei = linha[MAPEAMENTO_COLUNAS['imei']]
         device, _ = Device.objects.get_or_create(
             imsi=imsi,
             defaults={
-                'msisdn': msisdn,
                 'imei': imei,
                 'thing': thing,
             },

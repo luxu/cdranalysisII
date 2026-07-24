@@ -76,7 +76,6 @@ class DeviceViewSet(viewsets.ModelViewSet):
             qs = qs.filter(
                 Q(iccid__icontains=search)
                 | Q(imsi__icontains=search)
-                | Q(msisdn__icontains=search)
                 | Q(imei__icontains=search)
             )
         return qs
@@ -96,7 +95,7 @@ class SessionViewSet(viewsets.ModelViewSet):
             qs = qs.filter(
                 Q(sessionid__icontains=search)
                 | Q(device__imsi__icontains=search)
-                | Q(device__msisdn__icontains=search)
+                | Q(device__iccid__icontains=search)
                 | Q(device__thing__thingsgroupname__icontains=search)
             )
         start_date = self.request.query_params.get('start_date')
@@ -179,8 +178,8 @@ class SessionViewSet(viewsets.ModelViewSet):
         qs = self.filter_queryset(self.get_queryset())
         top = (
             qs
-            .values('device', 'device__iccid', 'device__imsi', 'device__msisdn')
-            .annotate(total=Sum('realusage'))
+            .values('device', 'device__iccid', 'device__imsi')
+            .annotate(total=Sum('realusage'), session_count=Count('id'))
             .order_by('-total')[:10]
         )
         data = [
@@ -188,8 +187,8 @@ class SessionViewSet(viewsets.ModelViewSet):
                 'device_id': str(t['device']),
                 'iccid': t['device__iccid'],
                 'imsi': t['device__imsi'],
-                'msisdn': t['device__msisdn'],
                 'total_bytes': float(t['total']) if t['total'] else 0,
+                'session_count': t['session_count'],
             }
             for t in top
         ]

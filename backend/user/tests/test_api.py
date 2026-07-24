@@ -141,7 +141,7 @@ class TestProfileSessionsAPI:
             thingsgroupid='THING-O', thingsgroupname='Outro', customer=other_cust,
         )
         other_device = Device.objects.create(
-            thing=other_thing, imsi='OTHER', msisdn='0', imei='0',
+            thing=other_thing, imsi='OTHER', imei='0',
         )
         Session.objects.create(
             device=other_device, sessionid='other',

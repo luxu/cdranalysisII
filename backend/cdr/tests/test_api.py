@@ -23,12 +23,6 @@ class TestDeviceFilterAPI:
         assert resp.status_code == 200
         assert len(resp.data['results']) == 1
 
-    def test_filter_by_search_msisdn(self, authenticated_client, thing, device):
-        url = reverse('device-list')
-        resp = authenticated_client.get(url, {'search': '999999'})
-        assert resp.status_code == 200
-        assert len(resp.data['results']) == 1
-
     def test_filter_by_status_active(self, authenticated_client, thing, device):
         url = reverse('device-list')
         resp = authenticated_client.get(url, {'status': 'true'})
