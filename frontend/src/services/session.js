@@ -15,6 +15,13 @@ const sessionService = {
       params
     })
     return data
+  },
+
+  async topDevices(params = {}) {
+    const { data } = await api.get(`${endpoints.session}top_devices/`, {
+      params
+    })
+    return data
   }
 }
 

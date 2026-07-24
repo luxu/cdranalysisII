@@ -9,6 +9,25 @@
       </div>
     </div>
 
+    <section v-if="topDevices.length" class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-5">
+      <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4">
+        Top 10 Dispositivos por Consumo
+      </h3>
+      <div class="space-y-2">
+        <div v-for="device in topDevices" :key="device.device_id" class="flex items-center gap-3">
+          <span class="text-xs text-slate-400 w-[140px] truncate font-mono" :title="device.imsi">{{ device.imsi }}</span>
+          <div class="flex-1 h-5 bg-slate-800 rounded overflow-hidden">
+            <div
+              class="h-full bg-[#10B981]/70 rounded transition-all duration-500"
+              :style="{ width: devicePercent(device.total_bytes) + '%' }"
+            />
+          </div>
+          <span class="text-xs text-slate-300 w-[80px] text-right font-mono tabular-nums">{{ formatUsage(device.total_bytes) }}</span>
+          <span class="text-[11px] text-slate-500 w-[70px] text-right">{{ device.session_count }} sessões</span>
+        </div>
+      </div>
+    </section>
+
     <div class="flex items-center gap-3 flex-wrap">
       <q-input
         v-model="startDate"
@@ -160,6 +179,7 @@ import sessionService from '@/services/session'
 
 const loading = ref(true)
 const organizations = ref([])
+const topDevices = ref([])
 const dbDateRange = ref({ min_date: null, max_date: null })
 
 const selectedThing = ref(null)
@@ -250,8 +270,18 @@ async function fetchOrganizations() {
   const params = {}
   if (startDate.value) params.start_date = startDate.value
   if (endDate.value) params.end_date = endDate.value
-  const res = await sessionService.summaryByThing(params)
-  organizations.value = res
+  const [orgs, devices] = await Promise.all([
+    sessionService.summaryByThing(params),
+    sessionService.topDevices(params)
+  ])
+  organizations.value = orgs
+  topDevices.value = devices
+}
+
+function devicePercent(bytes) {
+  if (!topDevices.value.length) return 0
+  const max = topDevices.value[0].total_bytes
+  return max ? (bytes / max) * 100 : 0
 }
 
 async function fetchSessions(props) {
