@@ -24,13 +24,30 @@ class LoginView(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, _ = Token.objects.get_or_create(user=user)
+
+        thing_name = None
+        thing_id = None
+        user_name = user.email
+        try:
+            profile = user.profile
+            user_name = profile.name or user.email
+            if profile.thing_id:
+                thing_id = str(profile.thing_id)
+                thing_name = profile.thing.thingsgroupname
+        except Profile.DoesNotExist:
+            if user.is_staff:
+                user_name = 'Administrador'
+
         return Response({
             'token': token.key,
             'user': {
                 'id': str(user.id),
                 'email': user.email,
+                'name': user_name,
                 'is_staff': user.is_staff,
                 'groups': list(user.groups.values_list('name', flat=True)),
+                'thing_id': thing_id,
+                'thing_name': thing_name,
             },
         })
 
@@ -55,7 +72,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
                 'user': str(request.user.id),
                 'thing': None,
                 'thing_name': None,
-                'name': request.user.email,
+                'name': 'Administrador' if request.user.is_staff else request.user.email,
                 'is_staff': request.user.is_staff,
             })
 
