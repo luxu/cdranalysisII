@@ -38,44 +38,14 @@
     <template v-else>
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-white tracking-tight"
-            >Dashboard</h1
-          >
-          <p class="text-xs text-slate-500 mt-1"
-            >Visão geral das organizações</p
-          >
+          <h1 class="text-2xl font-bold text-white tracking-tight">{{
+            farmName
+          }}</h1>
+          <p class="text-xs text-slate-500 mt-1">Visão geral do cliente</p>
         </div>
       </div>
 
-      <section class="space-y-2">
-        <div
-          v-for="org in organizations"
-          :key="org.thing_id"
-          class="bg-[#0D1321] border border-[#1E293B]/40 rounded-xl px-5 py-3 shadow-sm flex items-center justify-between"
-        >
-          <span
-            class="text-sm font-bold text-white uppercase tracking-wider truncate"
-            :title="org.thing_name"
-            >{{ org.thing_name }}</span
-          >
-          <div class="flex items-center gap-6 shrink-0 ml-4">
-            <span class="text-xs text-slate-400 tabular-nums"
-              ><strong class="text-white font-bold">{{
-                org.device_count
-              }}</strong>
-              {{ org.device_count === 1 ? 'DEVICE' : 'DEVICES' }}</span
-            >
-            <span class="text-xs text-slate-400"
-              >CONSUMO
-              <strong class="text-[#10B981] font-bold ml-1">{{
-                formatUsage(org.total_usage)
-              }}</strong></span
-            >
-          </div>
-        </div>
-      </section>
-
-      <section class="flex flex-row gap-4">
+      <section v-if="thingId" class="flex flex-row gap-4">
         <div
           class="flex-1 bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-4 shadow-sm min-w-0"
         >
@@ -181,7 +151,10 @@
         </div>
       </section>
 
-      <section class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <section
+        v-if="canAccessAdmin"
+        class="grid grid-cols-1 sm:grid-cols-2 gap-6"
+      >
         <div
           class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-5 shadow-sm space-y-3"
         >
@@ -324,20 +297,20 @@
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useDashboardFilter } from '@/composables/useDashboardFilter'
+import useAuth from '@/composables/useAuth'
 import { api } from '@/boot/axios'
 import deviceService from '@/services/device'
 import sessionService from '@/services/session'
 import profileService from '@/services/profile'
 
 const { state, buildDeviceParams, buildSessionParams } = useDashboardFilter()
+const { canAccessAdmin } = useAuth()
 
 const loading = ref(true)
 const chartLoading = ref(true)
 const error = ref(null)
 const farmName = ref('')
 const thingId = ref(null)
-
-const organizations = ref([])
 
 const stats = reactive({
   totalDevices: 0,
@@ -363,10 +336,6 @@ function formatBytesShort(bytes) {
   if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + ' MB'
   if (bytes >= 1024) return (bytes / 1024).toFixed(1) + ' KB'
   return bytes.toFixed(0) + ' B'
-}
-
-function formatUsage(bytes) {
-  return formatBytesShort(bytes)
 }
 
 const barColors = [
@@ -428,11 +397,6 @@ const usageLabels = computed(() => {
   }
   return labels
 })
-
-async function fetchOrganizations() {
-  const res = await sessionService.summaryByThing()
-  organizations.value = res
-}
 
 async function fetchProfile() {
   const data = await profileService.get('me')
@@ -556,7 +520,7 @@ watch(
 
 onMounted(async () => {
   try {
-    await Promise.all([fetchProfile(), fetchOrganizations()])
+    await fetchProfile()
     await Promise.all([
       fetchFilteredDevices(),
       fetchSessionStats(),
