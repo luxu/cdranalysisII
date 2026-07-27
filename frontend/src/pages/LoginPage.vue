@@ -28,10 +28,18 @@
                 v-model="password"
                 filled
                 label="Senha"
-                type="password"
+                :type="showPassword ? 'text' : 'password'"
                 :error="hasError('password')"
                 :error-message="fieldError('password')"
-              />
+              >
+                <template #append>
+                  <q-icon
+                    :name="showPassword ? 'visibility_off' : 'visibility'"
+                    class="cursor-pointer"
+                    @click="showPassword = !showPassword"
+                  />
+                </template>
+              </q-input>
 
               <q-btn
                 label="Entrar"
@@ -61,6 +69,7 @@ const { login } = useAuth()
 const email = ref('admin@admin.com')
 const password = ref('')
 const loading = ref(false)
+const showPassword = ref(false)
 const errors = ref({})
 
 const hasError = field => !!errors.value[field]

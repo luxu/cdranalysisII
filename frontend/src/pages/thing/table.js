@@ -38,9 +38,9 @@ const columns = [
   }
 ]
 
-const initialPagination = ref({
+const initialPagination = {
   page: 1,
   rowsPerPage: 8
-})
+}
 
 export { columns, initialPagination }

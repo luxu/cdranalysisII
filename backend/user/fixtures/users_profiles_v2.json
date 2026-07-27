@@ -1,0 +1,124 @@
+[
+{
+    "model": "user.user",
+    "pk": "448e531d-08f3-43e1-bc7d-78791b461934",
+    "fields": {
+        "password": "pbkdf2_sha256$1200000$8SqEqrvVw0Jf4VwgXKffFL$0r9LDe1fJqKED/DppUa+fB3XJit1+lZvceVdFQjo89Q=",
+        "last_login": "2026-07-26T19:25:15.956Z",
+        "is_superuser": true,
+        "email": "admin@admin.com",
+        "is_staff": true,
+        "is_active": true,
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "user.user",
+    "pk": "84e62370-0ca2-4395-9833-b07319efc1b6",
+    "fields": {
+        "password": "pbkdf2_sha256$1200000$VeNng7f01gW3EqSRQOhT00$tJY4inMb+sR9toHvWBqW7zW1pPt7MjToyIacCisdEC4=",
+        "last_login": null,
+        "is_superuser": false,
+        "email": "valid@gmail.com",
+        "is_staff": false,
+        "is_active": true,
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "user.user",
+    "pk": "b415ff10-8aea-4f46-90d5-81fe6e46aa9a",
+    "fields": {
+        "password": "pbkdf2_sha256$1200000$UpC8S6InircTrj9PKDxKQI$NQ8iOtVRUizBGT4Pm1Z+zeuZ5vIht8rhkSgEFFh7ieU=",
+        "last_login": null,
+        "is_superuser": false,
+        "email": "lab_solis_cwb@gmail.com",
+        "is_staff": false,
+        "is_active": true,
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "user.user",
+    "pk": "b634595d-77cc-442a-8e29-7a9cc64cb648",
+    "fields": {
+        "password": "pbkdf2_sha256$1200000$ZFVXZIehiqxSgIpFKaQmcy$0T+JzXt1b3gAkKgCZHo+6NDcB3ts5lKBTMNH5DT5AIU=",
+        "last_login": null,
+        "is_superuser": false,
+        "email": "veracruz@veracruz.com",
+        "is_staff": false,
+        "is_active": true,
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "user.user",
+    "pk": "c9aaa81e-d075-43ef-929b-7678e3988e3a",
+    "fields": {
+        "password": "pbkdf2_sha256$1200000$NTbHi5rSSrFlOgdL3Fsjvc$2twKhxkGKk+BpyLdjywuYVlh64fqnPeVQBpperMdTW8=",
+        "last_login": null,
+        "is_superuser": false,
+        "email": "lab_solis_gyn@gmail.com",
+        "is_staff": false,
+        "is_active": true,
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "user.profile",
+    "pk": "45d61026-6470-4dc6-9814-7de95649de4e",
+    "fields": {
+        "created_at": "2026-07-26T19:34:00.652Z",
+        "modified_at": "2026-07-26T19:34:00.652Z",
+        "status": true,
+        "user": "c9aaa81e-d075-43ef-929b-7678e3988e3a",
+        "name": "Lab Solis GYN",
+        "celular": "",
+        "thing": "fb01726d-daa9-4d65-a290-79cb34d22539"
+    }
+},
+{
+    "model": "user.profile",
+    "pk": "471f2d72-1a75-44e7-adfb-08a375582472",
+    "fields": {
+        "created_at": "2026-07-26T19:28:29.929Z",
+        "modified_at": "2026-07-26T19:28:29.929Z",
+        "status": true,
+        "user": "b634595d-77cc-442a-8e29-7a9cc64cb648",
+        "name": "Vera",
+        "celular": "",
+        "thing": "e99378dc-1777-4ff2-ba90-89839885cbcb"
+    }
+},
+{
+    "model": "user.profile",
+    "pk": "646cff92-facf-4b2b-ac21-1fb31581940f",
+    "fields": {
+        "created_at": "2026-07-26T19:32:25.886Z",
+        "modified_at": "2026-07-26T19:32:25.886Z",
+        "status": true,
+        "user": "b415ff10-8aea-4f46-90d5-81fe6e46aa9a",
+        "name": "Lab Solis CWB",
+        "celular": "",
+        "thing": "9bf2758f-7969-49a0-aa8e-112008993923"
+    }
+},
+{
+    "model": "user.profile",
+    "pk": "a34ed511-0d98-4155-8a4b-0665bb165f88",
+    "fields": {
+        "created_at": "2026-07-26T19:34:26.866Z",
+        "modified_at": "2026-07-26T19:34:26.866Z",
+        "status": true,
+        "user": "84e62370-0ca2-4395-9833-b07319efc1b6",
+        "name": "Valid",
+        "celular": "",
+        "thing": "99cf6fb5-e01e-4bb0-a14b-7cf6ae3782c2"
+    }
+}
+]

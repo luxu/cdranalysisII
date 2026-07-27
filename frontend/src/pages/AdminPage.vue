@@ -136,7 +136,7 @@
           >
         </div>
         <q-table
-          v-model:pagination="sessionPagination"
+          :pagination="sessionPagination"
           :rows="sessionRows"
           :columns="sessionColumns"
           row-key="id"
@@ -172,7 +172,7 @@
             @click="changePage(sessionPagination.page - 1)"
           />
           <span class="text-xs text-slate-400">
-            Página {{ sessionPagination.page }} de {{ totalPages }}
+            Page {{ sessionPagination.page }} de {{ totalPages }}
           </span>
           <q-btn
             flat
@@ -191,6 +191,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
+import { sessionColumns, sessionPagination } from './tableAdmin'
 import sessionService from '@/services/session'
 
 const loading = ref(true)
@@ -201,56 +202,6 @@ const dbDateRange = ref({ min_date: null, max_date: null })
 const selectedThing = ref(null)
 const sessionRows = ref([])
 const sessionLoading = ref(false)
-const sessionPagination = ref({
-  page: 1,
-  rowsPerPage: 10,
-  rowsNumber: 0
-})
-
-const sessionColumns = [
-  {
-    name: 'sessionid',
-    label: 'Session ID',
-    align: 'left',
-    field: val => val.sessionid,
-    sortable: true
-  },
-  {
-    name: 'imsi',
-    label: 'IMSI',
-    align: 'left',
-    field: val => val.imsi,
-    sortable: true
-  },
-  {
-    name: 'msisdn',
-    label: 'MSISDN',
-    align: 'left',
-    field: val => val.msisdn,
-    sortable: true
-  },
-  {
-    name: 'sessioncreatetime',
-    label: 'Data',
-    align: 'left',
-    field: val => val.sessioncreatetime,
-    sortable: true
-  },
-  {
-    name: 'realusage',
-    label: 'Uso',
-    align: 'right',
-    field: val => val.realusage,
-    sortable: true
-  },
-  {
-    name: 'uom',
-    label: 'UOM',
-    align: 'left',
-    field: val => val.uom,
-    sortable: true
-  }
-]
 
 function today() {
   return new Date().toISOString().slice(0, 10)
@@ -312,6 +263,7 @@ async function fetchSessions(props) {
     if (endDate.value) params.end_date = endDate.value
 
     const data = await sessionService.list(params)
+    console.log('Data', data.results)
     sessionRows.value = data.results
     sessionPagination.value.page = props.pagination.page
     sessionPagination.value.rowsNumber = data.count
