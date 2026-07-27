@@ -111,8 +111,8 @@ class Thing(Base):
         return f'{self.thingsgroupname}'
 
     class Meta:
-        verbose_name = 'Cliente(Thing)'
-        verbose_name_plural = 'Clientes(Things)'
+        verbose_name = 'Cliente'
+        verbose_name_plural = 'Clientes'
 
 
 class Device(Base):

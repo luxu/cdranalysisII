@@ -69,7 +69,8 @@ CACHES = {
 
 
 def load_file(filename):
-    return pd.read_excel(filename, dtype={col: str for col in COLUNAS_COMO_STR})
+    return pd.read_csv(filename, dtype={col: str for col in COLUNAS_COMO_STR})
+    # return pd.read_excel(filename, dtype={col: str for col in COLUNAS_COMO_STR})
 
 
 def processar_linha(linha, caches):
@@ -214,7 +215,7 @@ def processar_linha(linha, caches):
 
 
 if __name__ == '__main__':
-    filename = os.path.join(os.path.dirname(__file__), '..', 'files', 'cdr.xlsx')
+    filename = os.path.join(os.path.dirname(__file__), '..', 'files', 'cdr.csv')
     df = load_file(filename)
 
     total = len(df)

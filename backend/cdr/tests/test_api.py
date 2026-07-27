@@ -42,20 +42,20 @@ class TestDeviceFilterAPI:
 
 
 class TestSessionFilterAPI:
-    def test_filter_by_device_thing(self, authenticated_client, user, thing, device):
+    def test_filter_by_device_thing(self, authenticated_client_with_profile, user, thing, device):
         Session.objects.create(
             device=device, sessionid='SESS-FILTER',
             sessioncreatetime=make_aware(datetime(2026, 1, 1)),
             realusage='100', uom='MB',
         )
         url = reverse('session-list')
-        resp = authenticated_client.get(url, {'device__thing': thing.id})
+        resp = authenticated_client_with_profile.get(url, {'device__thing': thing.id})
         assert resp.status_code == 200
         assert len(resp.data['results']) == 1
 
-    def test_filter_by_device_thing_no_match(self, authenticated_client, thing):
+    def test_filter_by_device_thing_no_match(self, authenticated_client_with_profile, thing):
         url = reverse('session-list')
-        resp = authenticated_client.get(url, {'device__thing': '00000000-0000-0000-0000-000000000000'})
+        resp = authenticated_client_with_profile.get(url, {'device__thing': '00000000-0000-0000-0000-000000000000'})
         assert resp.status_code == 200
         assert len(resp.data['results']) == 0
 
