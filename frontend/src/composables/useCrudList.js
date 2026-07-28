@@ -27,6 +27,7 @@ export default function useCrudList(
         ...extraParams
       }
       const data = await service.list(params)
+      console.log('fetchRows:', data.results)      
       rows.value = data.results
       pagination.value.page = page
       pagination.value.rowsNumber = data.count

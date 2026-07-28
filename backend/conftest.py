@@ -1,6 +1,7 @@
 import pytest
 
 from cdr.models import Organization, Customer, Thing, Device
+from user.models import Profile
 
 
 @pytest.fixture
@@ -40,6 +41,17 @@ def user(django_user_model, user_data):
 
 
 @pytest.fixture
+def profile(user, thing):
+    return Profile.objects.create(user=user, name='Perfil Teste', thing=thing)
+
+
+@pytest.fixture
 def authenticated_client(client, user):
+    client.force_login(user)
+    return client
+
+
+@pytest.fixture
+def authenticated_client_with_profile(client, user, profile):
     client.force_login(user)
     return client

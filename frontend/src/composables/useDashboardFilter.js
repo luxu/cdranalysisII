@@ -43,5 +43,19 @@ export function useDashboardFilter() {
     state.endDate = ''
   }
 
-  return { state, buildDeviceParams, buildSessionParams, clearDates }
+  function setDefaultDates() {
+    const now = new Date()
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+    state.startDate = firstDay.toISOString().split('T')[0]
+    state.endDate = lastDay.toISOString().split('T')[0]
+  }
+
+  return {
+    state,
+    buildDeviceParams,
+    buildSessionParams,
+    clearDates,
+    setDefaultDates
+  }
 }

@@ -74,19 +74,68 @@ def resetar_projeto():
     
     print("\n✅ Migrações geradas e aplicadas com sucesso!")
 
+    # 4. Restaurando as Fixtures (Backup)
+    print("\n📥 Restaurando dados das fixtures...")
+
+    NOME_FIXTURE = "users_profiles"
+    fixture_restaurada = False
+
+    try:
+        # Executa o loaddata capturando a saída para analise
+        resultado = subprocess.run(
+            [sys.executable, "manage.py", "loaddata", NOME_FIXTURE, "--ignorenonexistent"],
+            cwd=BASE_DIR,
+            check=True,
+            capture_output=True,
+            text=True
+        )
+
+        # Exibe no terminal a saída do comando Django
+        print(resultado.stdout)
+
+        # Verifica se o Django realmente instalou 1 ou mais objetos
+        if "Installed 0 object(s)" in resultado.stdout or "No fixture data found" in resultado.stderr:
+            print("⚠️ Nenhuma fixture foi instalada (arquivo vazio ou não encontrado).")
+        else:
+            print("✅ Dados restaurados com sucesso a partir das fixtures!")
+            fixture_restaurada = True
+
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Erro ao tentar restaurar a fixture: {e}")
+
+    # Fallback: Se a fixture NÃO foi restaurada com sucesso, cria o superusuário
+    if not fixture_restaurada:
+        print("\n👤 Fixture não restaurada. Criando superusuário padrão...")
+        try:
+            subprocess.run(
+                ["task", "createsuperuser"],  # Ou o comando direto via python manage.py se preferir
+                cwd=BASE_DIR,
+                env={
+                    **os.environ,
+                    "DJANGO_SUPERUSER_EMAIL": config("DJANGO_SUPERUSER_EMAIL"),
+                    "DJANGO_SUPERUSER_PASSWORD": config("DJANGO_SUPERUSER_PASSWORD"),
+                },
+                check=True
+            )
+            print("✅ Superusuário criado com sucesso!")
+        except Exception as e:
+            print(f"❌ Erro ao criar superusuário: {e}")
+
+
+
     # 4. Criando superusuário
-    print("\n👤 Criando superusuário...")
-    subprocess.run(
-        ["task", "createsuperuser", "--noinput"],
-        cwd=BASE_DIR,
-        env={
-            **os.environ,
-            "DJANGO_SUPERUSER_EMAIL": config("DJANGO_SUPERUSER_EMAIL"),
-            "DJANGO_SUPERUSER_PASSWORD": config("DJANGO_SUPERUSER_PASSWORD"),
-        },
-        check=True,
-    )
-    print("\n✅ Superusuário criado com sucesso!")
+    # print("\n👤 Criando superusuário...")
+    # subprocess.run(
+    #     ["task", "createsuperuser", "--noinput"],
+    #     cwd=BASE_DIR,
+    #     env={
+    #         **os.environ,
+    #         "DJANGO_SUPERUSER_EMAIL": config("DJANGO_SUPERUSER_EMAIL"),
+    #         "DJANGO_SUPERUSER_PASSWORD": config("DJANGO_SUPERUSER_PASSWORD"),
+    #     },
+    #     check=True,
+    # )
+    # print("\n✅ Superusuário criado com sucesso!")
 
 
 if __name__ == "__main__":

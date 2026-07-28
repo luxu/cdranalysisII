@@ -22,6 +22,13 @@ const sessionService = {
       params
     })
     return data
+  },
+
+  async usageByMonth(params = {}) {
+    const { data } = await api.get(`${endpoints.session}usage_by_month/`, {
+      params
+    })
+    return data
   }
 }
 

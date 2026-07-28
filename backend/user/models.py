@@ -4,9 +4,10 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 
-from cdr.models import Thing
+from cdr.models import Thing, Device, Session
 from core.models import Base
 from .manager import MinUserManager
+
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -32,6 +33,22 @@ class Profile(Base):
         null=True, blank=True,
         related_name='things_profiles'
     )
+
+    @property
+    def qtd_devices_com_sessao(self):
+        if not self.thing:
+            return 0
+        return Device.objects.filter(
+            thing=self.thing
+        ).filter(
+            models.Exists(Session.objects.filter(device=models.OuterRef('pk')))
+        ).count()
+
+    @property
+    def qtd_total_sessoes(self):
+        if not self.thing:
+            return 0
+        return Session.objects.filter(device__thing=self.thing).count()
 
     def __str__(self):
         return f"Profile: {self.name}"

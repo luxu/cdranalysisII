@@ -72,8 +72,32 @@ def load_file(filename):
     return pd.read_csv(filename, dtype={col: str for col in COLUNAS_COMO_STR})
     # return pd.read_excel(filename, dtype={col: str for col in COLUNAS_COMO_STR})
 
+def _detect_mapping(columns, is_csv):
+    if is_csv:
+        return {
+            'orgid': 'OrganizationId' if 'OrganizationId' in columns else None,
+            'orgname': 'OrganizationName' if 'OrganizationName' in columns else None,
+            'customerid': 'CustomerId' if 'CustomerId' in columns else None,
+            'customername': 'CustomerName' if 'CustomerName' in columns else None,
+            'thingsgroupid': 'ThingsGroupId' if 'ThingsGroupId' in columns else None,
+            'thingsgroupname': 'ThingsGroupName' if 'ThingsGroupName' in columns else None,
+            'imsi': 'IMSI',
+            'imei': 'IMEI',
+            'sessionid': 'SessionId',
+            'sessioncreatetime': 'sessionCreationTime',
+            'realusage': 'RealUsage' if 'RealUsage' in columns else None,
+            'uom': 'UOM' if 'UOM' in columns else None,
+            'networkproviderid': 'NetworkProviderId' if 'NetworkProviderId' in columns else None,
+            'networkprovidername': 'NetworkProviderName' if 'NetworkProviderName' in columns else None,
+            'priceplanid': 'PricePlanId' if 'PricePlanId' in columns else None,
+            'priceplanname': 'PricePlanName' if 'PricePlanName' in columns else None,
+            'mnoid': 'MNOId' if 'MNOId' in columns else None,
+            'mnoname': 'MnoName' if 'MnoName' in columns else None,
+        }
+    return MAPEAMENTO_COLUNAS
 
-def processar_linha(linha, caches):
+def _processar_linha(linha, caches, mapping, is_csv):
+# def processar_linha(linha, caches):
     """
     A linha 80 usa `get_or_create` do Django ORM:
     busca um `Organization` com `orgid=org_id` no banco; 
@@ -85,6 +109,7 @@ def processar_linha(linha, caches):
     org_id = org_id.replace("OrganizationId_", "")
     orgname = linha[MAPEAMENTO_COLUNAS['orgname']]
     # OrganizationId_e70a6a5a-4dbb-42fb-9be2-e263ff27240f
+
     org, _ = Organization.objects.get_or_create(
         orgid=org_id,  # Pesquisa no banco se existe dados iguais
         defaults={
@@ -216,9 +241,23 @@ def processar_linha(linha, caches):
 
 if __name__ == '__main__':
     filename = os.path.join(os.path.dirname(__file__), '..', 'files', 'cdr.csv')
+
+    is_csv = filename.endswith('.csv')
+
     df = load_file(filename)
 
+    if is_csv:
+        df = pd.read_csv(filename, nrows=0)
+        columns = list(df.columns)
+        mapping = _detect_mapping(columns, is_csv)
+        str_cols = [c for c in columns if c in COLUNAS_COMO_STR]
+        df = pd.read_csv(filename, dtype={col: str for col in str_cols})
+    else:
+        mapping = MAPEAMENTO_COLUNAS
+        df = pd.read_excel(filename, dtype={col: str for col in COLUNAS_COMO_STR})
+
     total = len(df)
+    errors = []
     print(f"Iniciando carga de {total} registros...")
 
     """
@@ -228,7 +267,10 @@ if __name__ == '__main__':
     ignorando o índice numérico que o pandas já tem.
     """
     for i, (_, linha) in enumerate(df.iterrows(), 1):
-        processar_linha(linha, CACHES)
+        try:
+            _processar_linha(linha, CACHES, mapping, is_csv)
+        except Exception as e:
+            errors.append({'line': i, 'error': str(e)})
         if i % 100 == 0 or i == total:
             print(f"  Processadas {i}/{total} linhas...")
 
@@ -241,3 +283,4 @@ if __name__ == '__main__':
     print(f"  Things:          {len(CACHES['thing'])}")
     print(f"  Devices:         {len(CACHES['device'])}")
     print(f"  Sessions:        {len(CACHES['session'])}")
+    print(f'errors: {errors[:100]}')

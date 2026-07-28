@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from cdr.models import Organization, Mno, Customer, PricePlan, NetworkProvider, Thing, Session, Device
+from user.models import Profile
 
 admin.site.register(
     [
@@ -16,8 +17,8 @@ admin.site.register(
 class SessionAdmin(admin.ModelAdmin):
     list_display = (
         'id',
-        '__str__',
         'device',
+        'sessionid',
         'sessioncreatetime',
         'realusage',
         'uom',
@@ -27,6 +28,7 @@ class SessionAdmin(admin.ModelAdmin):
         'sessionid',
     )
     search_fields = (
+        'id',
         'sessionid',
     )
 
@@ -36,7 +38,8 @@ class ThingAdmin(admin.ModelAdmin):
         'id',
         '__str__',
         'thingsgroupid',
-        'customer__customername',
+        'thingsgroupname',
+        'customer',
     )
 
 @admin.register(Device)
