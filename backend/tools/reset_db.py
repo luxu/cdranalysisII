@@ -1,9 +1,11 @@
+import json
 import os
 import sys
 import shutil
 import subprocess
-from decouple import config
+import tempfile
 from pathlib import Path
+from decouple import config
 
 # --- CONFIGURAÇÃO DE SEGURANÇA ---
 FORCAR = False
@@ -77,13 +79,29 @@ def resetar_projeto():
     # 4. Restaurando as Fixtures (Backup)
     print("\n📥 Restaurando dados das fixtures...")
 
-    NOME_FIXTURE = "users_profiles"
+    NOME_FIXTURE = "users_profiles_v2"
+    fixture_path = BASE_DIR / "user" / "fixtures" / f"{NOME_FIXTURE}.json"
     fixture_restaurada = False
 
     try:
+        with open(fixture_path, 'r', encoding='utf-8') as f:
+            fixture_data = json.load(f)
+
+        # Remove o campo 'thing' dos profiles para evitar erro de FK
+        # (os Things ainda não existem no banco após o reset)
+        for item in fixture_data:
+            if item.get("model") == "user.profile":
+                item["fields"].pop("thing", None)
+
+        temp_fixture = Path(tempfile.gettempdir()) / f"{NOME_FIXTURE}_clean.json"
+        with open(temp_fixture, 'w', encoding='utf-8') as f:
+            json.dump(fixture_data, f, indent=2)
+
+        print(f"   -> Fixture temporária gerada em: {temp_fixture}")
+
         # Executa o loaddata capturando a saída para analise
         resultado = subprocess.run(
-            [sys.executable, "manage.py", "loaddata", NOME_FIXTURE, "--ignorenonexistent"],
+            ["uv", "run", "manage.py", "loaddata", str(temp_fixture), "--ignorenonexistent"],
             cwd=BASE_DIR,
             check=True,
             capture_output=True,
@@ -108,7 +126,7 @@ def resetar_projeto():
         print("\n👤 Fixture não restaurada. Criando superusuário padrão...")
         try:
             subprocess.run(
-                ["task", "createsuperuser"],  # Ou o comando direto via python manage.py se preferir
+                ["task", "createsuperuser"],
                 cwd=BASE_DIR,
                 env={
                     **os.environ,
@@ -120,22 +138,6 @@ def resetar_projeto():
             print("✅ Superusuário criado com sucesso!")
         except Exception as e:
             print(f"❌ Erro ao criar superusuário: {e}")
-
-
-
-    # 4. Criando superusuário
-    # print("\n👤 Criando superusuário...")
-    # subprocess.run(
-    #     ["task", "createsuperuser", "--noinput"],
-    #     cwd=BASE_DIR,
-    #     env={
-    #         **os.environ,
-    #         "DJANGO_SUPERUSER_EMAIL": config("DJANGO_SUPERUSER_EMAIL"),
-    #         "DJANGO_SUPERUSER_PASSWORD": config("DJANGO_SUPERUSER_PASSWORD"),
-    #     },
-    #     check=True,
-    # )
-    # print("\n✅ Superusuário criado com sucesso!")
 
 
 if __name__ == "__main__":

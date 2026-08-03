@@ -97,7 +97,6 @@ def _detect_mapping(columns, is_csv):
     return MAPEAMENTO_COLUNAS
 
 def _processar_linha(linha, caches, mapping, is_csv):
-# def processar_linha(linha, caches):
     """
     A linha 80 usa `get_or_create` do Django ORM:
     busca um `Organization` com `orgid=org_id` no banco; 
@@ -108,7 +107,6 @@ def _processar_linha(linha, caches, mapping, is_csv):
     org_id = linha[MAPEAMENTO_COLUNAS['orgid']]
     org_id = org_id.replace("OrganizationId_", "")
     orgname = linha[MAPEAMENTO_COLUNAS['orgname']]
-    # OrganizationId_e70a6a5a-4dbb-42fb-9be2-e263ff27240f
 
     org, _ = Organization.objects.get_or_create(
         orgid=org_id,  # Pesquisa no banco se existe dados iguais
