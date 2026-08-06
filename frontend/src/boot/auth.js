@@ -1,7 +1,7 @@
 import { defineBoot } from '#q-app'
 import { api } from '@/boot/axios'
 
-export default defineBoot(({ router }) => {
+export default defineBoot(async ({ router }) => {
   api.interceptors.request.use(config => {
     const storedToken = localStorage.getItem('token')
     if (storedToken) {
@@ -9,6 +9,18 @@ export default defineBoot(({ router }) => {
     }
     return config
   })
+
+  const token = localStorage.getItem('token')
+  if (token) {
+    try {
+      await api.get('/profiles/me/')
+    } catch {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      window.location.href = '/login'
+      return
+    }
+  }
 
   api.interceptors.response.use(
     response => response,
