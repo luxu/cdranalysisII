@@ -1,5 +1,6 @@
 import os
 import sys
+from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kernel.settings')
@@ -49,11 +50,46 @@ COLUNAS_COMO_STR = [
     'PricePlanId', 'MNOId'
 ]
 
+EXCEL_EPOCH = datetime(1899, 12, 30)
+
+
+def _excel_serial_to_datetime(serial):
+    try:
+        val = float(serial)
+    except (ValueError, TypeError):
+        return None
+    if val < 1:
+        return None
+    return EXCEL_EPOCH + timedelta(days=val)
+
+
+def _parse_datetime(value):
+    if pd.isna(value):
+        return None
+    if isinstance(value, datetime):
+        return value
+    if isinstance(value, str):
+        try:
+            return pd.to_datetime(value).to_pydatetime()
+        except Exception:
+            pass
+    return _excel_serial_to_datetime(value)
+
+
+def _normalize_dt(value):
+    dt = _parse_datetime(value)
+    if dt is None:
+        return None
+    if dt.tzinfo is not None:
+        dt = dt.replace(tzinfo=None)
+    return timezone.make_aware(dt)
+
+
 """
-Linhas 199–204 inicializam o dicionário `caches` com chaves `org`, 
-`customer`, `thing`, `device`, `session` — cada uma mapeando para um dict vazio. 
-Serve como cache em memória para evitar consultas repetidas ao banco: 
-quando `processar_linha` processa uma linha, ela primeiro verifica se a entidade 
+Linhas 199–204 inicializam o dicionário `caches` com chaves `org`,
+`customer`, `thing`, `device`, `session` — cada uma mapeando para um dict vazio.
+Serve como cache em memória para evitar consultas repetidas ao banco:
+quando `processar_linha` processa uma linha, ela primeiro verifica se a entidade
 já está no cache; se sim, reusa o objeto em vez de buscar/criar no banco de novo.
 """
 CACHES = {
@@ -61,11 +97,13 @@ CACHES = {
     'customer': {},
     'thing': {},
     'device': {},
-    'session': {},
     'networkprovider': {},
     'priceplan': {},
     'mno': {},
 }
+
+SESSION_STATS = {'saved': 0, 'empty': 0, 'duplicate': 0}
+SESSION_BATCH_SIZE = 1000
 
 
 def load_file(filename):
@@ -96,7 +134,7 @@ def _detect_mapping(columns, is_csv):
         }
     return MAPEAMENTO_COLUNAS
 
-def _processar_linha(linha, caches, mapping, is_csv):
+def _processar_linha(linha, caches, mapping, is_csv, sessions_batch):
     """
     A linha 80 usa `get_or_create` do Django ORM:
     busca um `Organization` com `orgid=org_id` no banco; 
@@ -157,36 +195,10 @@ def _processar_linha(linha, caches, mapping, is_csv):
         )
         caches['device'][imsi] = device
     device = caches['device'][imsi]
-    # ******************************************************************** SESSION *****************
-    session_id = linha[MAPEAMENTO_COLUNAS['sessionid']]
-    # Se a célula Session estiver em branco retorna
-    if pd.isna(session_id):
-        return
 
-    if session_id not in caches['session']:
-        sessioncreatetime = linha[MAPEAMENTO_COLUNAS['sessioncreatetime']]
-        sessioncreatetime = None if pd.isna(sessioncreatetime) else timezone.make_aware(sessioncreatetime)
-        realusage = linha[MAPEAMENTO_COLUNAS['realusage']] if not pd.isna(
-            linha[MAPEAMENTO_COLUNAS['realusage']]) else None
-        uom = linha[MAPEAMENTO_COLUNAS['uom']] if not pd.isna(linha[MAPEAMENTO_COLUNAS['uom']]) else None
-        Session.objects.get_or_create(
-            sessionid=session_id,
-            defaults={
-                'sessioncreatetime': sessioncreatetime,
-                'device': device,
-                'realusage': realusage,
-                'uom': uom,
-            },
-        )
-        caches['session'][session_id] = True
     # ******************************************************************** NETWORK PROVIDERS *****************
     networkproviderid = linha[MAPEAMENTO_COLUNAS['networkproviderid']]
     networkproviderid = networkproviderid.replace("NetworkProviderId_", "")
-    # NetworkProviderId_57afa6a5-a642-4d01-92f8-87880964264c
-    # Se a célula Network Provider estiver em branco retorna
-    if pd.isna(session_id):
-        return
-
     if networkproviderid not in caches['networkprovider']:
         networkprovidername = linha[MAPEAMENTO_COLUNAS['networkprovidername']]
         NetworkProvider.objects.get_or_create(
@@ -198,11 +210,43 @@ def _processar_linha(linha, caches, mapping, is_csv):
         )
         caches['networkprovider'][networkproviderid] = True
 
+    # ******************************************************************** MNOS *****************
+    mnoid = linha[MAPEAMENTO_COLUNAS['mnoid']]
+    mnoid = mnoid.replace("MNOId_", "")
+    if mnoid not in caches['mno']:
+        mnoname = linha[MAPEAMENTO_COLUNAS['mnoname']]
+        Mno.objects.get_or_create(
+            mnoid=mnoid,
+            defaults={
+                'mnoname': mnoname,
+                'organization': org,
+            }
+        )
+        caches['mno'][mnoid] = True
+
+    # ******************************************************************** SESSION *****************
+    session_id = linha[MAPEAMENTO_COLUNAS['sessionid']]
+    session_id = '' if pd.isna(session_id) else str(session_id).strip()
+
+    raw_dt = linha[MAPEAMENTO_COLUNAS['sessioncreatetime']]
+    sessioncreatetime_norm = _normalize_dt(raw_dt) or timezone.now()
+
+    realusage = linha[MAPEAMENTO_COLUNAS['realusage']]
+    realusage = '' if pd.isna(realusage) else str(realusage).strip()
+    uom = '' if pd.isna(linha[MAPEAMENTO_COLUNAS['uom']]) else str(linha[MAPEAMENTO_COLUNAS['uom']]).strip()
+
+    session = Session(
+        sessionid=session_id,
+        sessioncreatetime=sessioncreatetime_norm,
+        device=device,
+        realusage=realusage,
+        uom=uom,
+    )
+    sessions_batch.append(session)
+
     # ******************************************************************** PRICE PLANS *****************
     priceplanid = linha[MAPEAMENTO_COLUNAS['priceplanid']]
     priceplanid = priceplanid.replace("PricePlanId_", "")
-    # PricePlanId_0e61e5d4-300a-4be6-8d9a-868c185f7044
-    # Se a célula Price Plan estiver em branco retorna
     if pd.isna(priceplanid):
         return
 
@@ -216,26 +260,6 @@ def _processar_linha(linha, caches, mapping, is_csv):
             }
         )
         caches['priceplan'][priceplanid] = True
-
-    # ******************************************************************** MNOS *****************
-    mnoid = linha[MAPEAMENTO_COLUNAS['mnoid']]
-    mnoid = mnoid.replace("MNOId_", "")
-    # MNOId_48d1f9c1-283a-45ea-8f09-50a75f8f80b9
-    # Se a célula Mno estiver em branco retorna
-    if pd.isna(session_id):
-        return
-
-    if mnoid not in caches['mno']:
-        mnoname = linha[MAPEAMENTO_COLUNAS['mnoname']]
-        Mno.objects.get_or_create(
-            mnoid=mnoid,
-            defaults={
-                'mnoname': mnoname,
-                'organization': org,
-            }
-        )
-        caches['mno'][mnoid] = True
-
 
 if __name__ == '__main__':
     filename = os.path.join(os.path.dirname(__file__), '..', 'files', 'cdr.csv')
@@ -256,21 +280,31 @@ if __name__ == '__main__':
 
     total = len(df)
     errors = []
+    sessions_batch = []
     print(f"Iniciando carga de {total} registros...")
 
     """
-    `df.iterrows()` retorna pares `(índice_do_dataframe, série_com_a_linha)`. 
-    O `_` descarta o índice original do pandas (não usado), `linha` recebe os dados da linha. 
-    Resumindo: itera as linhas da planilha com um número sequencial para o log, 
+    `df.iterrows()` retorna pares `(índice_do_dataframe, série_com_a_linha)`.
+    O `_` descarta o índice original do pandas (não usado), `linha` recebe os dados da linha.
+    Resumindo: itera as linhas da planilha com um número sequencial para o log,
     ignorando o índice numérico que o pandas já tem.
     """
     for i, (_, linha) in enumerate(df.iterrows(), 1):
         try:
-            _processar_linha(linha, CACHES, mapping, is_csv)
+            _processar_linha(linha, CACHES, mapping, is_csv, sessions_batch)
         except Exception as e:
             errors.append({'line': i, 'error': str(e)})
+        if len(sessions_batch) >= SESSION_BATCH_SIZE:
+            Session.objects.bulk_create(sessions_batch)
+            SESSION_STATS['saved'] += len(sessions_batch)
+            sessions_batch.clear()
         if i % 100 == 0 or i == total:
             print(f"  Processadas {i}/{total} linhas...")
+
+    if sessions_batch:
+        Session.objects.bulk_create(sessions_batch)
+        SESSION_STATS['saved'] += len(sessions_batch)
+        sessions_batch.clear()
 
     print("\nCarga finalizada com sucesso!")
     print(f"  Organizations:   {len(CACHES['org'])}")
@@ -280,5 +314,10 @@ if __name__ == '__main__':
     print(f"  Priceplan:       {len(CACHES['priceplan'])}")
     print(f"  Things:          {len(CACHES['thing'])}")
     print(f"  Devices:         {len(CACHES['device'])}")
-    print(f"  Sessions:        {len(CACHES['session'])}")
+    print(f"  Sessions:        {SESSION_STATS['saved']}")
+    print()
+    print("  Session Stats:")
+    print(f"    Saved:     {SESSION_STATS['saved']}")
+    print(f"    Empty:     {SESSION_STATS['empty']}")
+    print(f"    Duplicate: {SESSION_STATS['duplicate']}")
     print(f'errors: {errors[:100]}')
