@@ -85,12 +85,33 @@
           </q-icon>
         </template>
       </q-input>
+      <q-input
+        v-model="realusageMin"
+        dense
+        outlined
+        type="number"
+        label="Uso mín"
+        class="w-[120px]"
+        debounce="300"
+        @update:model-value="onFilterChange"
+      />
+      <q-input
+        v-model="realusageMax"
+        dense
+        outlined
+        type="number"
+        label="Uso máx"
+        class="w-[120px]"
+        debounce="300"
+        @update:model-value="onFilterChange"
+      />
       <q-btn
         flat
         dense
         color="grey"
         label="Limpar"
         icon="clear_all"
+        class="shrink-0 whitespace-nowrap"
         @click="clearDates"
       />
     </div>
@@ -202,6 +223,8 @@ const dbDateRange = ref({ min_date: null, max_date: null })
 const selectedThing = ref(null)
 const sessionRows = ref([])
 const sessionLoading = ref(false)
+const realusageMin = ref('')
+const realusageMax = ref('')
 
 function today() {
   return new Date().toISOString().slice(0, 10)
@@ -261,6 +284,14 @@ async function fetchSessions(props) {
     if (selectedThing.value) params.device__thing = selectedThing.value.id
     if (startDate.value) params.start_date = startDate.value
     if (endDate.value) params.end_date = endDate.value
+    if (realusageMin.value) params.realusage_min = realusageMin.value
+    if (realusageMax.value) params.realusage_max = realusageMax.value
+
+    const sortBy = props.pagination.sortBy
+    const descending = props.pagination.descending
+    if (sortBy) {
+      params.ordering = descending ? `-${sortBy}` : sortBy
+    }
 
     const data = await sessionService.list(params)
     console.log('Data', data.results)
@@ -292,8 +323,16 @@ function selectThing(org) {
 }
 
 function clearDates() {
-  startDate.value = today()
-  endDate.value = today()
+  startDate.value = dbDateRange.value.min_date || today()
+  endDate.value = dbDateRange.value.max_date || today()
+  realusageMin.value = ''
+  realusageMax.value = ''
+}
+
+function onFilterChange() {
+  if (!selectedThing.value) return
+  sessionPagination.value.page = 1
+  fetchSessions({ pagination: { ...sessionPagination.value, page: 1 } })
 }
 
 watch([startDate, endDate], () => {

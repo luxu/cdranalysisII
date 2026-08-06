@@ -44,6 +44,28 @@
               @update:model-value="applyFilters"
             />
           </div>
+          <div class="col-6 col-sm-2">
+            <q-input
+              v-model="realusageMin"
+              dense
+              outlined
+              type="number"
+              label="Uso mín"
+              debounce="300"
+              @update:model-value="applyFilters"
+            />
+          </div>
+          <div class="col-6 col-sm-2">
+            <q-input
+              v-model="realusageMax"
+              dense
+              outlined
+              type="number"
+              label="Uso máx"
+              debounce="300"
+              @update:model-value="applyFilters"
+            />
+          </div>
           <div class="col-12 col-sm-2">
             <q-btn
               flat
@@ -91,12 +113,16 @@ const { rows, loading, pagination, fetchRows, onRequest } = useCrudList(
 const search = ref('')
 const startDate = ref('')
 const endDate = ref('')
+const realusageMin = ref('')
+const realusageMax = ref('')
 
 const buildParams = () => {
   const params = {}
   if (search.value) params.search = search.value
   if (startDate.value) params.start_date = startDate.value
   if (endDate.value) params.end_date = endDate.value
+  if (realusageMin.value) params.realusage_min = realusageMin.value
+  if (realusageMax.value) params.realusage_max = realusageMax.value
   return params
 }
 
@@ -106,6 +132,8 @@ const clearFilters = () => {
   search.value = ''
   startDate.value = ''
   endDate.value = ''
+  realusageMin.value = ''
+  realusageMax.value = ''
   fetchRows(1)
 }
 </script>

@@ -12,6 +12,8 @@ export default function useCrudList(
   const $q = useQuasar()
   const rows = ref([])
   const loading = ref(false)
+  const sortBy = ref(null)
+  const descending = ref(false)
   const pagination = ref({
     page: 1,
     rowsPerPage: initialRowsPerPage || 50,
@@ -26,8 +28,11 @@ export default function useCrudList(
         page_size: pagination.value.rowsPerPage,
         ...extraParams
       }
+      if (sortBy.value) {
+        params.ordering = descending.value ? `-${sortBy.value}` : sortBy.value
+      }
       const data = await service.list(params)
-      console.log('fetchRows:', data.results)      
+      console.log('fetchRows:', data.results)
       rows.value = data.results
       pagination.value.page = page
       pagination.value.rowsNumber = data.count
@@ -38,8 +43,20 @@ export default function useCrudList(
     }
   }
 
-  // Handler do @request do q-table (mudança de página)
-  const onRequest = props => fetchRows(props.pagination.page)
+  // Handler do @request do q-table (mudança de página ou ordenação)
+  const onRequest = props => {
+    const newSortBy = props.pagination.sortBy || null
+    const newDescending = props.pagination.descending || false
+    const sortChanged =
+      newSortBy !== sortBy.value || newDescending !== descending.value
+    sortBy.value = newSortBy
+    descending.value = newDescending
+    if (sortChanged) {
+      fetchRows(1)
+    } else {
+      fetchRows(props.pagination.page)
+    }
+  }
 
   const confirmRemove = (item, description) => {
     $q.dialog({

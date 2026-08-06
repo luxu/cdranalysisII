@@ -41,8 +41,9 @@ const sessionColumns = [
 const sessionPagination = ref({
   page: 1,
   rowsPerPage: 10,
-  rowsNumber: 0
+  rowsNumber: 0,
+  sortBy: '',
+  descending: false
 })
-
 
 export { sessionColumns, sessionPagination }
