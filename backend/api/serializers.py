@@ -131,6 +131,26 @@ class SessionSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'modified_at']
 
 
+class SessionListSerializer(serializers.ModelSerializer):
+    imsi = serializers.CharField(source='device.imsi', read_only=True)
+
+    class Meta:
+        model = Session
+        fields = [
+            'id',
+            'device',
+            'sessionid',
+            'sessioncreatetime',
+            'realusage',
+            'uom',
+            'imsi',
+            'created_at',
+            'modified_at',
+            'status',
+        ]
+        read_only_fields = ['id', 'created_at', 'modified_at']
+
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)

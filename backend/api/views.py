@@ -34,6 +34,7 @@ from .serializers import (
     OrganizationSerializer,
     PricePlanSerializer,
     ProfileSerializer,
+    SessionListSerializer,
     SessionSerializer,
     ThingSerializer,
     UserSerializer,
@@ -162,8 +163,6 @@ class SessionViewSet(OwnerFilteredMixin, viewsets.ModelViewSet):
         qs = super().get_queryset()
         qs = self._apply_owner_filter(qs)
 
-        profile = getattr(self.request.user, 'profile', None)
-
         start_date = self.request.query_params.get('start_date')
         if start_date:
             qs = qs.filter(sessioncreatetime__date__gte=start_date)
@@ -178,15 +177,22 @@ class SessionViewSet(OwnerFilteredMixin, viewsets.ModelViewSet):
 
         device__thing = self.request.query_params.get('device__thing')
         if device__thing:
-            qs.filter(device__thing=device__thing)
+            qs = qs.filter(device__thing=device__thing)
 
-        print(f'Tamanho do QS..: {len(qs)} do ID Thing..: {device__thing}')
-        if profile:
-            qs = qs.filter(device__thing=profile.thing)
-        # if not profile or not profile.thing:
-            # return qs.none()
+        realusage_min = self.request.query_params.get('realusage_min')
+        if realusage_min:
+            qs = qs.filter(realusage__gte=realusage_min)
+
+        realusage_max = self.request.query_params.get('realusage_max')
+        if realusage_max:
+            qs = qs.filter(realusage__lte=realusage_max)
 
         return qs
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return SessionListSerializer
+        return SessionSerializer
 
     @action(detail=False, methods=['get'])
     def date_range(self, request):
