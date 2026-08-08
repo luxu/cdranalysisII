@@ -74,7 +74,7 @@
         </div>
       </div>
 
-      <section v-if="thingId" class="flex flex-row gap-4">
+      <section class="flex flex-row gap-4">
         <div
           class="flex-1 bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-4 shadow-sm min-w-0"
         >
