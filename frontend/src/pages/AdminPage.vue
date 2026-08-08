@@ -20,7 +20,13 @@
         <div
           v-for="device in topDevices"
           :key="device.device_id"
-          class="flex items-center gap-3"
+          class="flex items-center gap-3 cursor-pointer rounded-lg px-2 py-1 transition-all duration-200 hover:bg-[#1E293B]/50"
+          :class="
+            selectedDevice?.device_id === device.device_id
+              ? 'bg-[#10B981]/10 border border-[#10B981]/30'
+              : 'border border-transparent'
+          "
+          @click="selectDevice(device)"
         >
           <span
             class="text-xs text-slate-400 w-[140px] truncate font-mono"
@@ -93,7 +99,6 @@
         label="Uso mín"
         class="w-[120px]"
         debounce="300"
-        @update:model-value="onFilterChange"
       />
       <q-input
         v-model="realusageMax"
@@ -103,7 +108,6 @@
         label="Uso máx"
         class="w-[120px]"
         debounce="300"
-        @update:model-value="onFilterChange"
       />
       <q-btn
         flat
@@ -143,14 +147,19 @@
 
     <Transition name="panel">
       <section
-        v-if="selectedThing"
+        v-if="selectedThing || selectedDevice"
         class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl overflow-hidden"
       >
         <div
           class="px-5 py-3 border-b border-[#1E293B]/40 flex items-center justify-between"
         >
           <h3 class="text-sm font-bold text-white uppercase tracking-wider">
-            Sessões — {{ selectedThing.name }}
+            Sessões —
+            {{
+              selectedDevice
+                ? selectedDevice.iccid || selectedDevice.imsi || 'Device'
+                : selectedThing.name
+            }}
           </h3>
           <span class="text-[11px] text-slate-500"
             >{{ sessionPagination.rowsNumber }} sessões</span
@@ -221,6 +230,7 @@ const topDevices = ref([])
 const dbDateRange = ref({ min_date: null, max_date: null })
 
 const selectedThing = ref(null)
+const selectedDevice = ref(null)
 const sessionRows = ref([])
 const sessionLoading = ref(false)
 const realusageMin = ref('')
@@ -256,10 +266,13 @@ function formatDate(dateStr) {
   return d.toLocaleDateString('pt-BR')
 }
 
-async function fetchOrganizations() {
+async function fetchOrganizations(thingId = null) {
   const params = {}
   if (startDate.value) params.start_date = startDate.value
   if (endDate.value) params.end_date = endDate.value
+  if (realusageMin.value) params.realusage_min = realusageMin.value
+  if (realusageMax.value) params.realusage_max = realusageMax.value
+  if (thingId) params.device__thing = thingId
   const [orgs, devices] = await Promise.all([
     sessionService.summaryByThing(params),
     sessionService.topDevices(params)
@@ -281,7 +294,11 @@ async function fetchSessions(props) {
       page: props.pagination.page,
       page_size: props.pagination.rowsPerPage
     }
-    if (selectedThing.value) params.device__thing = selectedThing.value.id
+    if (selectedDevice.value) {
+      params.device = selectedDevice.value.device_id
+    } else if (selectedThing.value) {
+      params.device__thing = selectedThing.value.id
+    }
     if (startDate.value) params.start_date = startDate.value
     if (endDate.value) params.end_date = endDate.value
     if (realusageMin.value) params.realusage_min = realusageMin.value
@@ -313,9 +330,27 @@ function selectThing(org) {
   if (selectedThing.value?.id === org.thing_id) {
     selectedThing.value = null
     sessionRows.value = []
+    fetchOrganizations()
     return
   }
   selectedThing.value = { id: org.thing_id, name: org.thing_name }
+  selectedDevice.value = null
+  sessionPagination.value.page = 1
+  fetchOrganizations(org.thing_id)
+  fetchSessions({
+    pagination: { ...sessionPagination.value, page: 1 }
+  })
+}
+
+function selectDevice(device) {
+  if (selectedDevice.value?.device_id === device.device_id) {
+    selectedDevice.value = null
+    sessionRows.value = []
+    fetchOrganizations()
+    return
+  }
+  selectedDevice.value = device
+  selectedThing.value = null
   sessionPagination.value.page = 1
   fetchSessions({
     pagination: { ...sessionPagination.value, page: 1 }
@@ -329,15 +364,21 @@ function clearDates() {
   realusageMax.value = ''
 }
 
-function onFilterChange() {
-  if (!selectedThing.value) return
-  sessionPagination.value.page = 1
-  fetchSessions({ pagination: { ...sessionPagination.value, page: 1 } })
-}
-
 watch([startDate, endDate], () => {
-  fetchOrganizations()
-  if (selectedThing.value) {
+  const thingId = selectedThing.value?.id || null
+  fetchOrganizations(thingId)
+  if (selectedThing.value || selectedDevice.value) {
+    sessionPagination.value.page = 1
+    fetchSessions({
+      pagination: { ...sessionPagination.value, page: 1 }
+    })
+  }
+})
+
+watch([realusageMin, realusageMax], () => {
+  const thingId = selectedThing.value?.id || null
+  fetchOrganizations(thingId)
+  if (selectedThing.value || selectedDevice.value) {
     sessionPagination.value.page = 1
     fetchSessions({
       pagination: { ...sessionPagination.value, page: 1 }
