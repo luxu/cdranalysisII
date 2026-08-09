@@ -4,7 +4,7 @@ import { useQuasar } from 'quasar'
 
 export default function useCrudForm(
   service,
-  { listRoute, initialForm, mapIn = null, onSuccess = null }
+  { listRoute, initialForm, mapIn = null, mapOut = null, onSuccess = null }
 ) {
   const $q = useQuasar()
   const router = useRouter()
@@ -48,10 +48,13 @@ export default function useCrudForm(
     errors.value = {}
     loading.value = true
     try {
+      const payload = mapOut
+        ? mapOut(form.value, isUpdate.value)
+        : { ...form.value }
       if (isUpdate.value) {
-        await service.update(route.params.id, form.value)
+        await service.update(route.params.id, payload)
       } else {
-        await service.create(form.value)
+        await service.create(payload)
       }
       if (onSuccess) onSuccess(isUpdate.value)
       const target = resolvedListRoute.value

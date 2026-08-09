@@ -49,7 +49,7 @@
           <div class="col-12 col-sm-6 col-md-4">
             <q-select
               filled
-              label="Thing"
+              label="Cliente"
               v-model="form.thing"
               :options="thingOptions"
               option-label="thingsgroupname"
@@ -100,6 +100,13 @@ export default defineComponent({
           status: true,
           email: '',
           password: '123mudar'
+        },
+        mapOut: (payload, updating) => {
+          if (updating) {
+            const { email, password, ...rest } = payload
+            return rest
+          }
+          return payload
         },
         onSuccess: isUpdate => {
           if (!isUpdate) {
