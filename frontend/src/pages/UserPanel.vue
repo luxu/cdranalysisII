@@ -81,7 +81,7 @@
           <div class="flex items-center justify-between mb-2">
             <span
               class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate"
-              >Total Devices</span
+              >Total de chips</span
             >
             <div
               class="bg-[#10B981]/10 text-[#10B981] p-1.5 rounded-lg border border-[#10B981]/20 shrink-0 ml-2"
@@ -96,7 +96,12 @@
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 5h10a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2z"
+                  d="M6 2h12l4 4v14a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M8 6h2v4H8zm4 0h2v4h-2zm4 0h2v4h-2z"
                 />
               </svg>
             </div>
@@ -105,7 +110,7 @@
             <span class="text-xl font-bold text-white">{{
               stats.totalDevices
             }}</span>
-            <span class="text-[10px] text-slate-500 ml-1.5">devices</span>
+            <span class="text-[10px] text-slate-500 ml-1.5">chips</span>
           </div>
         </div>
 
@@ -115,7 +120,7 @@
           <div class="flex items-center justify-between mb-2">
             <span
               class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate"
-              >Devices c/ Sessões</span
+              >Chips c/ Sessões</span
             >
             <div
               class="bg-[#3B82F6]/10 text-[#3B82F6] p-1.5 rounded-lg border border-[#3B82F6]/20 shrink-0 ml-2"
@@ -130,7 +135,12 @@
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 5h10a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2z"
+                  d="M6 2h12l4 4v14a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M8 6h2v4H8zm4 0h2v4h-2zm4 0h2v4h-2z"
                 />
               </svg>
             </div>
@@ -149,7 +159,7 @@
           <div class="flex items-center justify-between mb-2">
             <span
               class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate"
-              >Total Real Usage</span
+              >Consumo Total</span
             >
             <div
               class="bg-[#F59E0B]/10 text-[#F59E0B] p-1.5 rounded-lg border border-[#F59E0B]/20 shrink-0 ml-2"
@@ -179,16 +189,114 @@
           </div>
         </div>
       </section>
+
+      <section
+        class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-5 shadow-sm space-y-4"
+      >
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-semibold text-white uppercase tracking-wider"
+            >Uso Mensal</h3
+          >
+          <span class="text-[10px] text-slate-500">últimos 6 meses</span>
+        </div>
+
+        <div v-if="chartLoading" class="h-52 flex items-center justify-center">
+          <div
+            class="w-6 h-6 border-2 border-[#10B981] border-t-transparent rounded-full animate-spin"
+          />
+        </div>
+
+        <div
+          v-else-if="monthlyUsage.length"
+          class="relative"
+          @mouseleave="hoveredIndex = null"
+        >
+          <svg
+            class="w-full"
+            viewBox="0 0 600 240"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <defs>
+              <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#10B981" />
+                <stop offset="100%" stop-color="#059669" />
+              </linearGradient>
+            </defs>
+
+            <line
+              x1="40"
+              y1="200"
+              x2="580"
+              y2="200"
+              stroke="#334155"
+              stroke-width="1"
+            />
+
+            <line
+              x1="40"
+              y1="10"
+              x2="40"
+              y2="200"
+              stroke="#334155"
+              stroke-width="1"
+            />
+
+            <rect
+              v-for="(d, i) in monthlyUsage"
+              :key="i"
+              :x="barX(i)"
+              :y="barY(d.total)"
+              :width="barW"
+              :height="200 - barY(d.total)"
+              rx="4"
+              fill="url(#barGrad)"
+              class="transition-all duration-300 cursor-pointer"
+              :opacity="hoveredIndex === null || hoveredIndex === i ? 1 : 0.5"
+              @mouseenter="hoveredIndex = i"
+            />
+
+            <text
+              v-for="(d, i) in monthlyUsage"
+              :key="'l' + i"
+              :x="barX(i) + barW / 2"
+              y="218"
+              text-anchor="middle"
+              class="text-[9px] fill-slate-400"
+              font-size="9"
+            >
+              {{ monthLabel(d.month) }}
+            </text>
+          </svg>
+
+          <div
+            v-if="hoveredIndex !== null"
+            class="absolute bg-[#1E293B] border border-[#334155] rounded-lg px-3 py-2 shadow-lg pointer-events-none z-10"
+            :style="tooltipStyle"
+          >
+            <p class="text-[10px] text-slate-400 mb-0.5">
+              {{ monthFullLabel(monthlyUsage[hoveredIndex].month) }}
+            </p>
+            <p class="text-xs font-semibold text-white">
+              {{ formatNumber(monthlyUsage[hoveredIndex].total) }}
+            </p>
+          </div>
+        </div>
+
+        <div v-else class="h-52 flex items-center justify-center">
+          <p class="text-xs text-slate-600">Nenhum dado de uso mensal</p>
+        </div>
+      </section>
     </template>
   </main>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useDashboardFilter } from '@/composables/useDashboardFilter'
 import deviceService from '@/services/device'
 import sessionService from '@/services/session'
 import profileService from '@/services/profile'
+import { formatNumber } from '@/utils/format'
 
 const {
   state,
@@ -199,6 +307,7 @@ const {
 } = useDashboardFilter()
 
 const loading = ref(true)
+const chartLoading = ref(true)
 const error = ref(null)
 const farmName = ref('')
 const thingId = ref(null)
@@ -207,21 +316,112 @@ const stats = reactive({
   totalDevices: 0,
   devicesWithSessions: 0,
   totalRealUsage: '0',
-  uom: 'MB'
+  uom: 'bytes'
 })
 
+const monthlyUsage = ref([])
+const hoveredIndex = ref(null)
+
+const chartW = 600
+const chartH = 200
+const padLeft = 40
+const padBottom = 40
+const padTop = 10
+const innerW = chartW - padLeft - 20
+const innerH = chartH - padTop - padBottom
+
+const barW = computed(() => {
+  const count = monthlyUsage.value.length
+  return count > 0 ? (innerW / count) * 0.6 : 0
+})
+
+const gap = computed(() => {
+  const count = monthlyUsage.value.length
+  return count > 0 ? (innerW / count) * 0.4 : 0
+})
+
+function barX(i) {
+  const count = monthlyUsage.value.length
+  if (count <= 0) return 0
+  const step = innerW / count
+  return padLeft + i * step + (step - barW.value) / 2
+}
+
+function barY(val) {
+  const maxVal = Math.max(...monthlyUsage.value.map(d => d.total), 1)
+  return padTop + innerH - (val / maxVal) * innerH
+}
+
+const tooltipStyle = computed(() => {
+  if (hoveredIndex.value === null) return {}
+  const x = barX(hoveredIndex.value) + barW.value / 2
+  const y = barY(monthlyUsage.value[hoveredIndex.value].total)
+  return {
+    left: `${(x / chartW) * 100}%`,
+    top: `${(y / chartH) * 100}%`,
+    transform: 'translate(-50%, -120%)'
+  }
+})
+
+const monthNames = {
+  '01': 'Jan',
+  '02': 'Fev',
+  '03': 'Mar',
+  '04': 'Abr',
+  '05': 'Mai',
+  '06': 'Jun',
+  '07': 'Jul',
+  '08': 'Ago',
+  '09': 'Set',
+  10: 'Out',
+  11: 'Nov',
+  12: 'Dez'
+}
+
+const monthFullNames = {
+  '01': 'Janeiro',
+  '02': 'Fevereiro',
+  '03': 'Março',
+  '04': 'Abril',
+  '05': 'Maio',
+  '06': 'Junho',
+  '07': 'Julho',
+  '08': 'Agosto',
+  '09': 'Setembro',
+  10: 'Outubro',
+  11: 'Novembro',
+  12: 'Dezembro'
+}
+
+function monthLabel(monthStr) {
+  const parts = monthStr.split('-')
+  if (parts.length !== 2) return monthStr
+  return `${monthNames[parts[1]] || parts[1]}/${parts[0].slice(2)}`
+}
+
+function monthFullLabel(monthStr) {
+  const parts = monthStr.split('-')
+  if (parts.length !== 2) return monthStr
+  return `${monthFullNames[parts[1]] || parts[1]} ${parts[0]}`
+}
+
 async function fetchProfile() {
-  const data = await profileService.get('me')
-  thingId.value = data.thing
-  farmName.value = data.thing_name || 'Cliente'
+  try {
+    const data = await profileService.get('me')
+    thingId.value = data.thing
+    farmName.value = data.thing_name || 'Cliente'
+  } catch (error) {
+    if (error.response?.status === 404) {
+      thingId.value = null
+      farmName.value = 'Visão Geral'
+    } else {
+      throw error
+    }
+  }
 }
 
 async function fetchFilteredDevices() {
-  if (!thingId.value) {
-    stats.totalDevices = 0
-    return
-  }
-  const params = buildDeviceParams(thingId.value)
+  const params = thingId.value ? buildDeviceParams(thingId.value) : {}
   params.page = 1
   params.page_size = 1
   const res = await deviceService.list(params)
@@ -229,27 +429,30 @@ async function fetchFilteredDevices() {
 }
 
 async function fetchSessionStats() {
-  if (!thingId.value) {
-    stats.devicesWithSessions = 0
-    stats.totalRealUsage = '0'
-    return
-  }
-
-  const params = buildSessionParams(thingId.value)
+  const params = thingId.value ? buildSessionParams(thingId.value) : {}
   const [devicesRes, usageRes] = await Promise.all([
     sessionService.topDevices(params),
     sessionService.usageByMonth(params)
   ])
 
-  const totalSessions = devicesRes.reduce(
-    (sum, d) => sum + (d.session_count || 0),
-    0
-  )
   const totalBytes = usageRes.reduce((sum, m) => sum + (m.total || 0), 0)
 
   stats.devicesWithSessions = devicesRes.length
-  stats.totalRealUsage = (totalBytes / (1024 * 1024)).toFixed(2)
-  stats.uom = 'MB'
+  stats.totalRealUsage = formatNumber(totalBytes)
+  stats.uom = 'Bytes'
+}
+
+async function fetchChartData() {
+  chartLoading.value = true
+  try {
+    const params = thingId.value ? { device__thing: thingId.value } : {}
+    const usageRes = await sessionService.usageByMonth(params)
+    monthlyUsage.value = usageRes.filter(d => d.month).slice(-6)
+  } catch {
+    monthlyUsage.value = []
+  } finally {
+    chartLoading.value = false
+  }
 }
 
 watch(
@@ -280,7 +483,11 @@ onMounted(async () => {
   try {
     setDefaultDates()
     await fetchProfile()
-    await Promise.all([fetchFilteredDevices(), fetchSessionStats()])
+    await Promise.all([
+      fetchFilteredDevices(),
+      fetchSessionStats(),
+      fetchChartData()
+    ])
   } catch (e) {
     error.value = e.friendlyMessage || 'Erro ao carregar dados'
   } finally {

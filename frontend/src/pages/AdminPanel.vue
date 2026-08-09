@@ -74,7 +74,7 @@
         </div>
       </div>
 
-      <section v-if="thingId" class="flex flex-row gap-4">
+      <section class="flex flex-row gap-4">
         <div
           class="flex-1 bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-4 shadow-sm min-w-0"
         >
@@ -115,7 +115,7 @@
           <div class="flex items-center justify-between mb-2">
             <span
               class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate"
-              >Devices c/ Sessões</span
+              >Chips c/ Sessões</span
             >
             <div
               class="bg-[#3B82F6]/10 text-[#3B82F6] p-1.5 rounded-lg border border-[#3B82F6]/20 shrink-0 ml-2"
@@ -149,7 +149,7 @@
           <div class="flex items-center justify-between mb-2">
             <span
               class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate"
-              >Total Real Usage</span
+              >Consumo Total</span
             >
             <div
               class="bg-[#F59E0B]/10 text-[#F59E0B] p-1.5 rounded-lg border border-[#F59E0B]/20 shrink-0 ml-2"
@@ -187,7 +187,7 @@
           <div class="flex items-center justify-between">
             <h3
               class="text-xs font-semibold text-white uppercase tracking-wider"
-              >Top Devices</h3
+              >Top Chips</h3
             >
             <span class="text-[10px] text-slate-500">consumo total</span>
           </div>
@@ -233,14 +233,6 @@
         <div
           class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-5 shadow-sm space-y-4"
         >
-          <div class="flex items-center justify-between">
-            <h3
-              class="text-xs font-semibold text-white uppercase tracking-wider"
-              >Uso Mensal</h3
-            >
-            <span class="text-[10px] text-slate-500">bytes</span>
-          </div>
-
           <div
             v-if="chartLoading"
             class="h-52 flex items-center justify-center"
@@ -326,6 +318,7 @@ import { useDashboardFilter } from '@/composables/useDashboardFilter'
 import deviceService from '@/services/device'
 import sessionService from '@/services/session'
 import profileService from '@/services/profile'
+import { formatNumber } from '@/utils/format'
 
 const {
   state,
@@ -344,19 +337,11 @@ const thingId = ref(null)
 const stats = reactive({
   totalDevices: 0,
   devicesWithSessions: 0,
-  totalRealUsage: '0',
-  uom: 'MB'
+  totalRealUsage: '0'
 })
 
 const usageData = ref([])
 const topDevices = ref([])
-
-function formatBytesShort(bytes) {
-  if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(1) + ' GB'
-  if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + ' MB'
-  if (bytes >= 1024) return (bytes / 1024).toFixed(1) + ' KB'
-  return bytes.toFixed(0) + ' B'
-}
 
 const barColors = [
   'bg-[#10B981]',
@@ -419,17 +404,22 @@ const usageLabels = computed(() => {
 })
 
 async function fetchProfile() {
-  const data = await profileService.get('me')
-  thingId.value = data.thing
-  farmName.value = data.thing_name || 'Admin'
+  try {
+    const data = await profileService.get('me')
+    thingId.value = data.thing
+    farmName.value = data.thing_name || 'Admin'
+  } catch (error) {
+    if (error.response?.status === 404) {
+      thingId.value = null
+      farmName.value = 'Visão Geral'
+    } else {
+      throw error
+    }
+  }
 }
 
 async function fetchFilteredDevices() {
-  if (!thingId.value) {
-    stats.totalDevices = 0
-    return
-  }
-  const params = buildDeviceParams(thingId.value)
+  const params = thingId.value ? buildDeviceParams(thingId.value) : {}
   params.page = 1
   params.page_size = 1
   const res = await deviceService.list(params)
@@ -437,38 +427,23 @@ async function fetchFilteredDevices() {
 }
 
 async function fetchSessionStats() {
-  if (!thingId.value) {
-    stats.devicesWithSessions = 0
-    stats.totalRealUsage = '0'
-    return
-  }
-
-  const params = buildSessionParams(thingId.value)
+  const params = thingId.value ? buildSessionParams(thingId.value) : {}
   const [devicesRes, usageRes] = await Promise.all([
     sessionService.topDevices(params),
     sessionService.usageByMonth(params)
   ])
 
-  const totalSessions = devicesRes.reduce(
-    (sum, d) => sum + (d.session_count || 0),
-    0
-  )
   const totalBytes = usageRes.reduce((sum, m) => sum + (m.total || 0), 0)
 
   stats.devicesWithSessions = devicesRes.length
-  stats.totalRealUsage = (totalBytes / (1024 * 1024)).toFixed(2)
-  stats.uom = 'MB'
+  stats.totalRealUsage = formatNumber(totalBytes)
+  stats.uom = 'Bytes'
 }
 
 async function fetchCharts() {
-  if (!thingId.value) {
-    usageData.value = []
-    topDevices.value = []
-    return
-  }
   chartLoading.value = true
   try {
-    const chartParams = buildSessionParams(thingId.value)
+    const chartParams = thingId.value ? buildSessionParams(thingId.value) : {}
     const [usageRes, topRes] = await Promise.all([
       sessionService.usageByMonth(chartParams),
       sessionService.topDevices(chartParams)
@@ -481,7 +456,7 @@ async function fetchCharts() {
       return {
         ...d,
         label: label.length > 22 ? label.slice(0, 20) + '…' : label,
-        display: formatBytesShort(d.total_bytes)
+        display: formatNumber(d.total_bytes)
       }
     })
 
