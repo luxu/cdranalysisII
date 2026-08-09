@@ -46,7 +46,6 @@ class ThingAdmin(admin.ModelAdmin):
 class DeviceAdmin(admin.ModelAdmin):
     list_display = (
         'id',
-        '__str__',
         'iccid',
         'imsi',
         'imei',

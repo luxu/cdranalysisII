@@ -28,6 +28,7 @@ MAPEAMENTO_COLUNAS = {
     'orgname': 'OrganizationName',
     'customerid': 'CustomerId',
     'customername': 'CustomerName',
+    'thingid': 'ThingId',
     'thingsgroupid': 'ThingsGroupId',
     'thingsgroupname': 'ThingsGroupName',
     'imsi': 'IMSI',
@@ -184,10 +185,13 @@ def _processar_linha(linha, caches, mapping, is_csv, sessions_batch):
     thing = caches['thing'][thing_id]
     # ******************************************************************** DEVICE *****************
     imsi = linha[MAPEAMENTO_COLUNAS['imsi']]
+    #iccid = linha[MAPEAMENTO_COLUNAS['imsi']].replace("ThingId_ICCID_", "")  8955992211100000003
+    iccid = linha[MAPEAMENTO_COLUNAS['imsi']].replace("ThingId_ICCID_", "")
     if imsi not in caches['device']:
         imei = linha[MAPEAMENTO_COLUNAS['imei']]
         device, _ = Device.objects.get_or_create(
             imsi=imsi,
+            iccid=iccid,
             defaults={
                 'imei': imei,
                 'thing': thing,
