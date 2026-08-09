@@ -43,35 +43,6 @@
           }}</h1>
           <p class="text-xs text-slate-500 mt-1">Visão geral do cliente</p>
         </div>
-
-        <div class="flex items-center gap-3">
-          <q-input
-            v-model="state.startDate"
-            type="date"
-            label="Data início"
-            dense
-            outlined
-            dark
-            class="w-36"
-          />
-          <q-input
-            v-model="state.endDate"
-            type="date"
-            label="Data fim"
-            dense
-            outlined
-            dark
-            class="w-36"
-          />
-          <q-btn
-            v-if="state.startDate || state.endDate"
-            icon="clear"
-            flat
-            dense
-            color="grey-5"
-            @click="clearDates"
-          />
-        </div>
       </div>
 
       <section class="flex flex-row gap-4">
@@ -118,10 +89,18 @@
           class="flex-1 bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-4 shadow-sm min-w-0"
         >
           <div class="flex items-center justify-between mb-2">
-            <span
-              class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate"
-              >Chips c/ Sessões</span
-            >
+            <div>
+              <span
+                class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate block"
+                >Chips c/ Sessões</span
+              >
+              <span
+                v-if="formatPeriod(state.startDate, state.endDate)"
+                class="text-[9px] text-slate-500 mt-0.5 block"
+              >
+                {{ formatPeriod(state.startDate, state.endDate) }}
+              </span>
+            </div>
             <div
               class="bg-[#3B82F6]/10 text-[#3B82F6] p-1.5 rounded-lg border border-[#3B82F6]/20 shrink-0 ml-2"
             >
@@ -157,10 +136,18 @@
           class="flex-1 bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-4 shadow-sm min-w-0"
         >
           <div class="flex items-center justify-between mb-2">
-            <span
-              class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate"
-              >Consumo Total</span
-            >
+            <div>
+              <span
+                class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate block"
+                >Consumo Total</span
+              >
+              <span
+                v-if="formatPeriod(state.startDate, state.endDate)"
+                class="text-[9px] text-slate-500 mt-0.5 block"
+              >
+                {{ formatPeriod(state.startDate, state.endDate) }}
+              </span>
+            </div>
             <div
               class="bg-[#F59E0B]/10 text-[#F59E0B] p-1.5 rounded-lg border border-[#F59E0B]/20 shrink-0 ml-2"
             >
@@ -296,7 +283,7 @@ import { useDashboardFilter } from '@/composables/useDashboardFilter'
 import deviceService from '@/services/device'
 import sessionService from '@/services/session'
 import profileService from '@/services/profile'
-import { formatNumber } from '@/utils/format'
+import { formatNumber, formatPeriod } from '@/utils/format'
 
 const {
   state,
