@@ -3,7 +3,7 @@ import tempfile
 from api.services import import_cdr_from_file
 
 from django.contrib.auth import get_user_model
-from django.db.models import Count, FloatField, Max, Min, Q, Sum
+from django.db.models import Count, Exists, FloatField, Max, Min, OuterRef, Q, Sum
 from django.db.models.functions import Cast, TruncMonth
 from rest_framework import status, viewsets
 from rest_framework.authtoken.models import Token
@@ -150,6 +150,27 @@ class DeviceViewSet(viewsets.ModelViewSet):
             status_bool = status.lower() in ('true', '1', 'ativo')
             qs = qs.filter(status=status_bool)
         return qs
+
+    @action(detail=False, methods=['get'], url_path='with-sessions')
+    def with_sessions(self, request):
+        qs = self.get_queryset().filter(
+            Exists(Session.objects.filter(device=OuterRef('pk')))
+        ).values('id', 'iccid', 'imsi').annotate(
+            total_sessions=Count('sessions_devices'),
+            total_usage=Sum(Cast('sessions_devices__realusage', output_field=FloatField()))
+        ).order_by('-total_usage')
+
+        data = [
+            {
+                'device_id': str(d['id']),
+                'iccid': d['iccid'],
+                'imsi': d['imsi'],
+                'total_sessions': d['total_sessions'],
+                'total_usage': float(d['total_usage']) if d['total_usage'] else 0,
+            }
+            for d in qs
+        ]
+        return Response(data)
 
 
 class SessionViewSet(OwnerFilteredMixin, viewsets.ModelViewSet):

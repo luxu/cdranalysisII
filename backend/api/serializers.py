@@ -177,6 +177,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     user_email = serializers.EmailField(source='user.email', read_only=True)
     thing_name = serializers.CharField(source='thing.thingsgroupname', read_only=True)
+    qtd_devices_com_sessao = serializers.IntegerField(read_only=True)
     email = serializers.EmailField(write_only=True, required=False)
     password = serializers.CharField(write_only=True, required=False)
 
@@ -185,9 +186,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'user', 'user_email', 'email', 'password',
             'name', 'celular', 'thing', 'thing_name',
+            'qtd_devices_com_sessao',
             'status', 'created_at', 'modified_at',
         ]
-        read_only_fields = ['id', 'user', 'created_at', 'modified_at']
+        read_only_fields = ['id', 'user', 'qtd_devices_com_sessao', 'created_at', 'modified_at']
 
     def validate(self, attrs):
         if not self.instance:
