@@ -1,13 +1,13 @@
 <template>
   <q-page padding>
-    <h1 class="text-h2 text-center">Device Page</h1>
+    <h1 class="text-h2 text-center">Chip Page</h1>
     <div class="q-pa-md" style="max-width: 900px; margin: auto">
       <q-form class="q-gutter-md" @submit.prevent="onSubmit">
         <div class="row q-col-gutter-md">
           <div class="col-12 col-sm-6 col-md-3">
             <q-select
               filled
-              label="Thing"
+              label="Cliente"
               v-model="form.thing"
               :options="thingOptions"
               option-label="thingsgroupname"

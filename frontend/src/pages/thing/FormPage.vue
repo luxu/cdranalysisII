@@ -1,6 +1,6 @@
 <template>
   <q-page padding>
-    <h1 class="text-h2 text-center">Thing Page</h1>
+    <h1 class="text-h2 text-center">Página Cliente</h1>
     <div class="q-pa-md" style="max-width: 900px; margin: auto">
       <q-form class="q-gutter-md" @submit.prevent="onSubmit">
         <div class="row q-col-gutter-md">

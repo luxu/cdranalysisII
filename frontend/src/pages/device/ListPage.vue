@@ -54,7 +54,7 @@ export default defineComponent({
 
     const { rows, loading, pagination, onRequest, confirmRemove } = useCrudList(
       deviceService,
-      { entityLabel: 'Device' }
+      { entityLabel: 'Chip' }
     )
 
     const handlerEdit = (item: any) => {

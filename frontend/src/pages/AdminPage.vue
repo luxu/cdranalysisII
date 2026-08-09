@@ -14,7 +14,7 @@
       class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-5"
     >
       <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4">
-        Top 10 Dispositivos por Consumo
+        Top 10 Chips por Consumo
       </h3>
       <div class="space-y-2">
         <div
@@ -30,8 +30,8 @@
         >
           <span
             class="text-xs text-slate-400 w-[140px] truncate font-mono"
-            :title="device.imsi"
-            >{{ device.imsi }}</span
+            :title="device.iccid"
+            >{{ device.iccid }}</span
           >
           <div class="flex-1 h-5 bg-slate-800 rounded overflow-hidden">
             <div
@@ -41,7 +41,7 @@
           </div>
           <span
             class="text-xs text-slate-300 w-[80px] text-right font-mono tabular-nums"
-            >{{ formatUsage(device.total_bytes) }}</span
+            >{{ formatNumber(device.total_bytes) }}</span
           >
           <span class="text-[11px] text-slate-500 w-[70px] text-right"
             >{{ device.session_count }} sessões</span
@@ -137,10 +137,10 @@
         }}</p>
         <p class="text-slate-300 text-sm"
           >{{ org.device_count }}
-          {{ org.device_count === 1 ? 'device' : 'devices' }}</p
+          {{ org.device_count === 1 ? 'chip' : 'chips' }}</p
         >
         <p class="text-slate-300 text-sm"
-          >consumo {{ formatUsage(org.total_usage) }}</p
+          >consumo {{ formatNumber(org.total_usage) }}</p
         >
       </div>
     </section>
@@ -157,7 +157,7 @@
             Sessões —
             {{
               selectedDevice
-                ? selectedDevice.iccid || selectedDevice.imsi || 'Device'
+                ? selectedDevice.iccid || selectedDevice.iccid || 'Chips'
                 : selectedThing.name
             }}
           </h3>
@@ -179,7 +179,7 @@
         >
           <template v-slot:body-cell-realusage="props">
             <q-td :props="props" class="text-right font-mono tabular-nums">
-              {{ formatUsage(parseFloat(props.value) || 0) }}
+              {{ formatNumber(props.value) }}
             </q-td>
           </template>
           <template v-slot:body-cell-sessioncreatetime="props">
@@ -223,6 +223,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { sessionColumns, sessionPagination } from './tableAdmin'
 import sessionService from '@/services/session'
+import { formatNumber } from '@/utils/format'
 
 const loading = ref(true)
 const organizations = ref([])
@@ -252,13 +253,6 @@ const totalPages = computed(() =>
 const sortedOrganizations = computed(() =>
   [...organizations.value].sort((a, b) => b.device_count - a.device_count)
 )
-
-function formatUsage(bytes) {
-  if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(2) + ' GB'
-  if (bytes >= 1048576) return (bytes / 1048576).toFixed(2) + ' MB'
-  if (bytes >= 1024) return (bytes / 1024).toFixed(2) + ' KB'
-  return bytes.toFixed(0) + ' B'
-}
 
 function formatDate(dateStr) {
   if (!dateStr) return ''

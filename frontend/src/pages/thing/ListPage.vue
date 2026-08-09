@@ -55,7 +55,7 @@ export default defineComponent({
 
     const { rows, loading, pagination, onRequest, confirmRemove } = useCrudList(
       thingService,
-      { entityLabel: 'Thing' }
+      { entityLabel: 'Cliente' }
     )
 
     const isAdmin = () => route.path.startsWith('/admin')

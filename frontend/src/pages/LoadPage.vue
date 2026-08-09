@@ -84,7 +84,7 @@
                 </div>
               </div>
               <div class="col-6 col-sm-3">
-                <div class="text-caption text-grey-5">Devices</div>
+                <div class="text-caption text-grey-5">Chips</div>
                 <div class="text-subtitle1 text-weight-bold">
                   {{ resultadoImportacao.devices }}
                 </div>

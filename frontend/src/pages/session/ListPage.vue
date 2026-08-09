@@ -12,7 +12,7 @@
               v-model="search"
               dense
               outlined
-              placeholder="Buscar por Session ID, IMSI, MSISDN ou Thing..."
+              placeholder="Buscar por Session ID, ISSID ou Cliente..."
               debounce="300"
               clearable
               @clear="applyFilters"
@@ -88,6 +88,11 @@
       :loading="loading"
       @request="onRequest"
     >
+      <template v-slot:body-cell-realusage="props">
+        <q-td :props="props" class="text-right font-mono tabular-nums">
+          {{ formatNumber(props.value) }}
+        </q-td>
+      </template>
       <template v-slot:body-cell-status="props">
         <q-td :props="props">
           <q-badge :color="props.value ? 'positive' : 'negative'">
@@ -104,6 +109,7 @@ import { ref } from 'vue'
 import { columns } from './table'
 import sessionService from '@/services/session'
 import useCrudList from '@/composables/useCrudList'
+import { formatNumber } from '@/utils/format'
 
 const { rows, loading, pagination, fetchRows, onRequest } = useCrudList(
   sessionService,
