@@ -2,7 +2,7 @@
   <main class="flex-1 p-8 space-y-6 overflow-y-auto">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-white tracking-tight">Admin</h1>
+        <h1 class="text-2xl font-bold text-white tracking-tight">Administrador</h1>
         <p v-if="dbDateRange.min_date" class="text-xs text-slate-400 mt-1">
           Base de dados: {{ dbDateRange.min_date }} a {{ dbDateRange.max_date }}
         </p>
