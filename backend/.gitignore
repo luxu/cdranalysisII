@@ -9,6 +9,7 @@ sample_sessions.csv
 .idea
 .xlsx
 .iml
+files/
 
 # C extensions
 *.so

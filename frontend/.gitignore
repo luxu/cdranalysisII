@@ -13,6 +13,7 @@ frontend/node_modules
 
 .vscode
 frontend/.vscode
+backend/files/
 
 # Cordova related directories and files
 /src-cordova/node_modules
