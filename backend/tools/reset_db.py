@@ -1,9 +1,7 @@
-import json
 import os
 import sys
 import shutil
 import subprocess
-import tempfile
 from pathlib import Path
 from decouple import config
 
@@ -79,39 +77,22 @@ def resetar_projeto():
     # 4. Restaurando as Fixtures (Backup)
     print("\n📥 Restaurando dados das fixtures...")
 
-    NOME_FIXTURE = "users_profiles_v2"
-    fixture_path = BASE_DIR / "user" / "fixtures" / f"{NOME_FIXTURE}.json"
+    # NOME_FIXTURE = "users_profiles_v2"
+    # fixture_path = BASE_DIR / "user" / "fixtures" / f"{NOME_FIXTURE}.json"
+    NOME_FIXTURE = "base_data"
+    fixture_path = BASE_DIR / "cdr" / "fixtures" / f"{NOME_FIXTURE}.json"
     fixture_restaurada = False
 
     try:
-        with open(fixture_path, 'r', encoding='utf-8') as f:
-            fixture_data = json.load(f)
-
-        # Remove o campo 'thing' dos profiles para evitar erro de FK
-        # (os Things ainda não existem no banco após o reset)
-        for item in fixture_data:
-            if item.get("model") == "user.profile":
-                item["fields"].pop("thing", None)
-
-        temp_fixture = Path(tempfile.gettempdir()) / f"{NOME_FIXTURE}_clean.json"
-        with open(temp_fixture, 'w', encoding='utf-8') as f:
-            json.dump(fixture_data, f, indent=2)
-
-        print(f"   -> Fixture temporária gerada em: {temp_fixture}")
-
         # Executa o loaddata capturando a saída para analise
         resultado = subprocess.run(
-            ["uv", "run", "manage.py", "loaddata", str(temp_fixture), "--ignorenonexistent"],
+            ["uv", "run", "manage.py", "loaddata", str(fixture_path), "--ignorenonexistent"],
             cwd=BASE_DIR,
             check=True,
             capture_output=True,
             text=True
         )
-
-        # Exibe no terminal a saída do comando Django
         print(resultado.stdout)
-
-        # Verifica se o Django realmente instalou 1 ou mais objetos
         if "Installed 0 object(s)" in resultado.stdout or "No fixture data found" in resultado.stderr:
             print("⚠️ Nenhuma fixture foi instalada (arquivo vazio ou não encontrado).")
         else:
