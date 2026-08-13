@@ -333,7 +333,6 @@ import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useDashboardFilter } from '@/composables/useDashboardFilter'
 import deviceService from '@/services/device'
 import sessionService from '@/services/session'
-import profileService from '@/services/profile'
 import { formatNumber, formatPeriod } from '@/utils/format'
 
 const {
@@ -347,7 +346,7 @@ const {
 const loading = ref(true)
 const chartLoading = ref(true)
 const error = ref(null)
-const farmName = ref('')
+const farmName = ref('Administrador')
 const thingId = ref(null)
 
 const stats = reactive({
@@ -418,21 +417,6 @@ const usageLabels = computed(() => {
   }
   return labels
 })
-
-async function fetchProfile() {
-  try {
-    const data = await profileService.get('me')
-    thingId.value = data.thing
-    farmName.value = data.thing_name || 'Admin'
-  } catch (error) {
-    if (error.response?.status === 404) {
-      thingId.value = null
-      farmName.value = 'Visão Geral'
-    } else {
-      throw error
-    }
-  }
-}
 
 async function fetchFilteredDevices() {
   const params = thingId.value ? buildDeviceParams(thingId.value) : {}
@@ -516,7 +500,6 @@ watch(
 onMounted(async () => {
   try {
     setDefaultDates()
-    await fetchProfile()
     await Promise.all([
       fetchFilteredDevices(),
       fetchSessionStats(),
