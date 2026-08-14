@@ -184,11 +184,13 @@ def _processar_linha(linha, caches, mapping, is_csv, sessions_batch):
     thing = caches['thing'][thing_id]
     # ******************************************************************** DEVICE *****************
     imsi = linha[MAPEAMENTO_COLUNAS['imsi']]
+    iccid = linha[MAPEAMENTO_COLUNAS['imsi']].replace("ThingId_ICCID_", "")
     if imsi not in caches['device']:
         imei = linha[MAPEAMENTO_COLUNAS['imei']]
         device, _ = Device.objects.get_or_create(
             imsi=imsi,
             defaults={
+                'iccid': iccid,
                 'imei': imei,
                 'thing': thing,
             },
@@ -263,6 +265,7 @@ def _processar_linha(linha, caches, mapping, is_csv, sessions_batch):
 
 if __name__ == '__main__':
     files_dir = os.path.join(os.path.dirname(__file__), '..', 'files')
+    # files_dir = r'C:\Users\luxu\Desktop\cdr'
     filenames = [
         os.path.join(files_dir, f)
         for f in os.listdir(files_dir)

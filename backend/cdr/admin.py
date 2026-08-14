@@ -18,13 +18,14 @@ class SessionAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'device',
+        'device__iccid',
         'sessionid',
         'sessioncreatetime',
         'realusage',
         'uom',
     )
     list_filter = (
-        'device__imsi',
+        'device__iccid',
         'sessionid',
     )
     search_fields = (
