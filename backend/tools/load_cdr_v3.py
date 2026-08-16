@@ -191,8 +191,8 @@ def _processar_linha(linha, caches, mapping, is_csv, sessions_batch):
         imei = linha[MAPEAMENTO_COLUNAS['imei']]
         device, _ = Device.objects.get_or_create(
             imsi=imsi,
-            iccid=iccid,
             defaults={
+                'iccid': iccid,
                 'imei': imei,
                 'thing': thing,
             },

@@ -21,6 +21,7 @@ MAPEAMENTO_COLUNAS = {
     'customername': 'CustomerName',
     'thingsgroupid': 'ThingsGroupId',
     'thingsgroupname': 'ThingsGroupName',
+    'iccid': 'ICCID',
     'imsi': 'IMSI',
     'imei': 'IMEI',
     'sessionid': 'SessionId',
@@ -148,9 +149,11 @@ def _processar_linha(linha, caches, mapping, is_csv):
 
     if imsi not in caches['device']:
         imei = _get(linha, 'imei', mapping) or ''
+        iccid = _get(linha, 'iccid', mapping) or ''
         device, _ = Device.objects.get_or_create(
             imsi=imsi,
             defaults={
+                'iccid': iccid,
                 'imei': imei,
                 'thing': thing,
             },
@@ -230,6 +233,7 @@ def _detect_mapping(columns, is_csv):
             'customername': 'CustomerName' if 'CustomerName' in columns else None,
             'thingsgroupid': 'ThingsGroupId' if 'ThingsGroupId' in columns else None,
             'thingsgroupname': 'ThingsGroupName' if 'ThingsGroupName' in columns else None,
+            'iccid': 'ICCID',
             'imsi': 'IMSI',
             'imei': 'IMEI',
             'sessionid': 'SessionId',

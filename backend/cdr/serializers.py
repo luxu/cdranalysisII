@@ -129,7 +129,9 @@ class SessionSerializer(serializers.ModelSerializer):
 
 class SessionListSerializer(serializers.ModelSerializer):
     imsi = serializers.CharField(source='device.imsi', read_only=True)
-    iccid = serializers.CharField(source='device.iccid', read_only=True)
+    iccid = serializers.CharField(
+        source='device.iccid', read_only=True, allow_null=True, allow_blank=True
+    )
     thing_name = serializers.CharField(
         source='device.thing.thingsgroupname', read_only=True
     )

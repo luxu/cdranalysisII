@@ -29,6 +29,7 @@ MAPEAMENTO_COLUNAS = {
     'customername': 'CustomerName',
     'thingsgroupid': 'ThingsGroupId',
     'thingsgroupname': 'ThingsGroupName',
+    'iccid': 'ICCID',
     'imsi': 'IMSI',
     'imei': 'IMEI',
     'sessionid': 'SessionId',
@@ -125,9 +126,13 @@ def processar_linha(linha, caches):
     imsi = linha[MAPEAMENTO_COLUNAS['imsi']]
     if imsi not in caches['device']:
         imei = linha[MAPEAMENTO_COLUNAS['imei']]
+        iccid = linha.get(MAPEAMENTO_COLUNAS.get('iccid', ''), '')
+        if pd.isna(iccid):
+            iccid = ''
         device, _ = Device.objects.get_or_create(
             imsi=imsi,
             defaults={
+                'iccid': iccid,
                 'imei': imei,
                 'thing': thing,
             },

@@ -9,10 +9,10 @@ const sessionColumns = [
     sortable: true
   },
   {
-    name: 'imsi',
-    label: 'IMSI',
+    name: 'iccid',
+    label: 'ICCID',
     align: 'left',
-    field: val => val.imsi,
+    field: val => val.iccid,
     sortable: true
   },
   {
