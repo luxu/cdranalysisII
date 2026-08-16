@@ -41,7 +41,7 @@
           <h1 class="text-2xl font-bold text-white tracking-tight">{{
             farmName
           }}</h1>
-          <p class="text-xs text-slate-500 mt-1">Visão geral do cliente</p>
+          <p class="text-xs text-slate-500 mt-1">Visão geral do cliente - AdminPanel</p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -428,6 +428,7 @@ async function fetchFilteredDevices() {
 
 async function fetchSessionStats() {
   const params = thingId.value ? buildSessionParams(thingId.value) : {}
+  console.log('AdminPanel.vue -> PARAMS..:', params)
   const [devicesRes, usageRes] = await Promise.all([
     sessionService.topDevices(params),
     sessionService.usageByMonth(params)

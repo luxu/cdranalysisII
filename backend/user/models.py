@@ -38,9 +38,7 @@ class Profile(Base):
     def qtd_devices_com_sessao(self):
         if not self.thing:
             return 0
-        return Device.objects.filter(
-            thing=self.thing
-        ).filter(
+        return Device.objects.filter(thing=self.thing).filter(
             models.Exists(Session.objects.filter(device=models.OuterRef('pk')))
         ).count()
 

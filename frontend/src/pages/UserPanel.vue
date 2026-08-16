@@ -182,7 +182,7 @@
       >
         <div class="flex items-center justify-between">
           <h3 class="text-xs font-semibold text-white uppercase tracking-wider"
-            >Uso Mensal</h3
+            >Consumo Mensal</h3
           >
           <span class="text-[10px] text-slate-500">últimos 6 meses</span>
         </div>
