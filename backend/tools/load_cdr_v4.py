@@ -264,8 +264,8 @@ def _processar_linha(linha, caches, mapping, is_csv, sessions_batch):
         caches['priceplan'][priceplanid] = True
 
 if __name__ == '__main__':
-    files_dir = os.path.join(os.path.dirname(__file__), '..', 'files')
-    # files_dir = r'C:\Users\luxu\Desktop\cdr'
+    # files_dir = os.path.join(os.path.dirname(__file__), '..', 'files')
+    files_dir = r'C:\Users\luxu\Desktop\cdr'
     filenames = [
         os.path.join(files_dir, f)
         for f in os.listdir(files_dir)
