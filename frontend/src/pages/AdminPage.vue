@@ -45,10 +45,10 @@
             />
           </div>
           <span
-            class="text-xs text-slate-300 w-[80px] text-right font-mono tabular-nums"
+            class="text-xs text-slate-300 w-[140px] text-right font-mono tabular-nums"
             >{{ formatNumber(device.total_bytes) }}</span
           >
-          <span class="text-[11px] text-slate-500 w-[70px] text-right"
+          <span class="text-[11px] text-slate-500 w-[100px] text-right"
             >{{ device.session_count }} sessões</span
           >
         </div>
