@@ -3,28 +3,14 @@
     class="w-64 bg-[#0D1321] border-r border-[#1E293B]/40 flex flex-col justify-between p-5 shrink-0"
   >
     <div class="space-y-8">
-      <div class="flex items-center space-x-3 px-2">
-        <div
-          class="bg-[#10B981]/10 text-[#10B981] p-2 rounded-xl border border-[#10B981]/20"
-        >
-          <svg
-            class="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-            />
-          </svg>
-        </div>
-        <div>
-          <h2 class="text-sm font-bold text-white tracking-wide">SOLIS</h2>
-          <p class="text-[10px] text-slate-500 font-medium">Administração</p>
-        </div>
+      <div class="text-center q-pa-md q-gutter-x-sm">
+        <q-img
+        src="@/assets/logo_solis.jpg"
+        class="q-mb-md"
+        spinner-color="white"
+        style="width: 80px"
+        mix-blend-mode: screen
+        />
       </div>
 
       <nav class="space-y-1">
@@ -114,6 +100,78 @@
           <span>{{ item.label }}</span>
         </RouterLink>
 
+        <div class="space-y-2">
+          <div>
+            <label
+              class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-1 px-1"
+              >De
+            </label>
+            <div class="q-pa-md" style="max-width: 300px">
+              <q-input 
+                filled
+                readonly
+                :model-value="formatarDataBR(startDate)"
+                mask="##/##/####"
+              >
+                <template v-slot:append>
+                  <q-icon name="event" class="cursor-pointer">
+                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                      <q-date
+                        v-model="startDate"
+                        mask="YYYY-MM-DD"
+                        :locale="localeBR"
+                      >
+                        <div class="row items-center justify-end">
+                          <q-btn v-close-popup label="Close" color="primary" flat />
+                        </div>
+                      </q-date>
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+              </q-input>
+            </div>
+          </div>
+          <div>
+            <label
+              class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-1 px-1"
+              >
+              Até
+            </label>
+            <div class="q-pa-md" style="max-width: 300px">
+            <q-input 
+              filled
+              readonly
+              :model-value="formatarDataBR(endDate)"
+            >
+                <template v-slot:append>
+                  <q-icon name="event" class="cursor-pointer">
+                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                      <q-date
+                        v-model="endDate"
+                        mask="YYYY-MM-DD"
+                        :locale="localeBR"
+                      >
+                        <div class="row items-center justify-end">
+                          <q-btn v-close-popup label="Close" color="primary" flat />
+                        </div>
+                      </q-date>
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+              </q-input>
+            </div>
+          </div>
+          <q-btn
+            flat
+            dense
+            color="grey"
+            label="Limpar"
+            icon="clear_all"
+            class="shrink-0 whitespace-nowrap"
+            @click="clearDates"
+          />
+      </div>
+
         <div class="px-4 py-2">
           <p class="text-[10px] text-slate-500 uppercase tracking-wider"
             >Logado como</p
@@ -148,12 +206,49 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import useAuth from '@/composables/useAuth'
+import sessionService from '@/services/session'
+import { date } from 'quasar'
+
+const loading = ref(true)
+const things = ref([])
+const startDate = ref()
+const endDate = ref()
+const topDevices = ref([])
+const dbDateRange = ref({ min_date: null, max_date: null })
+const selectedThing = ref(null)
+const selectedDevice = ref(null)
+const realusageMin = ref('')
+const realusageMax = ref('')
 
 const route = useRoute()
 const router = useRouter()
 const { logout, user } = useAuth()
+
+const localeBR = {
+  days: ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
+  daysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+  months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+  monthsShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+  firstDayOfWeek: 0, // 0 para Domingo, 1 para Segunda-feira
+  pluralDay: 'dias'
+}
+
+const formatarDataBR = (val) => {
+  if (!val) return ''
+  return date.formatDate(val, 'DD/MM/YYYY')
+}
+
+
+
+function clearDates() {
+  startDate.value = dbDateRange.value.min_date || today()
+  endDate.value = dbDateRange.value.max_date || today()
+  realusageMin.value = ''
+  realusageMax.value = ''
+}
 
 function handleLogout() {
   logout()
@@ -189,4 +284,16 @@ const toolItems = [
 function isActive(to) {
   return route.path === to
 }
+
+onMounted(async () => {
+  try {
+    const range = await sessionService.dateRange()
+    dbDateRange.value = range
+    if (range.min_date) startDate.value = range.min_date
+    if (range.max_date) endDate.value = range.max_date
+  } finally {
+    loading.value = false
+  }
+})
+
 </script>

@@ -1,5 +1,7 @@
 <template>
   <main class="flex-1 p-8 space-y-6 overflow-y-auto">
+    
+    <!-- Cabeçalho e Data dos dados -->
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold text-white tracking-tight">Administrador</h1>
@@ -8,7 +10,9 @@
         </p>
       </div>
     </div>
+    <!-- fim Cabeçalho e Data dos dados -->
 
+    <!-- Gráfico Top 10 Chips por Consumo -->
     <section
       v-if="topDevices.length"
       class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-5"
@@ -49,48 +53,65 @@
         </div>
       </div>
     </section>
+    <!-- fim Gráfico Top 10 Chips por Consumo -->
 
+    <!-- Filtros -->
     <div class="flex items-center gap-3 flex-wrap">
-      <q-input
-        v-model="startDate"
-        dense
-        outlined
-        label="Data início"
-        class="w-[160px]"
-        readonly
-      >
-        <template v-slot:prepend>
-          <q-icon name="event" class="cursor-pointer">
-            <q-popup-proxy
-              cover
-              transition-show="scale"
-              transition-hide="scale"
-            >
-              <q-date v-model="startDate" mask="YYYY-MM-DD" />
-            </q-popup-proxy>
-          </q-icon>
-        </template>
-      </q-input>
-      <q-input
-        v-model="endDate"
-        dense
-        outlined
-        label="Data fim"
-        class="w-[160px]"
-        readonly
-      >
-        <template v-slot:prepend>
-          <q-icon name="event" class="cursor-pointer">
-            <q-popup-proxy
-              cover
-              transition-show="scale"
-              transition-hide="scale"
-            >
-              <q-date v-model="endDate" mask="YYYY-MM-DD" />
-            </q-popup-proxy>
-          </q-icon>
-        </template>
-      </q-input>
+      <div class="q-pa-md" style="max-width: 300px">
+        <q-input 
+          filled
+          readonly
+          :model-value="formatDate(startDate)"
+          mask="##/##/####"
+        >
+          <template v-slot:append>
+            <q-icon name="event" class="cursor-pointer">
+              <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                <q-date
+                  v-model="startDate"
+                  mask="YYYY-MM-DD"
+                  :locale="localeBR"
+                >
+                  <div class="row items-center justify-end">
+                    <q-btn v-close-popup label="Close" color="primary" flat />
+                  </div>
+                </q-date>
+              </q-popup-proxy>
+            </q-icon>
+          </template>
+        </q-input>
+      </div>
+      
+      <div class="q-pa-md" style="max-width: 300px">
+        <q-input 
+          filled
+          readonly
+          :model-value="formatDate(endDate)"
+          mask="##/##/####"
+        >
+          <template v-slot:append>
+            <q-icon name="event" class="cursor-pointer">
+              <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                <q-date
+                  v-model="endDate"
+                  mask="YYYY-MM-DD"
+                  :locale="localeBR"
+                >
+                  <div class="row items-center justify-end">
+                    <q-btn
+                      v-close-popup 
+                      label="Close" 
+                      color="primary" 
+                      flat
+                    />
+                  </div>
+                </q-date>
+              </q-popup-proxy>
+            </q-icon>
+          </template>
+        </q-input>
+      </div>
+      
       <q-input
         v-model="realusageMin"
         dense
@@ -119,32 +140,36 @@
         @click="clearDates"
       />
     </div>
+    <!-- fim dos Filtros -->
 
+    <!-- Cards dos Things(CLIENTES) -->
     <section class="flex gap-4 overflow-x-auto pb-2">
       <div
-        v-for="org in sortedOrganizations"
-        :key="org.thing_id"
+        v-for="thing in sortedThings"
+        :key="thing.thing_id"
         class="border rounded-2xl px-5 py-4 shrink-0 min-w-[180px] transition-all duration-200 hover:scale-105 cursor-pointer"
         :class="
-          selectedThing?.id === org.thing_id
+          selectedThing?.id === thing.thing_id
             ? 'border-[#10B981] bg-[#10B981]/5'
             : 'border-slate-600'
         "
-        @click="selectThing(org)"
+        @click="selectThing(thing)"
       >
         <p class="text-white font-bold uppercase text-sm mb-3 truncate">{{
-          org.thing_name
+          thing.thing_name
         }}</p>
         <p class="text-slate-300 text-sm"
-          >{{ org.device_count }}
-          {{ org.device_count === 1 ? 'chip' : 'chips' }}</p
+          >{{ thing.device_count }}
+          {{ thing.device_count === 1 ? 'chip' : 'chips' }}</p
         >
         <p class="text-slate-300 text-sm"
-          >consumo {{ formatNumber(org.total_usage) }}</p
+          >consumo {{ formatNumber(thing.total_usage) }}</p
         >
       </div>
     </section>
-
+    <!-- fim dos Cards dos Things(CLIENTES) -->
+    
+    <!-- Dados na tabela do Thing(Cliente) selecionado do card acima -->
     <Transition name="panel">
       <section
         v-if="selectedThing || selectedDevice"
@@ -216,6 +241,7 @@
         </div>
       </section>
     </Transition>
+    <!-- Dados na tabela do Thing(Cliente) selecionado do card acima -->
   </main>
 </template>
 
@@ -226,33 +252,27 @@ import sessionService from '@/services/session'
 import { formatNumber } from '@/utils/format'
 
 const loading = ref(true)
-const organizations = ref([])
+const things = ref([])
+const startDate = ref(today())
+const endDate = ref(today())
 const topDevices = ref([])
 const dbDateRange = ref({ min_date: null, max_date: null })
-
 const selectedThing = ref(null)
 const selectedDevice = ref(null)
-const sessionRows = ref([])
-const sessionLoading = ref(false)
 const realusageMin = ref('')
 const realusageMax = ref('')
 
-function today() {
-  return new Date().toISOString().slice(0, 10)
+const sessionRows = ref([])
+const sessionLoading = ref(false)
+
+const localeBR = {
+  days: ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
+  daysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+  months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+  monthsShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+  firstDayOfWeek: 0, // 0 para Domingo, 1 para Segunda-feira
+  pluralDay: 'dias'
 }
-
-const startDate = ref(today())
-const endDate = ref(today())
-
-const totalPages = computed(() =>
-  Math.ceil(
-    sessionPagination.value.rowsNumber / sessionPagination.value.rowsPerPage
-  )
-)
-
-const sortedOrganizations = computed(() =>
-  [...organizations.value].sort((a, b) => b.device_count - a.device_count)
-)
 
 function formatDate(dateStr) {
   if (!dateStr) return ''
@@ -260,18 +280,32 @@ function formatDate(dateStr) {
   return d.toLocaleDateString('pt-BR')
 }
 
-async function fetchOrganizations(thingId = null) {
+function today() {
+  return new Date().toISOString().slice(0, 10)
+}
+
+const totalPages = computed(() =>
+  Math.ceil(
+    sessionPagination.value.rowsNumber / sessionPagination.value.rowsPerPage
+  )
+)
+
+const sortedThings = computed(() =>  
+  [...things.value].sort((a, b) => b.device_count - a.device_count)
+)
+
+async function fetchThings(thingId = null) {
   const params = {}
   if (startDate.value) params.start_date = startDate.value
   if (endDate.value) params.end_date = endDate.value
   if (realusageMin.value) params.realusage_min = realusageMin.value
   if (realusageMax.value) params.realusage_max = realusageMax.value
   if (thingId) params.device__thing = thingId
-  const [orgs, devices] = await Promise.all([
+  const [clientes, devices] = await Promise.all([
     sessionService.summaryByThing(params),
     sessionService.topDevices(params)
   ])
-  organizations.value = orgs
+  things.value = clientes
   topDevices.value = devices
 }
 
@@ -305,7 +339,6 @@ async function fetchSessions(props) {
     }
 
     const data = await sessionService.list(params)
-    console.log('Data', data.results)
     sessionRows.value = data.results
     sessionPagination.value.page = props.pagination.page
     sessionPagination.value.rowsNumber = data.count
@@ -320,17 +353,17 @@ function changePage(page) {
   fetchSessions({ pagination: { ...sessionPagination.value, page } })
 }
 
-function selectThing(org) {
-  if (selectedThing.value?.id === org.thing_id) {
+function selectThing(thing) {
+  if (selectedThing.value?.id === thing.thing_id) {
     selectedThing.value = null
     sessionRows.value = []
-    fetchOrganizations()
+    fetchThings()
     return
   }
-  selectedThing.value = { id: org.thing_id, name: org.thing_name }
+  selectedThing.value = { id: thing.thing_id, name: thing.thing_name }
   selectedDevice.value = null
   sessionPagination.value.page = 1
-  fetchOrganizations(org.thing_id)
+  fetchThings(thing.thing_id)
   fetchSessions({
     pagination: { ...sessionPagination.value, page: 1 }
   })
@@ -340,7 +373,7 @@ function selectDevice(device) {
   if (selectedDevice.value?.device_id === device.device_id) {
     selectedDevice.value = null
     sessionRows.value = []
-    fetchOrganizations()
+    fetchThings()
     return
   }
   selectedDevice.value = device
@@ -360,7 +393,7 @@ function clearDates() {
 
 watch([startDate, endDate], () => {
   const thingId = selectedThing.value?.id || null
-  fetchOrganizations(thingId)
+  fetchThings(thingId)
   if (selectedThing.value || selectedDevice.value) {
     sessionPagination.value.page = 1
     fetchSessions({
@@ -371,7 +404,7 @@ watch([startDate, endDate], () => {
 
 watch([realusageMin, realusageMax], () => {
   const thingId = selectedThing.value?.id || null
-  fetchOrganizations(thingId)
+  fetchThings(thingId)
   if (selectedThing.value || selectedDevice.value) {
     sessionPagination.value.page = 1
     fetchSessions({
@@ -386,7 +419,7 @@ onMounted(async () => {
     dbDateRange.value = range
     if (range.min_date) startDate.value = range.min_date
     if (range.max_date) endDate.value = range.max_date
-    await fetchOrganizations()
+    await fetchThings()
   } finally {
     loading.value = false
   }

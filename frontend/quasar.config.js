@@ -105,7 +105,8 @@ export default defineConfig(() => {
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
     framework: {
       config: {
-        dark: true
+        dark: true,
+        lang: 'pt-BR'
       },
 
       // iconSet: 'material-icons', // Quasar icon set

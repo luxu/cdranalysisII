@@ -106,24 +106,62 @@
           <div>
             <label
               class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-1 px-1"
-              >De</label
-            >
-            <input
-              type="date"
-              v-model="state.startDate"
-              class="w-full bg-[#090D16] border border-[#1E293B]/40 text-xs text-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:border-[#10B981]/50 transition [color-scheme:dark]"
-            />
+              >De
+            </label>
+            <div class="q-pa-md" style="max-width: 300px">
+              <q-input 
+                filled
+                readonly
+                :model-value="formatarDataBR(state.startDate)"
+                mask="##/##/####"
+              >
+                <template v-slot:append>
+                  <q-icon name="event" class="cursor-pointer">
+                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                      <q-date
+                        v-model="state.startDate"
+                        mask="YYYY-MM-DD"
+                        :locale="localeBR"
+                      >
+                        <div class="row items-center justify-end">
+                          <q-btn v-close-popup label="Close" color="primary" flat />
+                        </div>
+                      </q-date>
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+              </q-input>
+            </div>
           </div>
           <div>
             <label
               class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-1 px-1"
-              >Até</label
+              >
+              Até
+            </label>
+            <div class="q-pa-md" style="max-width: 300px">
+            <q-input 
+              filled
+              readonly
+              :model-value="formatarDataBR(state.endDate)"
             >
-            <input
-              type="date"
-              v-model="state.endDate"
-              class="w-full bg-[#090D16] border border-[#1E293B]/40 text-xs text-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:border-[#10B981]/50 transition [color-scheme:dark]"
-            />
+                <template v-slot:append>
+                  <q-icon name="event" class="cursor-pointer">
+                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                      <q-date
+                        v-model="state.endDate"
+                        mask="YYYY-MM-DD"
+                        :locale="localeBR"
+                      >
+                        <div class="row items-center justify-end">
+                          <q-btn v-close-popup label="Close" color="primary" flat />
+                        </div>
+                      </q-date>
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+              </q-input>
+            </div>
           </div>
           <button
             v-if="state.startDate || state.endDate"
@@ -198,6 +236,21 @@
 import { useRoute, useRouter } from 'vue-router'
 import useAuth from '@/composables/useAuth'
 import { useDashboardFilter } from '@/composables/useDashboardFilter'
+import { date } from 'quasar'
+
+const route = useRoute()
+const router = useRouter()
+const { logout, canAccessAdmin, user } = useAuth()
+const { state, clearDates } = useDashboardFilter()
+
+const localeBR = {
+  days: ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
+  daysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+  months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+  monthsShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+  firstDayOfWeek: 0, // 0 para Domingo, 1 para Segunda-feira
+  pluralDay: 'dias'
+}
 
 defineProps({
   alertCount: {
@@ -206,10 +259,12 @@ defineProps({
   }
 })
 
-const route = useRoute()
-const router = useRouter()
-const { logout, canAccessAdmin, user } = useAuth()
-const { state, clearDates } = useDashboardFilter()
+const formatarDataBR = (val) => {
+  if (!val) return ''
+  // Converte YYYY-MM-DD para DD/MM/YYYY para exibição
+  return date.formatDate(val, 'DD/MM/YYYY')
+}
+
 
 function handleLogout() {
   logout()
