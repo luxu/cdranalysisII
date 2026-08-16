@@ -56,96 +56,6 @@
     </section>
     <!-- fim Gráfico Top 10 Chips por Consumo -->
 
-    <!-- Filtros -->
-    <div class="flex items-center gap-3 flex-wrap">
-      <div class="q-pa-md" style="max-width: 300px">
-        <q-input
-          filled
-          readonly
-          :model-value="formatDate(state.startDate)"
-          mask="##/##/####"
-        >
-          <template v-slot:append>
-            <q-icon name="event" class="cursor-pointer">
-              <q-popup-proxy
-                cover
-                transition-show="scale"
-                transition-hide="scale"
-              >
-                <q-date
-                  v-model="state.startDate"
-                  mask="YYYY-MM-DD"
-                  :locale="localeBR"
-                >
-                  <div class="row items-center justify-end">
-                    <q-btn v-close-popup label="Close" color="primary" flat />
-                  </div>
-                </q-date>
-              </q-popup-proxy>
-            </q-icon>
-          </template>
-        </q-input>
-      </div>
-
-      <div class="q-pa-md" style="max-width: 300px">
-        <q-input
-          filled
-          readonly
-          :model-value="formatDate(state.endDate)"
-          mask="##/##/####"
-        >
-          <template v-slot:append>
-            <q-icon name="event" class="cursor-pointer">
-              <q-popup-proxy
-                cover
-                transition-show="scale"
-                transition-hide="scale"
-              >
-                <q-date
-                  v-model="state.endDate"
-                  mask="YYYY-MM-DD"
-                  :locale="localeBR"
-                >
-                  <div class="row items-center justify-end">
-                    <q-btn v-close-popup label="Close" color="primary" flat />
-                  </div>
-                </q-date>
-              </q-popup-proxy>
-            </q-icon>
-          </template>
-        </q-input>
-      </div>
-
-      <q-input
-        v-model="state.realusageMin"
-        dense
-        outlined
-        type="number"
-        label="Uso mín"
-        class="w-[120px]"
-        debounce="300"
-      />
-      <q-input
-        v-model="state.realusageMax"
-        dense
-        outlined
-        type="number"
-        label="Uso máx"
-        class="w-[120px]"
-        debounce="300"
-      />
-      <q-btn
-        flat
-        dense
-        color="grey"
-        label="Limpar"
-        icon="clear_all"
-        class="shrink-0 whitespace-nowrap"
-        @click="clearDates"
-      />
-    </div>
-    <!-- fim dos Filtros -->
-
     <!-- Cards dos Things(CLIENTES) -->
     <section class="flex gap-4 overflow-x-auto pb-2">
       <div
@@ -268,61 +178,10 @@ const selectedDevice = ref(null)
 const sessionRows = ref([])
 const sessionLoading = ref(false)
 
-const localeBR = {
-  days: [
-    'Domingo',
-    'Segunda-feira',
-    'Terça-feira',
-    'Quarta-feira',
-    'Quinta-feira',
-    'Sexta-feira',
-    'Sábado'
-  ],
-  daysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
-  months: [
-    'Janeiro',
-    'Fevereiro',
-    'Março',
-    'Abril',
-    'Maio',
-    'Junho',
-    'Julho',
-    'Agosto',
-    'Setembro',
-    'Outubro',
-    'Novembro',
-    'Dezembro'
-  ],
-  monthsShort: [
-    'Jan',
-    'Fev',
-    'Mar',
-    'Abr',
-    'Mai',
-    'Jun',
-    'Jul',
-    'Ago',
-    'Set',
-    'Out',
-    'Nov',
-    'Dez'
-  ],
-  firstDayOfWeek: 0, // 0 para Domingo, 1 para Segunda-feira
-  pluralDay: 'dias'
-}
-
 function formatDate(dateStr) {
   if (!dateStr) return ''
   const [y, m, d] = dateStr.split('-')
   return `${d}/${m}/${y}`
-}
-
-function today() {
-  const now = new Date()
-  const y = now.getFullYear()
-  const m = String(now.getMonth() + 1).padStart(2, '0')
-  const d = String(now.getDate()).padStart(2, '0')
-  return `${y}-${m}-${d}`
 }
 
 const totalPages = computed(() =>
@@ -423,13 +282,6 @@ function selectDevice(device) {
   fetchSessions({
     pagination: { ...sessionPagination.value, page: 1 }
   })
-}
-
-function clearDates() {
-  state.startDate = dbDateRange.value.min_date || today()
-  state.endDate = dbDateRange.value.max_date || today()
-  state.realusageMin = ''
-  state.realusageMax = ''
 }
 
 watch(
