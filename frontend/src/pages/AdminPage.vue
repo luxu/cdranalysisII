@@ -180,7 +180,8 @@ const sessionLoading = ref(false)
 
 function formatDate(dateStr) {
   if (!dateStr) return ''
-  const [y, m, d] = dateStr.split('-')
+  const datePart = dateStr.split('T')[0]
+  const [y, m, d] = datePart.split('-')
   return `${d}/${m}/${y}`
 }
 
