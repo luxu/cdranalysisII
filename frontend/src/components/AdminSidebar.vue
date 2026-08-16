@@ -1,44 +1,86 @@
 <template>
   <aside
-    class="w-64 bg-[#0D1321] border-r border-[#1E293B]/40 flex flex-col justify-between p-5 shrink-0"
+    :class="[
+      'bg-[#0D1321] border-r border-[#1E293B]/40 flex flex-col shrink-0 transition-all duration-300 overflow-hidden',
+      collapsed ? 'w-16 py-4 px-2' : 'w-64 p-5'
+    ]"
   >
-    <div class="space-y-8">
-      <div class="text-center q-pa-md q-gutter-x-sm">
+    <div :class="collapsed ? 'space-y-3' : 'space-y-8'">
+      <div class="flex justify-center">
         <q-img
-        src="@/assets/logo_solis.jpg"
-        class="q-mb-md"
-        spinner-color="white"
-        style="width: 80px"
-        mix-blend-mode: screen
+          src="@/assets/logo_solis.jpg"
+          spinner-color="white"
+          :style="collapsed ? 'width: 36px' : 'width: 80px'"
+          mix-blend-mode="screen"
         />
       </div>
 
       <nav class="space-y-1">
-        <RouterLink
-          to="/admin"
-          class="flex items-center space-x-3 px-4 py-2.5 rounded-xl font-medium text-xs transition"
-          :class="
-            isActive('/admin')
-              ? 'bg-[#1E293B]/50 text-white'
-              : 'text-slate-400 hover:bg-[#1E293B]/20 hover:text-slate-200'
-          "
-        >
-          <svg
-            class="w-4 h-4"
-            :class="isActive('/admin') ? 'text-[#10B981]' : ''"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
+        <div class="flex items-center">
+          <RouterLink
+            to="/admin"
+            :class="[
+              'flex-1 flex items-center rounded-xl font-medium text-xs transition',
+              collapsed
+                ? 'justify-center px-0 py-2.5'
+                : 'space-x-3 px-4 py-2.5',
+              isActive('/admin')
+                ? 'bg-[#1E293B]/50 text-white'
+                : 'text-slate-400 hover:bg-[#1E293B]/20 hover:text-slate-200'
+            ]"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-            />
-          </svg>
-          <span>Dashboard</span>
-        </RouterLink>
+            <svg
+              class="w-4 h-4 shrink-0"
+              :class="isActive('/admin') ? 'text-[#10B981]' : ''"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+              />
+            </svg>
+            <span v-if="!collapsed">Dashboard</span>
+            <q-tooltip
+              v-if="collapsed"
+              anchor="center right"
+              self="center left"
+            >
+              Dashboard
+            </q-tooltip>
+          </RouterLink>
+          <button
+            class="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:bg-[#1E293B]/20 hover:text-slate-200 transition"
+            @click="collapsed = !collapsed"
+          >
+            <svg
+              class="w-4 h-4 transition-transform duration-300"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                v-if="collapsed"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13 5l7 7-7 7M5 5l7 7-7 7"
+              />
+              <path
+                v-else
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
+              />
+            </svg>
+            <q-tooltip anchor="center right" self="center left">
+              {{ collapsed ? 'Expandir' : 'Recolher' }}
+            </q-tooltip>
+          </button>
+        </div>
 
         <div class="border-t border-[#1E293B]/40 my-2" />
 
@@ -46,15 +88,16 @@
           v-for="item in menuItems"
           :key="item.to"
           :to="item.to"
-          class="flex items-center space-x-3 px-4 py-2.5 rounded-xl font-medium text-xs transition"
-          :class="
+          :class="[
+            'flex items-center rounded-xl font-medium text-xs transition',
+            collapsed ? 'justify-center px-0 py-2.5' : 'space-x-3 px-4 py-2.5',
             isActive(item.to)
               ? 'bg-[#1E293B]/50 text-white'
               : 'text-slate-400 hover:bg-[#1E293B]/20 hover:text-slate-200'
-          "
+          ]"
         >
           <svg
-            class="w-4 h-4"
+            class="w-4 h-4 shrink-0"
             :class="isActive(item.to) ? 'text-[#10B981]' : ''"
             fill="none"
             stroke="currentColor"
@@ -67,7 +110,10 @@
               :d="item.icon"
             />
           </svg>
-          <span>{{ item.label }}</span>
+          <span v-if="!collapsed">{{ item.label }}</span>
+          <q-tooltip v-if="collapsed" anchor="center right" self="center left">
+            {{ item.label }}
+          </q-tooltip>
         </RouterLink>
 
         <div class="border-t border-[#1E293B]/40 my-2" />
@@ -76,15 +122,16 @@
           v-for="item in toolItems"
           :key="item.to"
           :to="item.to"
-          class="flex items-center space-x-3 px-4 py-2.5 rounded-xl font-medium text-xs transition"
-          :class="
+          :class="[
+            'flex items-center rounded-xl font-medium text-xs transition',
+            collapsed ? 'justify-center px-0 py-2.5' : 'space-x-3 px-4 py-2.5',
             isActive(item.to)
               ? 'bg-[#1E293B]/50 text-white'
               : 'text-slate-400 hover:bg-[#1E293B]/20 hover:text-slate-200'
-          "
+          ]"
         >
           <svg
-            class="w-4 h-4"
+            class="w-4 h-4 shrink-0"
             :class="isActive(item.to) ? 'text-[#10B981]' : ''"
             fill="none"
             stroke="currentColor"
@@ -97,96 +144,118 @@
               :d="item.icon"
             />
           </svg>
-          <span>{{ item.label }}</span>
+          <span v-if="!collapsed">{{ item.label }}</span>
+          <q-tooltip v-if="collapsed" anchor="center right" self="center left">
+            {{ item.label }}
+          </q-tooltip>
         </RouterLink>
 
-        <div class="space-y-2">
-          <div>
-            <label
-              class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-1 px-1"
-              >De
-            </label>
-            <div class="q-pa-md" style="max-width: 300px">
-              <q-input 
-                filled
-                readonly
-                :model-value="formatarDataBR(startDate)"
-                mask="##/##/####"
-              >
-                <template v-slot:append>
-                  <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-date
-                        v-model="startDate"
-                        mask="YYYY-MM-DD"
-                        :locale="localeBR"
+        <template v-if="!collapsed">
+          <div class="space-y-2">
+            <div>
+              <label
+                class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-1 px-1"
+                >De
+              </label>
+              <div class="q-pa-md" style="max-width: 300px">
+                <q-input
+                  filled
+                  readonly
+                  :model-value="formatarDataBR(startDate)"
+                  mask="##/##/####"
+                >
+                  <template v-slot:append>
+                    <q-icon name="event" class="cursor-pointer">
+                      <q-popup-proxy
+                        cover
+                        transition-show="scale"
+                        transition-hide="scale"
                       >
-                        <div class="row items-center justify-end">
-                          <q-btn v-close-popup label="Close" color="primary" flat />
-                        </div>
-                      </q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
+                        <q-date
+                          v-model="startDate"
+                          mask="YYYY-MM-DD"
+                          :locale="localeBR"
+                        >
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-date>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </div>
             </div>
-          </div>
-          <div>
-            <label
-              class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-1 px-1"
+            <div>
+              <label
+                class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-1 px-1"
               >
-              Até
-            </label>
-            <div class="q-pa-md" style="max-width: 300px">
-            <q-input 
-              filled
-              readonly
-              :model-value="formatarDataBR(endDate)"
-            >
-                <template v-slot:append>
-                  <q-icon name="event" class="cursor-pointer">
-                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                      <q-date
-                        v-model="endDate"
-                        mask="YYYY-MM-DD"
-                        :locale="localeBR"
+                Até
+              </label>
+              <div class="q-pa-md" style="max-width: 300px">
+                <q-input filled readonly :model-value="formatarDataBR(endDate)">
+                  <template v-slot:append>
+                    <q-icon name="event" class="cursor-pointer">
+                      <q-popup-proxy
+                        cover
+                        transition-show="scale"
+                        transition-hide="scale"
                       >
-                        <div class="row items-center justify-end">
-                          <q-btn v-close-popup label="Close" color="primary" flat />
-                        </div>
-                      </q-date>
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
+                        <q-date
+                          v-model="endDate"
+                          mask="YYYY-MM-DD"
+                          :locale="localeBR"
+                        >
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-date>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </div>
             </div>
+            <q-btn
+              flat
+              dense
+              color="grey"
+              label="Limpar"
+              icon="clear_all"
+              class="shrink-0 whitespace-nowrap"
+              @click="clearDates"
+            />
           </div>
-          <q-btn
-            flat
-            dense
-            color="grey"
-            label="Limpar"
-            icon="clear_all"
-            class="shrink-0 whitespace-nowrap"
-            @click="clearDates"
-          />
-      </div>
 
-        <div class="px-4 py-2">
-          <p class="text-[10px] text-slate-500 uppercase tracking-wider"
-            >Logado como</p
-          >
-          <p class="text-xs text-white font-medium truncate">{{
-            user?.name || user?.email
-          }}</p>
-        </div>
+          <div class="px-4 py-2">
+            <p class="text-[10px] text-slate-500 uppercase tracking-wider"
+              >Logado como</p
+            >
+            <p class="text-xs text-white font-medium truncate">{{
+              user?.name || user?.email
+            }}</p>
+          </div>
+        </template>
 
         <button
-          class="flex items-center space-x-3 w-full px-4 py-2.5 rounded-xl font-medium text-xs transition text-slate-400 hover:bg-[#1E293B]/20 hover:text-slate-200"
+          :class="[
+            'flex items-center w-full rounded-xl font-medium text-xs transition text-slate-400 hover:bg-[#1E293B]/20 hover:text-slate-200',
+            collapsed ? 'justify-center px-0 py-2.5' : 'space-x-3 px-4 py-2.5'
+          ]"
           @click="handleLogout"
         >
           <svg
-            class="w-4 h-4"
+            class="w-4 h-4 shrink-0"
             fill="none"
             stroke="currentColor"
             stroke-width="2"
@@ -198,7 +267,10 @@
               d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
             />
           </svg>
-          <span>Sair</span>
+          <span v-if="!collapsed">Sair</span>
+          <q-tooltip v-if="collapsed" anchor="center right" self="center left">
+            Sair
+          </q-tooltip>
         </button>
       </nav>
     </div>
@@ -222,26 +294,59 @@ const selectedThing = ref(null)
 const selectedDevice = ref(null)
 const realusageMin = ref('')
 const realusageMax = ref('')
+const collapsed = ref(false)
 
 const route = useRoute()
 const router = useRouter()
 const { logout, user } = useAuth()
 
 const localeBR = {
-  days: ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
+  days: [
+    'Domingo',
+    'Segunda-feira',
+    'Terça-feira',
+    'Quarta-feira',
+    'Quinta-feira',
+    'Sexta-feira',
+    'Sábado'
+  ],
   daysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
-  months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-  monthsShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-  firstDayOfWeek: 0, // 0 para Domingo, 1 para Segunda-feira
+  months: [
+    'Janeiro',
+    'Fevereiro',
+    'Março',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro'
+  ],
+  monthsShort: [
+    'Jan',
+    'Fev',
+    'Mar',
+    'Abr',
+    'Mai',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Set',
+    'Out',
+    'Nov',
+    'Dez'
+  ],
+  firstDayOfWeek: 0,
   pluralDay: 'dias'
 }
 
-const formatarDataBR = (val) => {
+const formatarDataBR = val => {
   if (!val) return ''
   return date.formatDate(val, 'DD/MM/YYYY')
 }
-
-
 
 function clearDates() {
   startDate.value = dbDateRange.value.min_date || today()
@@ -295,5 +400,4 @@ onMounted(async () => {
     loading.value = false
   }
 })
-
 </script>
