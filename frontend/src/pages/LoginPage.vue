@@ -5,7 +5,7 @@
         <q-card class="q-pa-lg" style="width: 400px">
           <q-card-section class="text-center q-mb-md">
             <img
-              src="@/assets/logo_solis.jfif"
+              src="@/assets/logo_solis.jpg"
               alt="Logo"
               class="q-mb-md"
               style="width: 100px"
