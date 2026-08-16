@@ -282,7 +282,6 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import useAuth from '@/composables/useAuth'
 import sessionService from '@/services/session'
-import { date } from 'quasar'
 
 const loading = ref(true)
 const things = ref([])
@@ -345,7 +344,16 @@ const localeBR = {
 
 const formatarDataBR = val => {
   if (!val) return ''
-  return date.formatDate(val, 'DD/MM/YYYY')
+  const [y, m, d] = val.split('-')
+  return `${d}/${m}/${y}`
+}
+
+function today() {
+  const now = new Date()
+  const y = now.getFullYear()
+  const m = String(now.getMonth() + 1).padStart(2, '0')
+  const d = String(now.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
 }
 
 function clearDates() {

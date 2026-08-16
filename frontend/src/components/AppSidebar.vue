@@ -254,7 +254,6 @@
 import { useRoute, useRouter } from 'vue-router'
 import useAuth from '@/composables/useAuth'
 import { useDashboardFilter } from '@/composables/useDashboardFilter'
-import { date } from 'quasar'
 
 const route = useRoute()
 const router = useRouter()
@@ -313,8 +312,8 @@ defineProps({
 
 const formatarDataBR = val => {
   if (!val) return ''
-  // Converte YYYY-MM-DD para DD/MM/YYYY para exibição
-  return date.formatDate(val, 'DD/MM/YYYY')
+  const [y, m, d] = val.split('-')
+  return `${d}/${m}/${y}`
 }
 
 function handleLogout() {

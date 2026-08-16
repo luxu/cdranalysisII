@@ -45,10 +45,12 @@ export function useDashboardFilter() {
 
   function setDefaultDates() {
     const now = new Date()
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-    state.startDate = firstDay.toISOString().split('T')[0]
-    state.endDate = lastDay.toISOString().split('T')[0]
+    const y = now.getFullYear()
+    const m = now.getMonth()
+    const lastDay = new Date(y, m + 1, 0)
+    const mm = String(m + 1).padStart(2, '0')
+    state.startDate = `${y}-${mm}-01`
+    state.endDate = `${y}-${mm}-${String(lastDay.getDate()).padStart(2, '0')}`
   }
 
   return {
