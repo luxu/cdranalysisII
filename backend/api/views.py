@@ -363,8 +363,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
             profile = self.get_queryset().get(user=request.user)
         except Profile.DoesNotExist:
             return Response(
-                {'error': 'Perfil não encontrado'},
-                status=status.HTTP_404_NOT_FOUND,
+                {
+                    'error': 'Perfil não encontrado',
+                },
             )
         serializer = self.get_serializer(profile)
         return Response(serializer.data)

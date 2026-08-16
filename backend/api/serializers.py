@@ -176,6 +176,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     user_email = serializers.EmailField(source='user.email', read_only=True)
+    user_staff = serializers.BooleanField(source='user.is_staff', read_only=True)
     thing_name = serializers.CharField(source='thing.thingsgroupname', read_only=True)
     qtd_devices_com_sessao = serializers.IntegerField(read_only=True)
     email = serializers.EmailField(write_only=True, required=False)
@@ -184,10 +185,9 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = [
-            'id', 'user', 'user_email', 'email', 'password',
+            'id', 'user', 'user_email', 'user_staff', 'email', 'password',
             'name', 'celular', 'thing', 'thing_name',
-            'qtd_devices_com_sessao',
-            'status', 'created_at', 'modified_at',
+            'qtd_devices_com_sessao'
         ]
         read_only_fields = ['id', 'user', 'qtd_devices_com_sessao', 'created_at', 'modified_at']
 
