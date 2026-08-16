@@ -126,8 +126,6 @@ class ThingViewSet(viewsets.ModelViewSet):
 
 
 class DeviceViewSet(viewsets.ModelViewSet):
-    page_size = 10
-    page_size_query_param = 'page_size'  # <--- Habilita a leitura do 'page_size' da requisição
     queryset = Device.objects.select_related('thing').all()
     serializer_class = DeviceSerializer
 
@@ -174,8 +172,6 @@ class DeviceViewSet(viewsets.ModelViewSet):
 
 
 class SessionViewSet(OwnerFilteredMixin, viewsets.ModelViewSet):
-    page_size = 10
-    page_size_query_param = 'page_size'  # <--- Habilita a leitura do 'page_size' da requisição
     queryset = Session.objects.select_related('device').all()
     serializer_class = SessionSerializer
     owner_filter_field = 'device__thing_id'
