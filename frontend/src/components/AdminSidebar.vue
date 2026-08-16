@@ -1,7 +1,7 @@
 <template>
   <aside
     :class="[
-      'bg-[#0D1321] border-r border-[#1E293B]/40 flex flex-col shrink-0 transition-all duration-300 overflow-hidden',
+      'bg-[#0D1321] border-r border-[#1E293B]/40 flex flex-col shrink-0 transition-all duration-300',
       collapsed ? 'w-16 py-4 px-2' : 'w-64 p-5'
     ]"
   >
@@ -161,7 +161,7 @@
                 <q-input
                   filled
                   readonly
-                  :model-value="formatarDataBR(startDate)"
+                  :model-value="formatarDataBR(state.startDate)"
                   mask="##/##/####"
                 >
                   <template v-slot:append>
@@ -172,7 +172,7 @@
                         transition-hide="scale"
                       >
                         <q-date
-                          v-model="startDate"
+                          v-model="state.startDate"
                           mask="YYYY-MM-DD"
                           :locale="localeBR"
                         >
@@ -198,7 +198,11 @@
                 Até
               </label>
               <div class="q-pa-md" style="max-width: 300px">
-                <q-input filled readonly :model-value="formatarDataBR(endDate)">
+                <q-input
+                  filled
+                  readonly
+                  :model-value="formatarDataBR(state.endDate)"
+                >
                   <template v-slot:append>
                     <q-icon name="event" class="cursor-pointer">
                       <q-popup-proxy
@@ -207,7 +211,7 @@
                         transition-hide="scale"
                       >
                         <q-date
-                          v-model="endDate"
+                          v-model="state.endDate"
                           mask="YYYY-MM-DD"
                           :locale="localeBR"
                         >
@@ -235,6 +239,26 @@
               class="shrink-0 whitespace-nowrap"
               @click="clearDates"
             />
+            <div class="flex gap-2">
+              <q-input
+                v-model="state.realusageMin"
+                dense
+                outlined
+                type="number"
+                label="Uso mín"
+                class="flex-1"
+                debounce="300"
+              />
+              <q-input
+                v-model="state.realusageMax"
+                dense
+                outlined
+                type="number"
+                label="Uso máx"
+                class="flex-1"
+                debounce="300"
+              />
+            </div>
           </div>
 
           <div class="px-4 py-2">
@@ -282,17 +306,16 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import useAuth from '@/composables/useAuth'
 import sessionService from '@/services/session'
+import { useDashboardFilter } from '@/composables/useDashboardFilter'
+
+const { state, clearDates: clearFilterDates } = useDashboardFilter()
 
 const loading = ref(true)
 const things = ref([])
-const startDate = ref()
-const endDate = ref()
 const topDevices = ref([])
 const dbDateRange = ref({ min_date: null, max_date: null })
 const selectedThing = ref(null)
 const selectedDevice = ref(null)
-const realusageMin = ref('')
-const realusageMax = ref('')
 const collapsed = ref(false)
 
 const route = useRoute()
@@ -357,10 +380,10 @@ function today() {
 }
 
 function clearDates() {
-  startDate.value = dbDateRange.value.min_date || today()
-  endDate.value = dbDateRange.value.max_date || today()
-  realusageMin.value = ''
-  realusageMax.value = ''
+  state.startDate = dbDateRange.value.min_date || today()
+  state.endDate = dbDateRange.value.max_date || today()
+  state.realusageMin = ''
+  state.realusageMax = ''
 }
 
 function handleLogout() {
@@ -402,8 +425,8 @@ onMounted(async () => {
   try {
     const range = await sessionService.dateRange()
     dbDateRange.value = range
-    if (range.min_date) startDate.value = range.min_date
-    if (range.max_date) endDate.value = range.max_date
+    if (range.min_date) state.startDate = range.min_date
+    if (range.max_date) state.endDate = range.max_date
   } finally {
     loading.value = false
   }

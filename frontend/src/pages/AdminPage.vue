@@ -62,7 +62,7 @@
         <q-input
           filled
           readonly
-          :model-value="formatDate(startDate)"
+          :model-value="formatDate(state.startDate)"
           mask="##/##/####"
         >
           <template v-slot:append>
@@ -73,7 +73,7 @@
                 transition-hide="scale"
               >
                 <q-date
-                  v-model="startDate"
+                  v-model="state.startDate"
                   mask="YYYY-MM-DD"
                   :locale="localeBR"
                 >
@@ -91,7 +91,7 @@
         <q-input
           filled
           readonly
-          :model-value="formatDate(endDate)"
+          :model-value="formatDate(state.endDate)"
           mask="##/##/####"
         >
           <template v-slot:append>
@@ -101,7 +101,11 @@
                 transition-show="scale"
                 transition-hide="scale"
               >
-                <q-date v-model="endDate" mask="YYYY-MM-DD" :locale="localeBR">
+                <q-date
+                  v-model="state.endDate"
+                  mask="YYYY-MM-DD"
+                  :locale="localeBR"
+                >
                   <div class="row items-center justify-end">
                     <q-btn v-close-popup label="Close" color="primary" flat />
                   </div>
@@ -113,7 +117,7 @@
       </div>
 
       <q-input
-        v-model="realusageMin"
+        v-model="state.realusageMin"
         dense
         outlined
         type="number"
@@ -122,7 +126,7 @@
         debounce="300"
       />
       <q-input
-        v-model="realusageMax"
+        v-model="state.realusageMax"
         dense
         outlined
         type="number"
@@ -250,17 +254,16 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { sessionColumns, sessionPagination } from './tableAdmin'
 import sessionService from '@/services/session'
 import { formatNumber } from '@/utils/format'
+import { useDashboardFilter } from '@/composables/useDashboardFilter'
+
+const { state } = useDashboardFilter()
 
 const loading = ref(true)
 const things = ref([])
-const startDate = ref(today())
-const endDate = ref(today())
 const topDevices = ref([])
 const dbDateRange = ref({ min_date: null, max_date: null })
 const selectedThing = ref(null)
 const selectedDevice = ref(null)
-const realusageMin = ref('')
-const realusageMax = ref('')
 
 const sessionRows = ref([])
 const sessionLoading = ref(false)
@@ -334,10 +337,10 @@ const sortedThings = computed(() =>
 
 async function fetchThings(thingId = null) {
   const params = {}
-  if (startDate.value) params.start_date = startDate.value
-  if (endDate.value) params.end_date = endDate.value
-  if (realusageMin.value) params.realusage_min = realusageMin.value
-  if (realusageMax.value) params.realusage_max = realusageMax.value
+  if (state.startDate) params.start_date = state.startDate
+  if (state.endDate) params.end_date = state.endDate
+  if (state.realusageMin) params.realusage_min = state.realusageMin
+  if (state.realusageMax) params.realusage_max = state.realusageMax
   if (thingId) params.device__thing = thingId
   const [clientes, devices] = await Promise.all([
     sessionService.summaryByThing(params),
@@ -365,10 +368,10 @@ async function fetchSessions(props) {
     } else if (selectedThing.value) {
       params.device__thing = selectedThing.value.id
     }
-    if (startDate.value) params.start_date = startDate.value
-    if (endDate.value) params.end_date = endDate.value
-    if (realusageMin.value) params.realusage_min = realusageMin.value
-    if (realusageMax.value) params.realusage_max = realusageMax.value
+    if (state.startDate) params.start_date = state.startDate
+    if (state.endDate) params.end_date = state.endDate
+    if (state.realusageMin) params.realusage_min = state.realusageMin
+    if (state.realusageMax) params.realusage_max = state.realusageMax
 
     const sortBy = props.pagination.sortBy
     const descending = props.pagination.descending
@@ -423,40 +426,46 @@ function selectDevice(device) {
 }
 
 function clearDates() {
-  startDate.value = dbDateRange.value.min_date || today()
-  endDate.value = dbDateRange.value.max_date || today()
-  realusageMin.value = ''
-  realusageMax.value = ''
+  state.startDate = dbDateRange.value.min_date || today()
+  state.endDate = dbDateRange.value.max_date || today()
+  state.realusageMin = ''
+  state.realusageMax = ''
 }
 
-watch([startDate, endDate], () => {
-  const thingId = selectedThing.value?.id || null
-  fetchThings(thingId)
-  if (selectedThing.value || selectedDevice.value) {
-    sessionPagination.value.page = 1
-    fetchSessions({
-      pagination: { ...sessionPagination.value, page: 1 }
-    })
+watch(
+  () => [state.startDate, state.endDate],
+  () => {
+    const thingId = selectedThing.value?.id || null
+    fetchThings(thingId)
+    if (selectedThing.value || selectedDevice.value) {
+      sessionPagination.value.page = 1
+      fetchSessions({
+        pagination: { ...sessionPagination.value, page: 1 }
+      })
+    }
   }
-})
+)
 
-watch([realusageMin, realusageMax], () => {
-  const thingId = selectedThing.value?.id || null
-  fetchThings(thingId)
-  if (selectedThing.value || selectedDevice.value) {
-    sessionPagination.value.page = 1
-    fetchSessions({
-      pagination: { ...sessionPagination.value, page: 1 }
-    })
+watch(
+  () => [state.realusageMin, state.realusageMax],
+  () => {
+    const thingId = selectedThing.value?.id || null
+    fetchThings(thingId)
+    if (selectedThing.value || selectedDevice.value) {
+      sessionPagination.value.page = 1
+      fetchSessions({
+        pagination: { ...sessionPagination.value, page: 1 }
+      })
+    }
   }
-})
+)
 
 onMounted(async () => {
   try {
     const range = await sessionService.dateRange()
     dbDateRange.value = range
-    if (range.min_date) startDate.value = range.min_date
-    if (range.max_date) endDate.value = range.max_date
+    if (range.min_date) state.startDate = range.min_date
+    if (range.max_date) state.endDate = range.max_date
     await fetchThings()
   } finally {
     loading.value = false

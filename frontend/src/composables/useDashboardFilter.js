@@ -5,7 +5,9 @@ const state = reactive({
   statusAtivo: true,
   statusInativo: true,
   startDate: '',
-  endDate: ''
+  endDate: '',
+  realusageMin: '',
+  realusageMax: ''
 })
 
 export function useDashboardFilter() {
@@ -41,6 +43,8 @@ export function useDashboardFilter() {
   function clearDates() {
     state.startDate = ''
     state.endDate = ''
+    state.realusageMin = ''
+    state.realusageMax = ''
   }
 
   function setDefaultDates() {
