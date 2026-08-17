@@ -3,30 +3,13 @@
     class="w-64 bg-[#0D1321] border-r border-[#1E293B]/40 flex flex-col justify-between p-5 shrink-0"
   >
     <div class="space-y-6">
-      <div class="flex items-center space-x-3 px-2">
-        <div
-          class="bg-[#10B981]/10 text-[#10B981] p-2 rounded-xl border border-[#10B981]/20"
-        >
-          <svg
-            class="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 11-4 0 2 2 0 014 0z"
-            />
-          </svg>
-        </div>
-        <div>
-          <h2 class="text-sm font-bold text-white tracking-wide">SOLIS</h2>
-          <p class="text-[10px] text-slate-500 font-medium"
-            >Monitoramento Inteligente</p
-          >
-        </div>
+      <div class="flex justify-center px-2">
+        <q-img
+          src="@/assets/logo_solis.jpg"
+          spinner-color="white"
+          style="width: 80px"
+          mix-blend-mode="screen"
+        />
       </div>
 
       <nav class="space-y-1">
