@@ -138,7 +138,7 @@
           <div class="flex items-center justify-between mb-2">
             <div>
               <span
-                class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate block"
+                class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider truncate block"
                 >Consumo Total</span
               >
               <span
@@ -181,7 +181,7 @@
         class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-5 shadow-sm space-y-4"
       >
         <div class="flex items-center justify-between">
-          <h3 class="text-xs font-semibold text-white uppercase tracking-wider"
+          <h3 class="text-[7px] font-semibold text-white uppercase tracking-wider"
             >Consumo Mensal</h3
           >
           <span class="text-[10px] text-slate-500">últimos 6 meses</span>
@@ -252,6 +252,19 @@
               font-size="9"
             >
               {{ monthLabel(d.month) }}
+            </text>
+
+            <text
+              v-for="(d, i) in monthlyUsage"
+              :key="'v' + i"
+              :x="barX(i) + barW / 2"
+              :y="barY(d.total) - 6"
+              text-anchor="middle"
+              class="text-[7px] fill-white"
+              font-size="7"
+              font-weight="600"
+            >
+              {{ formatNumber(d.total) }}
             </text>
           </svg>
 
