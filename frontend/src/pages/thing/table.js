@@ -1,5 +1,3 @@
-import { ref } from 'vue'
-
 const columns = [
   {
     name: 'id',
