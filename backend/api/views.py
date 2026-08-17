@@ -283,6 +283,15 @@ class SessionViewSet(OwnerFilteredMixin, viewsets.ModelViewSet):
         ]
         return Response(data)
 
+    @action(detail=False, methods=['get'], url_path='count_by_uom')
+    def count_by_uom(self, request):
+        qs = self.get_queryset()
+        data = qs.values('uom').annotate(count=Count('id')).order_by('uom')
+        return Response([
+            {'uom': d['uom'], 'count': d['count']}
+            for d in data
+        ])
+
     @action(detail=False, methods=['get'], url_path='usage_by_month')
     def usage_by_month(self, request):
         qs = self.get_queryset()

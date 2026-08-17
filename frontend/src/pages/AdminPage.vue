@@ -100,9 +100,7 @@
                 : selectedThing.name
             }}
           </h3>
-          <span class="text-[11px] text-slate-500"
-            >{{ sessionPagination.rowsNumber }} sessões</span
-          >
+          <span class="text-[11px] text-slate-500">{{ uomLabel }}</span>
         </div>
         <q-table
           :pagination="sessionPagination"
@@ -177,6 +175,7 @@ const selectedDevice = ref(null)
 
 const sessionRows = ref([])
 const sessionLoading = ref(false)
+const sessionCountsByUom = ref([])
 
 function formatDate(dateStr) {
   if (!dateStr) return ''
@@ -195,6 +194,16 @@ const sortedThings = computed(() =>
   [...things.value].sort((a, b) => b.device_count - a.device_count)
 )
 
+const uomLabel = computed(() => {
+  if (!sessionCountsByUom.value.length) return ''
+  return sessionCountsByUom.value
+    .map(item => {
+      const label = item.uom === 'bytes' ? 'sessões' : item.uom
+      return `${item.count} ${label}`
+    })
+    .join(' · ')
+})
+
 async function fetchThings(thingId = null) {
   const params = {}
   if (state.startDate) params.start_date = state.startDate
@@ -202,12 +211,14 @@ async function fetchThings(thingId = null) {
   if (state.realusageMin) params.realusage_min = state.realusageMin
   if (state.realusageMax) params.realusage_max = state.realusageMax
   if (thingId) params.device__thing = thingId
-  const [clientes, devices] = await Promise.all([
+  const [clientes, devices, uomCounts] = await Promise.all([
     sessionService.summaryByThing(params),
-    sessionService.topDevices(params)
+    sessionService.topDevices(params),
+    sessionService.countByUom(params)
   ])
   things.value = clientes
   topDevices.value = devices
+  sessionCountsByUom.value = uomCounts
 }
 
 function devicePercent(bytes) {

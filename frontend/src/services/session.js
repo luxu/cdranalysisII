@@ -30,6 +30,13 @@ const sessionService = {
       params
     })
     return data
+  },
+
+  async countByUom(params = {}) {
+    const { data } = await api.get(`${endpoints.session}count_by_uom/`, {
+      params
+    })
+    return data
   }
 }
 
