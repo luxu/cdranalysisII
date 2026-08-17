@@ -20,3 +20,9 @@ body,
   flex: 1 !important;
   padding: 0 !important;
 }
+
+@media (max-width: 639px) {
+  .q-layout > aside {
+    display: none !important;
+  }
+}

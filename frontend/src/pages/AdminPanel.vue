@@ -1,8 +1,8 @@
 <template>
-  <main class="flex-1 p-8 space-y-6 overflow-y-auto">
+  <main class="flex-1 p-4 sm:p-8 space-y-6 overflow-y-auto">
     <div v-if="loading" class="space-y-6">
       <div class="h-8 w-48 bg-slate-800 rounded animate-pulse" />
-      <section class="flex flex-row gap-4">
+      <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div
           v-for="i in 3"
           :key="i"
@@ -36,9 +36,11 @@
     </template>
 
     <template v-else>
-      <div class="flex items-center justify-between">
+      <div
+        class="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+      >
         <div>
-          <h1 class="text-2xl font-bold text-white tracking-tight">{{
+          <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">{{
             farmName
           }}</h1>
           <p class="text-xs text-slate-500 mt-1"
@@ -76,9 +78,9 @@
         </div>
       </div>
 
-      <section class="flex flex-row gap-4">
+      <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div
-          class="flex-1 bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-4 shadow-sm min-w-0"
+          class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-4 shadow-sm min-w-0"
         >
           <div class="flex items-center justify-between mb-2">
             <span
@@ -112,7 +114,7 @@
         </div>
 
         <div
-          class="flex-1 bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-4 shadow-sm min-w-0"
+          class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-4 shadow-sm min-w-0"
         >
           <div class="flex items-center justify-between mb-2">
             <div>
@@ -154,7 +156,7 @@
         </div>
 
         <div
-          class="flex-1 bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-4 shadow-sm min-w-0"
+          class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-4 shadow-sm min-w-0"
         >
           <div class="flex items-center justify-between mb-2">
             <div>

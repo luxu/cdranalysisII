@@ -2,7 +2,7 @@
   <q-layout>
     <q-page-container>
       <q-page class="flex flex-center bg-grey-3">
-        <q-card class="q-pa-lg" style="width: 400px">
+        <q-card class="q-pa-lg w-full max-w-[400px] mx-4">
           <q-card-section class="text-center q-mb-md">
             <img
               src="@/assets/logo_solis.jpg"

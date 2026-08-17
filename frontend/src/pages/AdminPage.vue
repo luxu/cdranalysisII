@@ -1,5 +1,5 @@
 <template>
-  <main class="flex-1 p-8 space-y-6 overflow-y-auto">
+  <main class="flex-1 p-4 sm:p-8 space-y-6 overflow-y-auto">
     <!-- Cabeçalho e Data dos dados -->
     <div class="flex items-center justify-between">
       <div>
@@ -16,7 +16,7 @@
     <!-- Gráfico Top 10 Chips por Consumo -->
     <section
       v-if="topDevices.length"
-      class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-5"
+      class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-5 overflow-x-auto"
     >
       <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4">
         Top 10 Chips por Consumo
