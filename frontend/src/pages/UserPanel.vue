@@ -181,10 +181,19 @@
         class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-5 shadow-sm space-y-4"
       >
         <div class="flex items-center justify-between mb-6">
-          <h4 class="text-[7px] font-semibold text-white uppercase tracking-wider"
+          <h4
+            class="text-[7px] font-semibold text-white uppercase tracking-wider"
             >Consumo Mensal</h4
           >
-          <span class="text-[10px] text-slate-500">últimos 12 meses</span>
+          <span
+            v-if="formatPeriod(state.startDate, state.endDate)"
+            class="text-[10px] text-slate-500"
+          >
+            {{ formatPeriod(state.startDate, state.endDate) }}
+          </span>
+          <span v-else class="text-[10px] text-slate-500"
+            >últimos 12 meses</span
+          >
         </div>
 
         <div v-if="chartLoading" class="h-52 flex items-center justify-center">
@@ -193,10 +202,7 @@
           />
         </div>
 
-        <div
-          v-else-if="monthlyUsage.length"
-          class="relative"
-        >
+        <div v-else-if="monthlyUsage.length" class="relative">
           <svg
             class="w-full"
             viewBox="0 0 600 240"
@@ -416,7 +422,7 @@ async function fetchSessionStats() {
 async function fetchChartData() {
   chartLoading.value = true
   try {
-    const params = thingId.value ? { device__thing: thingId.value } : {}
+    const params = thingId.value ? buildSessionParams(thingId.value) : {}
     const usageRes = await sessionService.usageByMonth(params)
     monthlyUsage.value = usageRes.filter(d => d.month).slice(-12)
   } catch {
@@ -446,6 +452,7 @@ watch(
   () => [state.startDate, state.endDate],
   () => {
     fetchSessionStats()
+    fetchChartData()
   },
   { deep: true, debounce: 300 }
 )
