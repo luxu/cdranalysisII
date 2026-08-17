@@ -180,9 +180,9 @@
       <section
         class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-5 shadow-sm space-y-4"
       >
-        <div class="flex items-center justify-between">
-          <h3 class="text-[7px] font-semibold text-white uppercase tracking-wider"
-            >Consumo Mensal</h3
+        <div class="flex items-center justify-between mb-6">
+          <h4 class="text-[7px] font-semibold text-white uppercase tracking-wider"
+            >Consumo Mensal</h4
           >
           <span class="text-[10px] text-slate-500">últimos 6 meses</span>
         </div>
@@ -196,7 +196,6 @@
         <div
           v-else-if="monthlyUsage.length"
           class="relative"
-          @mouseleave="hoveredIndex = null"
         >
           <svg
             class="w-full"
@@ -237,9 +236,6 @@
               :height="200 - barY(d.total)"
               rx="4"
               fill="url(#barGrad)"
-              class="transition-all duration-300 cursor-pointer"
-              :opacity="hoveredIndex === null || hoveredIndex === i ? 1 : 0.5"
-              @mouseenter="hoveredIndex = i"
             />
 
             <text
@@ -258,7 +254,7 @@
               v-for="(d, i) in monthlyUsage"
               :key="'v' + i"
               :x="barX(i) + barW / 2"
-              :y="barY(d.total) - 6"
+              :y="barY(d.total) - 5"
               text-anchor="middle"
               class="text-[7px] fill-white"
               font-size="7"
@@ -267,19 +263,6 @@
               {{ formatNumber(d.total) }}
             </text>
           </svg>
-
-          <div
-            v-if="hoveredIndex !== null"
-            class="absolute bg-[#1E293B] border border-[#334155] rounded-lg px-3 py-2 shadow-lg pointer-events-none z-10"
-            :style="tooltipStyle"
-          >
-            <p class="text-[10px] text-slate-400 mb-0.5">
-              {{ monthFullLabel(monthlyUsage[hoveredIndex].month) }}
-            </p>
-            <p class="text-xs font-semibold text-white">
-              {{ formatNumber(monthlyUsage[hoveredIndex].total) }}
-            </p>
-          </div>
         </div>
 
         <div v-else class="h-52 flex items-center justify-center">
@@ -320,7 +303,6 @@ const stats = reactive({
 })
 
 const monthlyUsage = ref([])
-const hoveredIndex = ref(null)
 
 const chartW = 600
 const chartH = 200
@@ -351,17 +333,6 @@ function barY(val) {
   const maxVal = Math.max(...monthlyUsage.value.map(d => d.total), 1)
   return padTop + innerH - (val / maxVal) * innerH
 }
-
-const tooltipStyle = computed(() => {
-  if (hoveredIndex.value === null) return {}
-  const x = barX(hoveredIndex.value) + barW.value / 2
-  const y = barY(monthlyUsage.value[hoveredIndex.value].total)
-  return {
-    left: `${(x / chartW) * 100}%`,
-    top: `${(y / chartH) * 100}%`,
-    transform: 'translate(-50%, -120%)'
-  }
-})
 
 const monthNames = {
   '01': 'Jan',
