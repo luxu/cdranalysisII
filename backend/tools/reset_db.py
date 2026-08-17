@@ -77,8 +77,6 @@ def resetar_projeto():
     # 4. Restaurando as Fixtures (Backup)
     print("\n📥 Restaurando dados das fixtures...")
 
-    # NOME_FIXTURE = "users_profiles_v2"
-    # fixture_path = BASE_DIR / "user" / "fixtures" / f"{NOME_FIXTURE}.json"
     NOME_FIXTURE = "base_data"
     fixture_path = BASE_DIR / "cdr" / "fixtures" / f"{NOME_FIXTURE}.json"
     fixture_restaurada = False
