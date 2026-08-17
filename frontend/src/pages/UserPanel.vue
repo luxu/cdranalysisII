@@ -184,7 +184,7 @@
           <h4 class="text-[7px] font-semibold text-white uppercase tracking-wider"
             >Consumo Mensal</h4
           >
-          <span class="text-[10px] text-slate-500">últimos 6 meses</span>
+          <span class="text-[10px] text-slate-500">últimos 12 meses</span>
         </div>
 
         <div v-if="chartLoading" class="h-52 flex items-center justify-center">
@@ -254,10 +254,10 @@
               v-for="(d, i) in monthlyUsage"
               :key="'v' + i"
               :x="barX(i) + barW / 2"
-              :y="barY(d.total) - 5"
+              :y="barY(d.total) - 4"
               text-anchor="middle"
-              class="text-[7px] fill-white"
-              font-size="7"
+              class="text-[5px] fill-white"
+              font-size="5"
               font-weight="600"
             >
               {{ formatNumber(d.total) }}
@@ -314,7 +314,7 @@ const innerH = chartH - padTop - padBottom
 
 const barW = computed(() => {
   const count = monthlyUsage.value.length
-  return count > 0 ? (innerW / count) * 0.6 : 0
+  return count > 0 ? (innerW / count) * 0.45 : 0
 })
 
 const gap = computed(() => {
@@ -418,7 +418,7 @@ async function fetchChartData() {
   try {
     const params = thingId.value ? { device__thing: thingId.value } : {}
     const usageRes = await sessionService.usageByMonth(params)
-    monthlyUsage.value = usageRes.filter(d => d.month).slice(-6)
+    monthlyUsage.value = usageRes.filter(d => d.month).slice(-12)
   } catch {
     monthlyUsage.value = []
   } finally {
