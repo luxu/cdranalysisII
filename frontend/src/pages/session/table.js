@@ -25,6 +25,11 @@ const columns = [
     label: 'Data Criação',
     align: 'left',
     field: val => val.sessioncreatetime,
+    format: val => {
+      if (!val) return ''
+      const d = new Date(val)
+      return d.toLocaleDateString('pt-BR')
+    },
     sortable: true
   },
   {
