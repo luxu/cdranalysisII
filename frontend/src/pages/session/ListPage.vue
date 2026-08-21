@@ -12,7 +12,7 @@
               v-model="search"
               dense
               outlined
-              placeholder="Buscar por Session ID, ICCID ou Cliente..."
+              placeholder="Buscar por Thing, Session ID, ICCID ou IMSI..."
               debounce="300"
               clearable
               @clear="applyFilters"
@@ -93,13 +93,7 @@
           {{ formatNumber(props.value) }}
         </q-td>
       </template>
-      <template v-slot:body-cell-status="props">
-        <q-td :props="props">
-          <q-badge :color="props.value ? 'positive' : 'negative'">
-            {{ props.value ? 'Sim' : 'Não' }}
-          </q-badge>
-        </q-td>
-      </template>
+
     </q-table>
   </q-page>
 </template>
