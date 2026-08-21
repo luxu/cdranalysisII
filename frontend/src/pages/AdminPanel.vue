@@ -432,7 +432,6 @@ async function fetchFilteredDevices() {
 
 async function fetchSessionStats() {
   const params = thingId.value ? buildSessionParams(thingId.value) : {}
-  console.log('AdminPanel.vue -> PARAMS..:', params)
   const [devicesRes, usageRes] = await Promise.all([
     sessionService.topDevices(params),
     sessionService.usageByMonth(params)

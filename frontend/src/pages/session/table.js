@@ -7,13 +7,6 @@ const columns = [
     sortable: true
   },
   {
-    name: 'imsi',
-    label: 'IMSI',
-    align: 'left',
-    field: val => val.imsi,
-    sortable: true
-  },
-  {
     name: 'iccid',
     label: 'ICCID',
     align: 'left',
@@ -46,13 +39,6 @@ const columns = [
     label: 'UOM',
     align: 'left',
     field: val => val.uom,
-    sortable: true
-  },
-  {
-    name: 'status',
-    label: 'Ativo',
-    align: 'center',
-    field: val => val.status,
     sortable: true
   }
 ]
