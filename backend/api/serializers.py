@@ -133,6 +133,9 @@ class SessionSerializer(serializers.ModelSerializer):
 
 class SessionListSerializer(serializers.ModelSerializer):
     iccid = serializers.CharField(source='device.iccid', read_only=True)
+    thing_name = serializers.CharField(
+        source='device.thing.thingsgroupname', read_only=True
+    )
 
     class Meta:
         model = Session
@@ -140,12 +143,13 @@ class SessionListSerializer(serializers.ModelSerializer):
             'id',
             'device',
             'iccid',
+            'thing_name',
             'sessionid',
             'sessioncreatetime',
             'realusage',
             'uom',
         ]
-        read_only_fields = ['id', 'iccid']
+        read_only_fields = ['id', 'iccid', 'thing_name']
 
 
 class LoginSerializer(serializers.Serializer):
