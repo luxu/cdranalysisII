@@ -20,8 +20,11 @@ export default function useCrudList(
     rowsNumber: 0
   })
 
+  const lastParams = ref({})
+
   const fetchRows = async (page = pagination.value.page, extraParams = {}) => {
     loading.value = true
+    lastParams.value = extraParams
     try {
       const params = {
         page,
@@ -32,7 +35,6 @@ export default function useCrudList(
         params.ordering = descending.value ? `-${sortBy.value}` : sortBy.value
       }
       const data = await service.list(params)
-      console.log('fetchRows:', data.results)
       rows.value = data.results
       pagination.value.page = page
       pagination.value.rowsNumber = data.count
@@ -52,9 +54,9 @@ export default function useCrudList(
     sortBy.value = newSortBy
     descending.value = newDescending
     if (sortChanged) {
-      fetchRows(1)
+      fetchRows(1, lastParams.value)
     } else {
-      fetchRows(props.pagination.page)
+      fetchRows(props.pagination.page, lastParams.value)
     }
   }
 
