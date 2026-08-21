@@ -15,6 +15,7 @@
               placeholder="Buscar por Thing, Session ID, ICCID ou IMSI..."
               debounce="300"
               clearable
+              @update:model-value="applyFilters"
               @clear="applyFilters"
             >
               <template v-slot:prepend>
