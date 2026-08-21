@@ -12,7 +12,7 @@
               v-model="search"
               dense
               outlined
-              placeholder="Buscar por Session ID, ISSID ou Cliente..."
+              placeholder="Buscar por Session ID, ICCID ou Cliente..."
               debounce="300"
               clearable
               @clear="applyFilters"
