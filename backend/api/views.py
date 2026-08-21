@@ -180,6 +180,15 @@ class SessionViewSet(OwnerFilteredMixin, viewsets.ModelViewSet):
         qs = super().get_queryset()
         qs = self._apply_owner_filter(qs)
 
+        search = self.request.query_params.get('search')
+        if search:
+            qs = qs.filter(
+                Q(sessionid__icontains=search)
+                | Q(device__imsi__icontains=search)
+                | Q(device__iccid__icontains=search)
+                | Q(device__thing__thingsgroupname__icontains=search)
+            )
+
         start_date = self.request.query_params.get('start_date')
         if start_date:
             qs = qs.filter(sessioncreatetime__date__gte=start_date)
