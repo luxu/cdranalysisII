@@ -3,11 +3,7 @@
     <div v-if="loading" class="space-y-6">
       <div class="h-8 w-48 bg-slate-800 rounded animate-pulse" />
       <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div
-          v-for="i in 3"
-          :key="i"
-          class="flex-1 bg-[#0D1321] border border-[#1E293B]/40 rounded-xl p-2.5 space-y-1.5 min-w-0"
-        >
+        <div v-for="i in 3" :key="i" class="flex-1 bg-[#0D1321] border border-[#1E293B]/40 rounded-xl p-2.5 space-y-1.5 min-w-0">
           <div class="h-2.5 w-16 bg-slate-800 rounded animate-pulse" />
           <div class="h-5 w-10 bg-slate-800 rounded animate-pulse" />
         </div>
@@ -17,18 +13,9 @@
     <template v-else-if="error">
       <div class="flex flex-col items-center justify-center py-20 text-center">
         <div class="bg-rose-500/10 text-rose-400 p-4 rounded-full mb-4">
-          <svg
-            class="w-8 h-8"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54-3.753 1.54-3.753 0-5.313l-6.928-12C5.86 4.087 5.86 4.087 4.3 6.375L1.464 9.5m16.5 0l-2.831 3.126M9 21h6"
-            />
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" >
+            <path stroke-linecap="round" stroke-linejoin="round" 
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54-3.753 1.54-3.753 0-5.313l-6.928-12C5.86 4.087 5.86 4.087 4.3 6.375L1.464 9.5m16.5 0l-2.831 3.126M9 21h6"/>
           </svg>
         </div>
         <p class="text-sm text-slate-400 max-w-xs">{{ error }}</p>
@@ -36,93 +23,51 @@
     </template>
 
     <template v-else>
-      <div
-        class="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-      >
+<!-- Título da página e descrição -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">{{
-            farmName
-          }}</h1>
+          <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">{{ farmName }}</h1>
           <p class="text-xs text-slate-500 mt-1">Visão geral do cliente</p>
         </div>
       </div>
+<!-- fim Título da página e descrição -->
 
+<!-- Cards de infos dos chips -->
       <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div
-          class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-3 sm:p-4 shadow-sm min-w-0"
-        >
+        <div class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-3 sm:p-4 shadow-sm min-w-0">
+  <!-- Card de Total de Chips -->
           <div class="flex items-center justify-between mb-2">
-            <span
-              class="text-[11px] sm:text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate"
-              >Total de chips</span
-            >
-            <div
-              class="bg-[#10B981]/10 text-[#10B981] p-1.5 rounded-lg border border-[#10B981]/20 shrink-0 ml-2"
-            >
-              <svg
-                class="w-3.5 h-3.5"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6 2h12l4 4v14a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M8 6h2v4H8zm4 0h2v4h-2zm4 0h2v4h-2z"
-                />
+            <span class="text-[11px] sm:text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate">Total de chips</span>
+            <div class="bg-[#10B981]/10 text-[#10B981] p-1.5 rounded-lg border border-[#10B981]/20 shrink-0 ml-2">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 2h12l4 4v14a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 6h2v4H8zm4 0h2v4h-2zm4 0h2v4h-2z"/>
               </svg>
             </div>
           </div>
+  <!-- fim Card de Total de Chips--> 
+          
+  <!-- Card de Total de Chips -->
           <div>
-            <span class="text-xl font-bold text-white">{{
-              stats.totalDevices
-            }}</span>
+            <span class="text-xl font-bold text-white">{{ stats.totalDevices}}</span>
             <span class="text-[10px] text-slate-500 ml-1.5">chips</span>
           </div>
+  <!-- fim Card de Total de Chips -->
         </div>
-
-        <div
-          class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-3 sm:p-4 shadow-sm min-w-0"
-        >
+        
+  <!-- Card de Chips com Sessões -->
+        <div class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-3 sm:p-4 shadow-sm min-w-0">
           <div class="flex items-center justify-between mb-2">
             <div>
-              <span
-                class="text-[11px] sm:text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate block"
-                >Chips c/ Sessões</span
-              >
-              <span
-                v-if="formatPeriod(state.startDate, state.endDate)"
-                class="text-[9px] text-slate-500 mt-0.5 block"
-              >
+              <span class="text-[11px] sm:text-[10px] font-semibold text-slate-400 uppercase tracking-wider truncate block">Chips c/ Sessões</span>
+              <span v-if="formatPeriod(state.startDate, state.endDate)" class="text-[9px] text-slate-500 mt-0.5 block">
                 {{ formatPeriod(state.startDate, state.endDate) }}
               </span>
             </div>
-            <div
-              class="bg-[#3B82F6]/10 text-[#3B82F6] p-1.5 rounded-lg border border-[#3B82F6]/20 shrink-0 ml-2"
-            >
-              <svg
-                class="w-3.5 h-3.5"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6 2h12l4 4v14a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M8 6h2v4H8zm4 0h2v4h-2zm4 0h2v4h-2z"
-                />
+            <div class="bg-[#3B82F6]/10 text-[#3B82F6] p-1.5 rounded-lg border border-[#3B82F6]/20 shrink-0 ml-2">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 2h12l4 4v14a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 6h2v4H8zm4 0h2v4h-2zm4 0h2v4h-2z"/>
               </svg>
             </div>
           </div>
@@ -133,142 +78,61 @@
             <span class="text-[10px] text-slate-500 ml-1.5">Sessões</span>
           </div>
         </div>
-
-        <div
-          class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-3 sm:p-4 shadow-sm min-w-0"
-        >
+  <!-- fim Card de Chips com Sessões -->
+<!-- Card de Consumo Total -->
+        <div class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-3 sm:p-4 shadow-sm min-w-0">
           <div class="flex items-center justify-between mb-2">
             <div>
-              <span
-                class="text-[10px] sm:text-[9px] font-semibold text-slate-400 uppercase tracking-wider truncate block"
-                >Consumo Total</span
-              >
-              <span
-                v-if="formatPeriod(state.startDate, state.endDate)"
-                class="text-[9px] text-slate-500 mt-0.5 block"
-              >
-                {{ formatPeriod(state.startDate, state.endDate) }}
-              </span>
+              <span class="text-[10px] sm:text-[9px] font-semibold text-slate-400 uppercase tracking-wider truncate block">Consumo Total</span>
+              <span v-if="formatPeriod(state.startDate, state.endDate)" class="text-[9px] text-slate-500 mt-0.5 block">{{ formatPeriod(state.startDate, state.endDate) }}</span>
             </div>
-            <div
-              class="bg-[#F59E0B]/10 text-[#F59E0B] p-1.5 rounded-lg border border-[#F59E0B]/20 shrink-0 ml-2"
-            >
-              <svg
-                class="w-3.5 h-3.5"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                />
+            <div class="bg-[#F59E0B]/10 text-[#F59E0B] p-1.5 rounded-lg border border-[#F59E0B]/20 shrink-0 ml-2">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
               </svg>
             </div>
           </div>
           <div>
-            <span class="text-xl font-bold text-white">{{
-              stats.totalRealUsage
-            }}</span>
-            <span class="text-[10px] text-slate-500 ml-1.5">{{
-              stats.uom
-            }}</span>
+            <span class="text-xl font-bold text-white">{{ stats.totalRealUsage }}</span>
+            <span class="text-[10px] text-slate-500 ml-1.5">{{ stats.uom}}</span>
           </div>
         </div>
+<!-- fim Card de Consumo Total -->
       </section>
-
-      <section
-        class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-5 shadow-sm space-y-4"
-      >
+<!-- fim Cards de infos dos chips -->
+      
+<!-- Card Consumo Mensal -->
+      <section class="bg-[#0D1321] border border-[#1E293B]/40 rounded-2xl p-5 shadow-sm space-y-4">
+  <!-- Header Consumo Mensal -->
         <div class="flex items-center justify-between mb-6">
-          <h4
-            class="text-xs sm:text-[7px] font-semibold text-white uppercase tracking-wider"
-            >Consumo Mensal</h4
-          >
-          <span
-            v-if="formatPeriod(state.startDate, state.endDate)"
-            class="text-[10px] text-slate-500"
-          >
-            {{ formatPeriod(state.startDate, state.endDate) }}
-          </span>
-          <span v-else class="text-[10px] text-slate-500"
-            >últimos 12 meses</span
-          >
+          <h4 class="text-xs sm:text-[7px] font-semibold text-white uppercase tracking-wider">Consumo Mensal</h4>
+          <span v-if="formatPeriod(state.startDate, state.endDate)" class="text-[10px] text-slate-500">{{ formatPeriod(state.startDate, state.endDate) }}</span>
+          <span v-else class="text-[10px] text-slate-500">últimos 12 meses</span>
         </div>
-
+  <!-- fim Header Consumo Mensal -->
+  <!-- Chart Consumo Mensal -->
         <div v-if="chartLoading" class="h-52 flex items-center justify-center">
-          <div
-            class="w-6 h-6 border-2 border-[#10B981] border-t-transparent rounded-full animate-spin"
-          />
+          <div class="w-6 h-6 border-2 border-[#10B981] border-t-transparent rounded-full animate-spin"/>
         </div>
 
         <div v-else-if="monthlyUsage.length" class="relative">
-          <svg
-            class="w-full"
-            viewBox="0 0 600 240"
-            preserveAspectRatio="xMidYMid meet"
-          >
+          <svg class="w-full" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid meet">
             <defs>
               <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#10B981" />
                 <stop offset="100%" stop-color="#059669" />
               </linearGradient>
             </defs>
-
-            <line
-              x1="40"
-              y1="200"
-              x2="580"
-              y2="200"
-              stroke="#334155"
-              stroke-width="1"
-            />
-
-            <line
-              x1="40"
-              y1="10"
-              x2="40"
-              y2="200"
-              stroke="#334155"
-              stroke-width="1"
-            />
-
-            <rect
-              v-for="(d, i) in monthlyUsage"
-              :key="i"
-              :x="barX(i)"
-              :y="barY(d.total)"
-              :width="barW"
-              :height="200 - barY(d.total)"
-              rx="4"
-              fill="url(#barGrad)"
-            />
-
-            <text
-              v-for="(d, i) in monthlyUsage"
-              :key="'l' + i"
-              :x="barX(i) + barW / 2"
-              y="218"
-              text-anchor="middle"
-              class="text-[9px] fill-slate-400"
-              font-size="9"
-            >
-              {{ monthLabel(d.month) }}
+            <line x1="40" y1="200" x2="580" y2="200" stroke="#334155" stroke-width="1"/>
+            <line x1="40" y1="10" x2="40" y2="200" stroke="#334155" stroke-width="1"/>
+            <rect v-for="(d, i) in monthlyUsage" :key="i" :x="barX(i)" :y="barY(d.total)" :width="barW" :height="200 - barY(d.total)" rx="4" fill="url(#barGrad)"/>
+            <text v-for="(d, i) in monthlyUsage" :key="'l' + i" :x="barX(i) + barW / 2" y="218" text-anchor="middle" class="text-[9px] fill-slate-400" font-size="9"
+              >{{ monthLabel(d.month) }}
             </text>
-
-            <text
-              v-for="(d, i) in monthlyUsage"
-              :key="'v' + i"
-              :x="barX(i) + barW / 2"
-              :y="barY(d.total) - 4"
-              text-anchor="middle"
-              class="text-[5px] fill-white"
+            <text v-for="(d, i) in monthlyUsage" :key="'v' + i" :x="barX(i) + barW / 2" :y="barY(d.total) - 4" text-anchor="middle" class="text-[5px] fill-white"
               font-size="5"
               font-weight="600"
-            >
-              {{ formatNumber(d.total) }}
+            >{{ formatNumber(d.total) }}
             </text>
           </svg>
         </div>
@@ -276,7 +140,9 @@
         <div v-else class="h-52 flex items-center justify-center">
           <p class="text-xs text-slate-600">Nenhum dado de uso mensal</p>
         </div>
+  <!-- fim Chart Consumo Mensal -->
       </section>
+<!-- fim Card Consumo Mensal -->
     </template>
   </main>
 </template>
@@ -293,7 +159,6 @@ const {
   state,
   buildDeviceParams,
   buildSessionParams,
-  clearDates,
   setDefaultDates
 } = useDashboardFilter()
 
