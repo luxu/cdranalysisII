@@ -205,20 +205,29 @@ const uomLabel = computed(() => {
 })
 
 async function fetchThings(thingId = null) {
+  const params = buildBaseParams()
+  if (thingId) params.device__thing = thingId
+  const [clientes, devices] = await Promise.all([
+    sessionService.summaryByThing(params),
+    sessionService.topDevices(params)
+  ])
+  things.value = clientes
+  topDevices.value = devices
+  await fetchUomCounts(thingId ? { device__thing: thingId } : {})
+}
+
+function buildBaseParams() {
   const params = {}
   if (state.startDate) params.start_date = state.startDate
   if (state.endDate) params.end_date = state.endDate
   if (state.realusageMin) params.realusage_min = state.realusageMin
   if (state.realusageMax) params.realusage_max = state.realusageMax
-  if (thingId) params.device__thing = thingId
-  const [clientes, devices, uomCounts] = await Promise.all([
-    sessionService.summaryByThing(params),
-    sessionService.topDevices(params),
-    sessionService.countByUom(params)
-  ])
-  things.value = clientes
-  topDevices.value = devices
-  sessionCountsByUom.value = uomCounts
+  return params
+}
+
+async function fetchUomCounts(extraParams = {}) {
+  const params = { ...buildBaseParams(), ...extraParams }
+  sessionCountsByUom.value = await sessionService.countByUom(params)
 }
 
 function devicePercent(bytes) {
@@ -291,6 +300,7 @@ function selectDevice(device) {
   selectedDevice.value = device
   selectedThing.value = null
   sessionPagination.value.page = 1
+  fetchUomCounts({ device: device.device_id })
   fetchSessions({
     pagination: { ...sessionPagination.value, page: 1 }
   })
@@ -301,6 +311,9 @@ watch(
   () => {
     const thingId = selectedThing.value?.id || null
     fetchThings(thingId)
+    if (selectedDevice.value) {
+      fetchUomCounts({ device: selectedDevice.value.device_id })
+    }
     if (selectedThing.value || selectedDevice.value) {
       sessionPagination.value.page = 1
       fetchSessions({
@@ -315,6 +328,9 @@ watch(
   () => {
     const thingId = selectedThing.value?.id || null
     fetchThings(thingId)
+    if (selectedDevice.value) {
+      fetchUomCounts({ device: selectedDevice.value.device_id })
+    }
     if (selectedThing.value || selectedDevice.value) {
       sessionPagination.value.page = 1
       fetchSessions({
